@@ -1,27 +1,51 @@
 package com.alinso.myapp.dto;
 
 import com.alinso.myapp.entity.enums.Gender;
+import org.springframework.stereotype.Component;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.validation.constraints.*;
+
+@Component
 public class UserDto {
+
+    @NotNull
     private Long id;
 
+    @NotBlank(message = "İsim boş olamaz")
     private String name;
 
+    @NotBlank(message = "Soyisim boş olamaz")
     private String surname;
 
+    @Email(message="Geçerli bir email adresi giriniz")
+    @NotBlank(message="Email adresi boş olamaz")
     private String email;
 
-    private String about;
+    @NotNull(message="Telefon boş olamaz")
+    private String phone;
 
+
+    private String about="";
+
+    @NotNull(message="Cinsiyet Seçiniz")
+    @Enumerated(EnumType.ORDINAL)
     private Gender gender;
 
-    private String motivation;
+    private String motivation="";
 
+    @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
 
-    private Double rate;
+    @NotNull
+    @Min(1)
+    @Max(5)
+    private Double rate=1.0;
 
-    private Integer eventCount;
+    @NotNull
+    private Integer eventCount=0;
+
 
     public Long getId() {
         return id;
@@ -101,5 +125,13 @@ public class UserDto {
 
     public void setEventCount(Integer eventCount) {
         this.eventCount = eventCount;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

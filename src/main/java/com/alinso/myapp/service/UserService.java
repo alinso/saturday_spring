@@ -23,7 +23,6 @@ public class UserService {
 
 
     public User register(User newUser) {
-        try {
 //            newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
             //TODO: password will be hashed
 
@@ -31,9 +30,6 @@ public class UserService {
             newUser.setConfirmPassword("");
             return userRepository.save(newUser);
 
-        } catch (Exception e) {
-            throw new UsernameAlreadyExistsException("Username '" + newUser.getEmail() + "' already exists");
-        }
     }
 
 
@@ -57,6 +53,26 @@ public class UserService {
             return userDto;
         } catch (Exception e) {
             throw new UserNotFoundException("user not found id : " + id);
+        }
+    }
+
+    public UserDto findByPhone(Integer phone) {
+        try {
+            User user = userRepository.findByPhone(phone).get();
+            UserDto userDto = modelMapper.map(user, UserDto.class);
+            return userDto;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public UserDto findByEmail(String email) {
+        try {
+            User user = userRepository.findByEmail(email).get();
+            UserDto userDto = modelMapper.map(user, UserDto.class);
+            return userDto;
+        } catch (Exception e) {
+            return null;
         }
     }
 

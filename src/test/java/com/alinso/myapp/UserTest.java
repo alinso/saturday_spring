@@ -131,6 +131,8 @@ public class UserTest {
                 .andExpect(content().string(containsString("en az 6 karakter")));
     }
 
+
+
     @Test
     public void crud() throws Exception {
 
@@ -166,8 +168,33 @@ public class UserTest {
         User userInDb = userRepository.findById(user1.getId()).get();
         Assert.isTrue(userInDb.getEmail().equals(user1.getEmail()) && userInDb.getName().equals(user1.getName()));
 
-        //update
 
+        //try to update with empty values
+        Map<String, String> userDtoForValidationCheck = new HashMap<>();
+        userDtoForValidationCheck.put("id", String.valueOf(userInDb.getId()));
+        userDtoForValidationCheck.put("name", "");
+        userDtoForValidationCheck.put("surname", "");
+        userDtoForValidationCheck.put("gender", "FEMALE");
+        userDtoForValidationCheck.put("referenceCode", "");
+        userDtoForValidationCheck.put("email", "");
+        userDtoForValidationCheck.put("about", "asdasd@asd.com");
+        userDtoForValidationCheck.put("rate", "0");
+        userDtoForValidationCheck.put("eventcount", "5");
+
+        JSONObject jsonObjectUpdateForValidation = new JSONObject(userDtoForValidationCheck);
+
+         mockMvc.perform(MockMvcRequestBuilders.post("/user/update")
+                .content(jsonObjectUpdateForValidation.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("İsim boş olamaz")))
+                .andExpect(content().string(containsString("Soyisim boş olamaz")))
+                 .andExpect(content().string(containsString("Email adresi boş olamaz")))
+                .andExpect(content().string(containsString("Referansınız olmadan kayıt olamazsınız")));
+
+
+        //update
         Map<String, String> userDto = new HashMap<>();
         userDto.put("id", String.valueOf(userInDb.getId()));
         userDto.put("name", "nameupdated");
@@ -177,7 +204,7 @@ public class UserTest {
         userDto.put("email", "asdasd@asd.com");
         userDto.put("about", "asdasd@asd.com");
         userDto.put("rate", "3.0");
-        userDto.put("eventcount", "5");
+        userDto.put("eventCount", "5");
 
         JSONObject jsonObjectUpdate = new JSONObject(userDto);
 

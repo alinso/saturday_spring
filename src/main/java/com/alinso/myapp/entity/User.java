@@ -26,6 +26,10 @@ public class User extends BaseEntity {
     @NotBlank(message="Email adresi boş olamaz")
     private String email;
 
+    @Column
+    @NotNull(message="Telefon boş olamaz")
+    private Integer phone;
+
     @NotBlank(message = "Şifre boş olamaz")
     private String password;
 
@@ -140,5 +144,13 @@ public class User extends BaseEntity {
 
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
+    }
+
+    public Integer getPhone() {
+        return phone;
+    }
+
+    public void setPhone(Integer phone) {
+        this.phone = phone;
     }
 }

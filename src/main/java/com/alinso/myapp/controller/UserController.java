@@ -55,7 +55,10 @@ public class UserController {
 
 
     @PostMapping("/update")
-    public ResponseEntity<?> update(@Valid @RequestBody UserDto userDto){
+    public ResponseEntity<?> update(@Valid @RequestBody UserDto userDto,BindingResult result){
+        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
+        if(errorMap != null)return errorMap;
+
         UserDto newUserDto =  userService.update(userDto);
 
         return new ResponseEntity<UserDto>(newUserDto, HttpStatus.ACCEPTED);
