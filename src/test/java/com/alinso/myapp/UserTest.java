@@ -48,6 +48,7 @@ public class UserTest {
         user.put("confirmPassword","123123");
         user.put("referenceCode","");
         user.put("email","");
+        user.put("phone","");
 
         JSONObject jsonObject = new JSONObject(user);
 
@@ -59,7 +60,8 @@ public class UserTest {
                 .andExpect(content().string(containsString("İsim boş olamaz")))
                 .andExpect(content().string(containsString("Soyisim boş olamaz")))
                 .andExpect(content().string(containsString("Email adresi boş olamaz")))
-                .andExpect(content().string(containsString("Referansınız olmadan")));
+                .andExpect(content().string(containsString("Referansınız olmadan")))
+                .andExpect(content().string(containsString("Telefon boş olamaz")));
     }
 
 
@@ -71,6 +73,7 @@ public class UserTest {
         user.put("surname","ali1");
         user.put("gender","MALE");
         user.put("password","123123");
+        user.put("phone","123123");
         user.put("confirmPassword","123123");
         user.put("referenceCode","asdf");
         user.put("email","asdasd");
@@ -93,6 +96,7 @@ public class UserTest {
         user.put("name","ali");
         user.put("surname","ali1");
         user.put("gender","MALE");
+        user.put("phone","123456");
         user.put("password","123123");
         user.put("confirmPassword","123123asd");
         user.put("referenceCode","asdf");
@@ -117,6 +121,7 @@ public class UserTest {
         user.put("surname","ali1");
         user.put("gender","MALE");
         user.put("password","123");
+        user.put("phone","123456");
         user.put("confirmPassword","123");
         user.put("referenceCode","asdf");
         user.put("email","asdasd@asd.com");
@@ -147,6 +152,7 @@ public class UserTest {
         user.put("name", "ali");
         user.put("surname", "ali1");
         user.put("gender", "MALE");
+        user.put("phone", "1234567890");
         user.put("password", "123456");
         user.put("confirmPassword", "123456");
         user.put("referenceCode", "asdf");
@@ -174,6 +180,7 @@ public class UserTest {
         userDtoForValidationCheck.put("id", String.valueOf(userInDb.getId()));
         userDtoForValidationCheck.put("name", "");
         userDtoForValidationCheck.put("surname", "");
+        userDtoForValidationCheck.put("phone", "");
         userDtoForValidationCheck.put("gender", "FEMALE");
         userDtoForValidationCheck.put("referenceCode", "");
         userDtoForValidationCheck.put("email", "");
@@ -202,6 +209,7 @@ public class UserTest {
         userDto.put("gender", "FEMALE");
         userDto.put("referenceCode", "asdf");
         userDto.put("email", "asdasd@asd.com");
+        userDto.put("phone", "1234567890");
         userDto.put("about", "asdasd@asd.com");
         userDto.put("rate", "3.0");
         userDto.put("eventCount", "5");
@@ -241,6 +249,7 @@ public class UserTest {
         userDto.put("gender", "FEMALE");
         userDto.put("referenceCode", "asdf");
         userDto.put("email", "asdasd@asd.com");
+        userDto.put("phone", "123456");
         userDto.put("about", "asdasd@asd.com");
         userDto.put("rate", "3.0");
         userDto.put("eventcount", "5");
@@ -259,7 +268,6 @@ public class UserTest {
     @Test
     public void isNonExistUserCanBeDeleted() throws Exception {
 
-
         mockMvc.perform(MockMvcRequestBuilders.get("/user/delete/0")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -268,4 +276,94 @@ public class UserTest {
                 .andReturn();
     }
 
+
+
+    @Test
+    public void isUniqueEmailValidationWorks() throws Exception{
+        Random random = new Random();
+        Integer first = random.nextInt(99999);
+        Integer second = random.nextInt(99999);
+        Integer third = random.nextInt(99999);
+        String email = "mail" + first.toString() + second.toString() + "@mail" + third.toString() + ".com";
+
+        Map<String, String> user = new HashMap<>();
+        user.put("name", "ali");
+        user.put("surname", "ali1");
+        user.put("gender", "MALE");
+        user.put("phone", "123456791");
+        user.put("password", "123456");
+        user.put("confirmPassword", "123456");
+        user.put("referenceCode", "asdf");
+        user.put("email", email);
+
+        JSONObject jsonObject = new JSONObject(user);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/user/register")
+                .content(jsonObject.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andReturn();
+
+
+
+         mockMvc.perform(MockMvcRequestBuilders.post("/user/register")
+                .content(jsonObject.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                 .andExpect(content().string(containsString("Bu email adresi ile")))
+                .andReturn();
+
+         User u = userRepository.findByEmail(email).get();
+         userRepository.delete(u);
+
+    }
+
+    @Test
+    public void isUniquePhonVealidationWorks() throws Exception{
+        Random random = new Random();
+        Integer first = random.nextInt(99999);
+        Integer second = random.nextInt(99999);
+        Integer third = random.nextInt(99999);
+        String email = "mail" + first.toString() + second.toString() + "@mail" + third.toString() + ".com";
+
+        Map<String, String> user = new HashMap<>();
+        user.put("name", "ali");
+        user.put("surname", "ali1");
+        user.put("gender", "MALE");
+        user.put("phone", "123456791");
+        user.put("password", "123456");
+        user.put("confirmPassword", "123456");
+        user.put("referenceCode", "asdf");
+        user.put("email", email);
+
+        JSONObject jsonObject = new JSONObject(user);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/user/register")
+                .content(jsonObject.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andReturn();
+
+
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/register")
+                .content(jsonObject.toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsString("Bu telefon numarası ile")))
+                .andReturn();
+
+
+        User u = userRepository.findByEmail(email).get();
+        userRepository.delete(u);
+
+    }
+
 }
+
+
+
+
+

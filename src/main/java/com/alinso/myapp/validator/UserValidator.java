@@ -36,13 +36,13 @@ public class UserValidator implements Validator {
         UserDto userDtoInDbPhone  = userService.findByPhone(user.getPhone());
 
         if(userDtoInDbPhone!=null){
-            errors.rejectValue("phoneNotUnique","Match", "Bu telefon numarası ile kayıt olunmuş");
+            errors.rejectValue("phone","Match", "Bu telefon numarası ile kayıt olunmuş");
         }
 
         UserDto userDtoInDbEmail  = userService.findByEmail(user.getEmail());
 
         if(userDtoInDbEmail!=null){
-            errors.rejectValue("phoneNotUnique","Match", "Bu email ile kayıt olunmuş");
+            errors.rejectValue("email","Match", "Bu email adresi ile daha önce kayıt olunmuş");
         }
 
 
