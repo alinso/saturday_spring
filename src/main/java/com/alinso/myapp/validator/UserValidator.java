@@ -2,6 +2,7 @@ package com.alinso.myapp.validator;
 
 import com.alinso.myapp.dto.UserDto;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,10 @@ public class UserValidator implements Validator {
 
         if(userDtoInDbEmail!=null){
             errors.rejectValue("email","Match", "Bu email adresi ile daha önce kayıt olunmuş");
+        }
+
+        if(user.getGender()== Gender.UNSELECTED){
+            errors.rejectValue("gender","Match", "Cinsiyet Seçiniz");
         }
 
 
