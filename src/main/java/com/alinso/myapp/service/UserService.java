@@ -3,7 +3,6 @@ package com.alinso.myapp.service;
 import com.alinso.myapp.dto.UserDto;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserNotFoundException;
-import com.alinso.myapp.exception.UsernameAlreadyExistsException;
 import com.alinso.myapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

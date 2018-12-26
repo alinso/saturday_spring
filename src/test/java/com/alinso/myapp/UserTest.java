@@ -1,7 +1,6 @@
 package com.alinso.myapp;
 
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
