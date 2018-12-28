@@ -10,7 +10,7 @@ public class Photo extends BaseEntity{
     @NotNull
     private String fileName;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.MERGE,fetch = FetchType.LAZY)
     private User user;
 
     public String getFileName() {

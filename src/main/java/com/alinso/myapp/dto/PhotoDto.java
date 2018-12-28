@@ -1,7 +1,7 @@
 package com.alinso.myapp.dto;
 import org.springframework.web.multipart.MultipartFile;
 
-public class ProfilePicDto {
+public class PhotoDto {
 
     MultipartFile file;
 

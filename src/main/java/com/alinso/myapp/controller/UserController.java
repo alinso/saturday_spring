@@ -1,7 +1,7 @@
 package com.alinso.myapp.controller;
 
 import com.alinso.myapp.dto.ChangePasswordDto;
-import com.alinso.myapp.dto.ProfilePicDto;
+import com.alinso.myapp.dto.PhotoDto;
 import com.alinso.myapp.dto.UserDto;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.security.JwtTokenProvider;
@@ -124,14 +124,14 @@ public class UserController {
 
 
     @PostMapping("/updateProfilePic")
-    public ResponseEntity<?> changeProfilePic( ProfilePicDto profilePicDto, BindingResult  result){
+    public ResponseEntity<?> changeProfilePic(PhotoDto photoDto, BindingResult  result){
 
-        profilePicValidator.validate(profilePicDto,result);
+        profilePicValidator.validate(photoDto,result);
 
         ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
         if(errorMap != null)return errorMap;
 
-        String picName = userService.updateProfilePic(profilePicDto);
+        String picName = userService.updateProfilePic(photoDto);
         return new ResponseEntity<String>(picName, HttpStatus.ACCEPTED);
     }
 

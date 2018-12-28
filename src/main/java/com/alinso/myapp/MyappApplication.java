@@ -17,6 +17,15 @@ public class MyappApplication  implements WebMvcConfigurer {
         SpringApplication.run(MyappApplication.class, args);
     }
 
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedMethods("POST","GET")
+        .allowedOrigins("http://localhost:3000");
+    }
+
+
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
@@ -26,12 +35,6 @@ public class MyappApplication  implements WebMvcConfigurer {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**");
     }
 
 

@@ -1,28 +1,26 @@
 package com.alinso.myapp.validator;
 
 
-import com.alinso.myapp.dto.ProfilePicDto;
+import com.alinso.myapp.dto.PhotoDto;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
 
 @Component
 public class ProfilePicValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return ProfilePicDto.class.isAssignableFrom(clazz);
+        return PhotoDto.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        ProfilePicDto profilePicDto = (ProfilePicDto) target;
+        PhotoDto photoDto = (PhotoDto) target;
 
 
-        MultipartFile file = profilePicDto.getFile();
+        MultipartFile file = photoDto.getFile();
 
         if (file != null && file.isEmpty()){
             errors.rejectValue("file", "Match","Dosya Seçiniz");

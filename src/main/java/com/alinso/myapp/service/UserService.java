@@ -1,7 +1,7 @@
 package com.alinso.myapp.service;
 
 import com.alinso.myapp.dto.ChangePasswordDto;
-import com.alinso.myapp.dto.ProfilePicDto;
+import com.alinso.myapp.dto.PhotoDto;
 import com.alinso.myapp.dto.UserDto;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserNotFoundException;
@@ -96,16 +96,16 @@ public class UserService {
         }
     }
 
-    public String updateProfilePic(ProfilePicDto profilePicDto){
+    public String updateProfilePic(PhotoDto photoDto){
 
-       String extension =  FilenameUtils.getExtension(profilePicDto.getFile().getOriginalFilename());
+       String extension =  FilenameUtils.getExtension(photoDto.getFile().getOriginalFilename());
        String newName  = fileStorageService.makeFileName()+"."+extension;
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //save new file and remove old one
         fileStorageService.deleteFile(profilPicUploadPath+user.getProfilePicName());
-        fileStorageService.storeFile(profilePicDto.getFile(), profilPicUploadPath,newName);
+        fileStorageService.storeFile(photoDto.getFile(), profilPicUploadPath,newName);
 
         //update database
         user.setProfilePicName(newName);
