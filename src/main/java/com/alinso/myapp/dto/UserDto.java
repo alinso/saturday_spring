@@ -6,12 +6,15 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
+import java.util.Date;
 
 @Component
 public class UserDto {
 
     @NotNull
     private Long id;
+
+    private String profilePicUrl;
 
     @NotBlank(message = "İsim boş olamaz")
     private String name;
@@ -28,6 +31,8 @@ public class UserDto {
 
 
     private String about="";
+
+    private Date birthDate;
 
     @NotNull(message="Cinsiyet Seçiniz")
     @Enumerated(EnumType.ORDINAL)
@@ -133,5 +138,21 @@ public class UserDto {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getProfilePicUrl() {
+        return profilePicUrl;
+    }
+
+    public void setProfilePicUrl(String profilePicUrl) {
+        this.profilePicUrl = profilePicUrl;
     }
 }

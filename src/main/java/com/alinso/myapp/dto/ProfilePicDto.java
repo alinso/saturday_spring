@@ -1,0 +1,15 @@
+package com.alinso.myapp.dto;
+import org.springframework.web.multipart.MultipartFile;
+
+public class ProfilePicDto {
+
+    MultipartFile file;
+
+    public MultipartFile getFile() {
+        return file;
+    }
+
+    public void setFile(MultipartFile file) {
+        this.file = file;
+    }
+}

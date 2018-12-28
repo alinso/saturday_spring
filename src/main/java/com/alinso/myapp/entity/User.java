@@ -42,6 +42,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String about="";
 
+
+
+    @Column
+    private String profilePicName="";
+
     @Column
     @Enumerated(EnumType.ORDINAL)
     @NotNull(message="Cinsiyet Seçiniz")
@@ -190,5 +195,13 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public String getProfilePicName() {
+        return profilePicName;
+    }
+
+    public void setProfilePicName(String profilePicName) {
+        this.profilePicName = profilePicName;
     }
 }
