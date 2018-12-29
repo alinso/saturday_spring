@@ -36,9 +36,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+
+    @Autowired
+    private CustomAuthenticationProvider authProvider;
+
+
+
     @Override
     protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(customUserDetailsService).passwordEncoder(bCryptPasswordEncoder);
+        authenticationManagerBuilder
+                .authenticationProvider(authProvider)
+                .userDetailsService(customUserDetailsService)
+                .passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Override
@@ -72,6 +81,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ).permitAll()
                 .antMatchers(SecurityConstants.SIGN_UP_URL).permitAll()
                 .antMatchers(SecurityConstants.LOGIN_URL).permitAll()
+                .antMatchers(SecurityConstants.LOGIN_URL).permitAll()
+                .antMatchers("/photo/album/**").permitAll()
+                .antMatchers("/user/verifyMail/**").permitAll()
+                .antMatchers("/user/search/**").permitAll()
+
+
+
                 .antMatchers(SecurityConstants.H2_URL).permitAll()
                 .anyRequest().authenticated();
                 http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

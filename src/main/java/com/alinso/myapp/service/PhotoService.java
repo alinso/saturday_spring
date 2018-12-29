@@ -2,8 +2,10 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.Photo;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.file.FileStorageService;
 import com.alinso.myapp.repository.PhotoRepository;
+import com.alinso.myapp.repository.UserRepository;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,12 +25,18 @@ public class PhotoService {
     @Autowired
     FileStorageService fileStorageService;
 
+    @Autowired
+    UserRepository userRepository;
+
     @Value("${upload.path}")
     private String fileUploadPath;
 
-    public void savePhotos(MultipartFile[] multipartPhotos) {
+
+
+    public List<String> savePhotos(MultipartFile[] multipartPhotos) {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<String> photoNames = new ArrayList<>();
 
         for (MultipartFile file : multipartPhotos) {
 
@@ -37,6 +45,7 @@ public class PhotoService {
             String newName = fileStorageService.makeFileName()+"."+extension;
 
             fileStorageService.storeFile(file, fileUploadPath, newName);
+            photoNames.add(newName);
 
             //save to the database
             Photo photo = new Photo();
@@ -46,7 +55,29 @@ public class PhotoService {
 
         }
 
-
+        return photoNames;
     }
+
+    public List<Photo> findByUserId(Long id){
+        User user  =userRepository.findById(id).get();
+        return photoRepository.findByUser(user);
+    }
+
+
+    public void deletePhoto(String photoName){
+        Photo photo = photoRepository.findByFileName(photoName).get();
+
+        User loggedUser  =(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(loggedUser.getId()!=photo.getUser().getId()){
+            throw  new UserWarningException("Bu fotoğrafı silmeye yetkiniz yok");
+        }
+
+        if(photo!=null){
+            fileStorageService.deleteFile(fileUploadPath+photoName);
+            photoRepository.delete(photo);
+        }
+    }
+
+
 }
 

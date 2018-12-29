@@ -14,6 +14,8 @@ import java.util.Collection;
 public class User extends BaseEntity implements UserDetails {
 
 
+    @Column
+    private Boolean enabled=false;
 
     @NotBlank(message = "İsim boş olamaz")
     @Column
@@ -160,7 +162,13 @@ public class User extends BaseEntity implements UserDetails {
     public void setPhone(Integer phone) {
         this.phone = phone;
     }
+    public Boolean getEnabled() {
+        return enabled;
+    }
 
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
 
     //user details methods
 
@@ -194,7 +202,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
     public String getProfilePicName() {

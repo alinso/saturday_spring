@@ -1,0 +1,12 @@
+package com.alinso.myapp.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class UserWarningException extends RuntimeException {
+    public UserWarningException(String message) {
+        super(message);
+    }
+
+}

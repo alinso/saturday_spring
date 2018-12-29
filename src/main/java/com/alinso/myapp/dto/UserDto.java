@@ -14,7 +14,7 @@ public class UserDto {
     @NotNull
     private Long id;
 
-    private String profilePicUrl;
+    private String profilePicName;
 
     @NotBlank(message = "İsim boş olamaz")
     private String name;
@@ -27,7 +27,7 @@ public class UserDto {
     private String email;
 
     @NotNull(message="Telefon boş olamaz")
-    private String phone;
+    private Integer phone;
 
 
     private String about="";
@@ -132,11 +132,11 @@ public class UserDto {
         this.eventCount = eventCount;
     }
 
-    public String getPhone() {
+    public Integer getPhone() {
         return phone;
     }
 
-    public void setPhone(String phone) {
+    public void setPhone(Integer phone) {
         this.phone = phone;
     }
 
@@ -148,11 +148,11 @@ public class UserDto {
         this.birthDate = birthDate;
     }
 
-    public String getProfilePicUrl() {
-        return profilePicUrl;
+    public String getProfilePicName() {
+        return profilePicName;
     }
 
-    public void setProfilePicUrl(String profilePicUrl) {
-        this.profilePicUrl = profilePicUrl;
+    public void setProfilePicName(String profilePicName) {
+        this.profilePicName = profilePicName;
     }
 }

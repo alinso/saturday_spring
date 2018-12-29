@@ -12,6 +12,7 @@ import com.alinso.myapp.service.MapValidationErrorService;
 import com.alinso.myapp.service.UserService;
 import com.alinso.myapp.validator.ChangePasswordValidator;
 import com.alinso.myapp.validator.ProfilePicValidator;
+import com.alinso.myapp.validator.UserUpdateValidator;
 import com.alinso.myapp.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -38,6 +40,10 @@ public class UserController {
 
     @Autowired
     ProfilePicValidator profilePicValidator;
+
+    @Autowired
+    UserUpdateValidator userUpdateValidator;
+
 
     @Autowired
     MapValidationErrorService mapValidationErrorService;
@@ -72,6 +78,12 @@ public class UserController {
         return ResponseEntity.ok(new JWTLoginSucessReponse(true, jwt,user.getName()));
     }
 
+    @GetMapping("/verifyMail/{token}")
+    public ResponseEntity<?> verifyMail(@PathVariable("token") String token){
+        userService.verifyMail(token);
+        return new ResponseEntity<String>("verified",HttpStatus.OK);
+    }
+
 
 
     @PostMapping("/register")
@@ -99,6 +111,13 @@ public class UserController {
 
     @PostMapping("/updateInfo")
     public ResponseEntity<?> update(@Valid @RequestBody UserDto userDto,BindingResult result){
+
+
+        //set logged usre id because of security issues
+        User loggedUser = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        userDto.setId(loggedUser.getId());
+
+        userUpdateValidator.validate(userDto,result);
         ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
         if(errorMap != null)return errorMap;
 
@@ -140,6 +159,12 @@ public class UserController {
         userService.deleteById(id);
 
         return new ResponseEntity<String>("User has been deleted", HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("search/{searchText}")
+    public ResponseEntity<?> search(@PathVariable("searchText") String searchText){
+        List<UserDto> userDtoList =  userService.searchUser(searchText);
+        return  new ResponseEntity<>(userDtoList,HttpStatus.OK);
     }
 
 }

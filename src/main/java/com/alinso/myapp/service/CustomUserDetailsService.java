@@ -1,6 +1,7 @@
 package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,13 +19,17 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username).get();
-        return user;
+        try {
+            User user = userRepository.findByEmail(username).get();
+            return user;
+        } catch (Exception e) {
+            throw new UserWarningException("Kullanıcı adı veya şifre yanlış");
+        }
     }
 
 
-    public User loadUserById(long id){
-        User user  = userRepository.findById(id).get();
+    public User loadUserById(long id) {
+        User user = userRepository.findById(id).get();
         return user;
     }
 }
