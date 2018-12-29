@@ -2,7 +2,9 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.dto.ChangePasswordDto;
 import com.alinso.myapp.dto.PhotoDto;
+import com.alinso.myapp.dto.ResetPasswordDto;
 import com.alinso.myapp.dto.UserDto;
+import com.alinso.myapp.entity.ForgottenPasswordToken;
 import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserNotFoundException;
@@ -16,11 +18,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -40,6 +40,10 @@ public class UserService {
     @Autowired
     MailVerificationTokenService mailVerificationTokenService;
 
+    @Autowired
+    ForgottenPasswordTokenService forgottenPasswordTokenService;
+
+
     @Value("${upload.profile.path}")
     private String profilPicUploadPath;
 
@@ -54,6 +58,16 @@ public class UserService {
         return user;
     }
 
+    public void forgottePasswordSendMail(String email){
+        User user;
+        try {
+            user = userRepository.findByEmail(email).get();
+        }catch (NoSuchElementException e){
+            throw new UserWarningException("Bu E-Posta ile kayıtlı kullanıcı bulunamadı");
+        }
+        String token = forgottenPasswordTokenService.saveToken(user);
+        forgottenPasswordTokenService.sendMail(token,user.getEmail());
+    }
 
     public void verifyMail(String tokenString) {
         MailVerificationToken token = mailVerificationTokenService.findByToken(tokenString);
@@ -64,6 +78,15 @@ public class UserService {
 
         User user = token.getUser();
         user.setEnabled(true);
+        userRepository.save(user);
+    }
+
+    public void resetPassword(ResetPasswordDto resetPasswordDto){
+        ForgottenPasswordToken token =  forgottenPasswordTokenService.findByToken(resetPasswordDto.getToken());
+
+        User user  =token.getUser();
+        user.setPassword(bCryptPasswordEncoder.encode(resetPasswordDto.getPassword()));
+        forgottenPasswordTokenService.delete(token);
         userRepository.save(user);
     }
 

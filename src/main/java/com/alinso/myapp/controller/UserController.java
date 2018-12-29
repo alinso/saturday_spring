@@ -2,6 +2,7 @@ package com.alinso.myapp.controller;
 
 import com.alinso.myapp.dto.ChangePasswordDto;
 import com.alinso.myapp.dto.PhotoDto;
+import com.alinso.myapp.dto.ResetPasswordDto;
 import com.alinso.myapp.dto.UserDto;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.security.JwtTokenProvider;
@@ -10,10 +11,7 @@ import com.alinso.myapp.security.payload.JWTLoginSucessReponse;
 import com.alinso.myapp.security.payload.LoginRequest;
 import com.alinso.myapp.service.MapValidationErrorService;
 import com.alinso.myapp.service.UserService;
-import com.alinso.myapp.validator.ChangePasswordValidator;
-import com.alinso.myapp.validator.ProfilePicValidator;
-import com.alinso.myapp.validator.UserUpdateValidator;
-import com.alinso.myapp.validator.UserValidator;
+import com.alinso.myapp.validator.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +42,6 @@ public class UserController {
     @Autowired
     UserUpdateValidator userUpdateValidator;
 
-
     @Autowired
     MapValidationErrorService mapValidationErrorService;
 
@@ -57,6 +54,8 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private ResetPasswordValidator resetPasswordValidator;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result){
@@ -82,6 +81,24 @@ public class UserController {
     public ResponseEntity<?> verifyMail(@PathVariable("token") String token){
         userService.verifyMail(token);
         return new ResponseEntity<String>("verified",HttpStatus.OK);
+    }
+
+    @GetMapping("forgottenPassword/{mail}")
+    public ResponseEntity<?> sendForgottenPasswordMail(@PathVariable("mail") String mail){
+        userService.forgottePasswordSendMail(mail);
+        return new ResponseEntity<>("mail sent",HttpStatus.OK);
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDto resetPassword, BindingResult result){
+        resetPasswordValidator.validate(resetPassword,result);
+
+        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
+        if(errorMap != null)return errorMap;
+
+        userService.resetPassword(resetPassword);
+        return new ResponseEntity<>("password reset",HttpStatus.OK);
+
     }
 
 

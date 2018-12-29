@@ -8,14 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.UUID;
 
 @Service
 public class MailVerificationTokenService {
-    private static final int EXPIRATION = 60 * 24;
 
     @Autowired
     MailVerificationTokenRepository mailVerificationTokenRepository;
@@ -36,7 +32,7 @@ public class MailVerificationTokenService {
 
 
     public void sendMail(String token,String recipientAddress){
-        String subject = "Registration Confirmation";
+        String subject = "Night Out E-Posta Doğrulama";
         String confirmationUrl = applicationUrl+ "/verifyMail/" + token;
 
         SMTPEmail email = new SMTPEmail();

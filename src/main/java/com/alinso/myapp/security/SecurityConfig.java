@@ -85,8 +85,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/photo/album/**").permitAll()
                 .antMatchers("/user/verifyMail/**").permitAll()
                 .antMatchers("/user/search/**").permitAll()
-
-
+                .antMatchers("/user/forgottenPassword/**").permitAll()
+                .antMatchers("/user/resetPassword/**").permitAll()
 
                 .antMatchers(SecurityConstants.H2_URL).permitAll()
                 .anyRequest().authenticated();

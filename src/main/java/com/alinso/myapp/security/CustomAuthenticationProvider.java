@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -30,14 +31,19 @@ public class CustomAuthenticationProvider
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(name);
 
-        if (userDetails.isEnabled()) {
+        if(!userDetails.isEnabled()){
+            throw new UserWarningException("Lütfen mailinize gelen linki onaylanıyınız");
+        }
+
+
+        if ( BCrypt.checkpw(password, userDetails.getPassword())) {
 
             // use the credentials
             // and authenticate against the third-party system
             return new UsernamePasswordAuthenticationToken(
                     userDetails, password, new ArrayList<>());
         } else {
-            throw new UserWarningException("Lütfen mailinize gelen linki onaylanıyınız");
+            throw new UserWarningException("Kullanıcı adı veya şifre yanlış");
         }
     }
 
