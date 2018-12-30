@@ -6,13 +6,16 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
-import java.util.Date;
 
 @Component
 public class UserDto {
 
     @NotNull
     private Long id;
+
+    @NotBlank(message = "Telefon boş olamaz")
+    private String phone;
+
 
     private String profilePicName;
 
@@ -22,23 +25,22 @@ public class UserDto {
     @NotBlank(message = "Soyisim boş olamaz")
     private String surname;
 
-    @Email(message="Geçerli bir email adresi giriniz")
-    @NotBlank(message="Email adresi boş olamaz")
+    @Email(message = "Geçerli bir email adresi giriniz")
+    @NotBlank(message = "Email adresi boş olamaz")
     private String email;
 
-    @NotNull(message="Telefon boş olamaz")
-    private Integer phone;
 
+    private String about = "";
 
-    private String about="";
+    private String bDateString;
 
-    private Date birthDate;
+    private Integer age;
 
-    @NotNull(message="Cinsiyet Seçiniz")
+    @NotNull(message = "Cinsiyet Seçiniz")
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
 
-    private String motivation="";
+    private String motivation = "";
 
     @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
@@ -46,10 +48,20 @@ public class UserDto {
     @NotNull
     @Min(1)
     @Max(5)
-    private Double rate=1.0;
+    private Double rate = 1.0;
 
     @NotNull
-    private Integer eventCount=0;
+    private Integer eventCount = 0;
+
+//getter setter
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
 
 
     public Long getId() {
@@ -132,21 +144,14 @@ public class UserDto {
         this.eventCount = eventCount;
     }
 
-    public Integer getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(Integer phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
-    public Date getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
-    }
 
     public String getProfilePicName() {
         return profilePicName;
@@ -154,5 +159,13 @@ public class UserDto {
 
     public void setProfilePicName(String profilePicName) {
         this.profilePicName = profilePicName;
+    }
+
+    public String getbDateString() {
+        return bDateString;
+    }
+
+    public void setbDateString(String bDateString) {
+        this.bDateString = bDateString;
     }
 }

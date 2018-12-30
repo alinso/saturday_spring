@@ -82,11 +82,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(SecurityConstants.SIGN_UP_URL).permitAll()
                 .antMatchers(SecurityConstants.LOGIN_URL).permitAll()
                 .antMatchers(SecurityConstants.LOGIN_URL).permitAll()
-                .antMatchers("/photo/album/**").permitAll()
                 .antMatchers("/user/verifyMail/**").permitAll()
                 .antMatchers("/user/search/**").permitAll()
                 .antMatchers("/user/forgottenPassword/**").permitAll()
                 .antMatchers("/user/resetPassword/**").permitAll()
+                .antMatchers("/user/profile/**").permitAll()
 
                 .antMatchers(SecurityConstants.H2_URL).permitAll()
                 .anyRequest().authenticated();

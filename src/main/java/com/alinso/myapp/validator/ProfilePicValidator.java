@@ -1,7 +1,7 @@
 package com.alinso.myapp.validator;
 
 
-import com.alinso.myapp.dto.PhotoDto;
+import com.alinso.myapp.dto.PhotoUploadDto;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -12,28 +12,28 @@ public class ProfilePicValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return PhotoDto.class.isAssignableFrom(clazz);
+        return PhotoUploadDto.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        PhotoDto photoDto = (PhotoDto) target;
+        PhotoUploadDto photoUploadDto = (PhotoUploadDto) target;
 
 
-        MultipartFile file = photoDto.getFile();
+        MultipartFile file = photoUploadDto.getFile();
 
         if (file != null && file.isEmpty()){
-            errors.rejectValue("file", "Match","Dosya Seçiniz");
+            errors.rejectValue("util", "Match","Dosya Seçiniz");
         }
 
         if(!(file.getContentType().toLowerCase().equals("image/jpg")
                 || file.getContentType().toLowerCase().equals("image/jpeg")
                 || file.getContentType().toLowerCase().equals("image/png"))){
-            errors.rejectValue("file", "","Yalnızca jpeg/jpg/png türündeki dosyaları yükleyebilirsiniz");
+            errors.rejectValue("util", "","Yalnızca jpeg/jpg/png türündeki dosyaları yükleyebilirsiniz");
         }
 
         if(file.getSize()>2097152){ //2 MB
-            errors.rejectValue("file","","Max dosya boyutu 2 MB olabilir");
+            errors.rejectValue("util","","Max dosya boyutu 2 MB olabilir");
         }
 
     }

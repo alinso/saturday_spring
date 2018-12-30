@@ -9,13 +9,14 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
+import java.util.Date;
 
 @Entity
 public class User extends BaseEntity implements UserDetails {
 
 
     @Column
-    private Boolean enabled=false;
+    private Boolean enabled = false;
 
     @NotBlank(message = "İsim boş olamaz")
     @Column
@@ -26,13 +27,17 @@ public class User extends BaseEntity implements UserDetails {
     private String surname;
 
     @Column
-    @Email(message="Geçerli bir email adresi giriniz")
-    @NotBlank(message="Email adresi boş olamaz")
+    @Email(message = "Geçerli bir email adresi giriniz")
+    @NotBlank(message = "Email adresi boş olamaz")
     private String email;
 
     @Column
-    @NotNull(message="Telefon boş olamaz")
-    private Integer phone;
+    @NotNull(message = "Telefon boş olamaz")
+    private String phone;
+
+    @Column
+    @Temporal(TemporalType.DATE)
+    private Date birthDate;
 
     @NotBlank(message = "Şifre boş olamaz")
     private String password;
@@ -40,32 +45,29 @@ public class User extends BaseEntity implements UserDetails {
     @Transient
     private String confirmPassword;
 
+    @Column(columnDefinition="TEXT")
+    private String about = "";
 
     @Column
-    private String about="";
-
-
-
-    @Column
-    private String profilePicName="";
+    private String profilePicName = "";
 
     @Column
     @Enumerated(EnumType.ORDINAL)
-    @NotNull(message="Cinsiyet Seçiniz")
+    @NotNull(message = "Cinsiyet Seçiniz")
     private Gender gender;
 
-    @Column
-    private String motivation="";
+    @Column(columnDefinition="TEXT")
+    private String motivation = "";
 
     @Column
     @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
 
     @Column
-    private Double rate=0.0;
+    private Double rate = 0.0;
 
     @Column
-    private Integer eventCount=0;
+    private Integer eventCount = 0;
 
     public Double getRate() {
         return rate;
@@ -155,13 +157,14 @@ public class User extends BaseEntity implements UserDetails {
         this.confirmPassword = confirmPassword;
     }
 
-    public Integer getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(Integer phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
+
     public Boolean getEnabled() {
         return enabled;
     }
@@ -182,7 +185,6 @@ public class User extends BaseEntity implements UserDetails {
     public String getUsername() {
         return email;
     }
-
 
 
     @Override
@@ -211,5 +213,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setProfilePicName(String profilePicName) {
         this.profilePicName = profilePicName;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
     }
 }

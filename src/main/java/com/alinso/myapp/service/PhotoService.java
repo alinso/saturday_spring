@@ -3,7 +3,7 @@ package com.alinso.myapp.service;
 import com.alinso.myapp.entity.Photo;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.file.FileStorageService;
+import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.repository.PhotoRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.apache.commons.io.FilenameUtils;
@@ -23,7 +23,7 @@ public class PhotoService {
     PhotoRepository photoRepository;
 
     @Autowired
-    FileStorageService fileStorageService;
+    FileStorageUtil fileStorageService;
 
     @Autowired
     UserRepository userRepository;
@@ -40,7 +40,7 @@ public class PhotoService {
 
         for (MultipartFile file : multipartPhotos) {
 
-            //store photo file
+            //store photo util
             String extension =  FilenameUtils.getExtension(file.getOriginalFilename());
             String newName = fileStorageService.makeFileName()+"."+extension;
 

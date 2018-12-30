@@ -1,33 +1,25 @@
 package com.alinso.myapp.dto;
 
-import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 public class AlbumDto {
-    private MultipartFile[] files;
-    private String sizeError;
-    private String typeError;
+    private String fullName;
+    private List<String> photoNames;
 
-    public MultipartFile[] getFiles() {
-        return files;
+
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFiles(MultipartFile[] files) {
-        this.files = files;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public String getSizeError() {
-        return sizeError;
+    public List<String> getPhotoNames() {
+        return photoNames;
     }
 
-    public void setSizeError(String sizeError) {
-        this.sizeError = sizeError;
-    }
-
-    public String getTypeError() {
-        return typeError;
-    }
-
-    public void setTypeError(String typeError) {
-        this.typeError = typeError;
+    public void setPhotoNames(List<String> photoNames) {
+        this.photoNames = photoNames;
     }
 }

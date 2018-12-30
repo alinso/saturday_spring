@@ -1,16 +1,17 @@
 package com.alinso.myapp.service;
 
 import com.alinso.myapp.dto.ChangePasswordDto;
-import com.alinso.myapp.dto.PhotoDto;
+import com.alinso.myapp.dto.PhotoUploadDto;
 import com.alinso.myapp.dto.ResetPasswordDto;
 import com.alinso.myapp.dto.UserDto;
 import com.alinso.myapp.entity.ForgottenPasswordToken;
 import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.exception.UserNotFoundException;
+import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.file.FileStorageService;
+import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.repository.UserRepository;
+import com.alinso.myapp.util.UserUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -35,7 +37,7 @@ public class UserService {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    FileStorageService fileStorageService;
+    FileStorageUtil fileStorageService;
 
     @Autowired
     MailVerificationTokenService mailVerificationTokenService;
@@ -58,15 +60,15 @@ public class UserService {
         return user;
     }
 
-    public void forgottePasswordSendMail(String email){
+    public void forgottePasswordSendMail(String email) {
         User user;
         try {
             user = userRepository.findByEmail(email).get();
-        }catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             throw new UserWarningException("Bu E-Posta ile kayıtlı kullanıcı bulunamadı");
         }
         String token = forgottenPasswordTokenService.saveToken(user);
-        forgottenPasswordTokenService.sendMail(token,user.getEmail());
+        forgottenPasswordTokenService.sendMail(token, user.getEmail());
     }
 
     public void verifyMail(String tokenString) {
@@ -81,10 +83,10 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void resetPassword(ResetPasswordDto resetPasswordDto){
-        ForgottenPasswordToken token =  forgottenPasswordTokenService.findByToken(resetPasswordDto.getToken());
+    public void resetPassword(ResetPasswordDto resetPasswordDto) {
+        ForgottenPasswordToken token = forgottenPasswordTokenService.findByToken(resetPasswordDto.getToken());
 
-        User user  =token.getUser();
+        User user = token.getUser();
         user.setPassword(bCryptPasswordEncoder.encode(resetPasswordDto.getPassword()));
         forgottenPasswordTokenService.delete(token);
         userRepository.save(user);
@@ -97,28 +99,46 @@ public class UserService {
         try {
             userInDb = userRepository.findById(user.getId()).get();
         } catch (Exception e) {
-            throw new UserNotFoundException("user not found id : " + userDto.getId());
+            throw new UserWarningException("user not found id : " + userDto.getId());
         }
+
         user.setPassword(userInDb.getPassword());
         user.setProfilePicName(userInDb.getProfilePicName());
         user.setReferenceCode(userInDb.getReferenceCode());
         user.setEnabled(userInDb.getEnabled());
+
+        if (userDto.getbDateString()!=null && !userDto.getbDateString().equals("")) {
+            Date birthDate = null;
+            try {
+                birthDate = new SimpleDateFormat("dd/MM/yyyy").parse(userDto.getbDateString());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            user.setBirthDate(birthDate);
+        }
         userRepository.save(user);
         return userDto;
     }
 
+
     public UserDto findById(Long id) {
         try {
+
             User user = userRepository.findById(id).get();
             UserDto userDto = modelMapper.map(user, UserDto.class);
 
+            if (user.getBirthDate() != null) {
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                String birthDateString = format.format(user.getBirthDate());
+                userDto.setbDateString(birthDateString);
+            }
             return userDto;
         } catch (Exception e) {
-            throw new UserNotFoundException("user not found id : " + id);
+            throw new UserWarningException("user not found id : " + id);
         }
     }
 
-    public UserDto findByPhone(Integer phone) {
+    public UserDto findByPhone(String phone) {
         try {
             User user = userRepository.findByPhone(phone).get();
             UserDto userDto = modelMapper.map(user, UserDto.class);
@@ -143,20 +163,20 @@ public class UserService {
         try {
             userRepository.deleteById(id);
         } catch (Exception e) {
-            throw new UserNotFoundException("user not found id : " + id);
+            throw new UserWarningException("user not found id : " + id);
         }
     }
 
-    public String updateProfilePic(PhotoDto photoDto) {
+    public String updateProfilePic(PhotoUploadDto photoUploadDto) {
 
-        String extension = FilenameUtils.getExtension(photoDto.getFile().getOriginalFilename());
+        String extension = FilenameUtils.getExtension(photoUploadDto.getFile().getOriginalFilename());
         String newName = fileStorageService.makeFileName() + "." + extension;
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        //save new file and remove old one
+        //save new util and remove old one
         fileStorageService.deleteFile(profilPicUploadPath + user.getProfilePicName());
-        fileStorageService.storeFile(photoDto.getFile(), profilPicUploadPath, newName);
+        fileStorageService.storeFile(photoUploadDto.getFile(), profilPicUploadPath, newName);
 
         //update database
         user.setProfilePicName(newName);
@@ -175,14 +195,13 @@ public class UserService {
         return true;
     }
 
-    public List<UserDto> searchUser(String searchText){
+    public List<UserDto> searchUser(String searchText) {
 
-
-         List<User> users=    userRepository.searchUser("%"+searchText+"%");
-
-        List<UserDto> userDtos= new ArrayList<>();
-        for(User user : users){
+        List<User> users = userRepository.searchUser("%" + searchText + "%");
+        List<UserDto> userDtos = new ArrayList<>();
+        for (User user : users) {
             UserDto userDto = modelMapper.map(user, UserDto.class);
+            userDto.setAge(UserUtil.calculateAge(user));
             userDtos.add(userDto);
         }
         return userDtos;

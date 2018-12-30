@@ -1,6 +1,6 @@
-package com.alinso.myapp.file;
+package com.alinso.myapp.util;
 
-import com.alinso.myapp.exception.FileStorageException;
+import com.alinso.myapp.exception.UserWarningException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,12 +14,12 @@ import java.nio.file.StandardCopyOption;
 import java.util.Random;
 
 @Service
-public class FileStorageService {
+public class FileStorageUtil {
 
     private Path fileStorageLocation;
 
     @Autowired
-    public FileStorageService() {
+    public FileStorageUtil() {
     }
 
 
@@ -39,7 +39,7 @@ public class FileStorageService {
         Character c8 = characterArray[rnd.nextInt(33)];
         Character c9 = characterArray[rnd.nextInt(33)];
 
-        String newName = c1.toString() + c2.toString() + c4.toString() + c5.toString() + c6.toString() + c7.toString() + c8.toString() + c9.toString();
+        String newName = c1.toString() + c2.toString() + c4.toString() + c3.toString() + c5.toString() + c6.toString() + c7.toString() + c8.toString() + c9.toString();
         return newName;
     }
 
@@ -51,7 +51,7 @@ public class FileStorageService {
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
         } catch (IOException ex) {
-            throw new FileStorageException("Could not store file " + newName + ". Please try again!", ex);
+            throw new UserWarningException("Could not store util " + newName + ". Please try again!. IO message: " + ex.getMessage());
         }
     }
 

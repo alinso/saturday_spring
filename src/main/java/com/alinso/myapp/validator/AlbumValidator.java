@@ -1,6 +1,6 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.dto.AlbumDto;
+import com.alinso.myapp.dto.MultiPhotoUploadDto;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -11,14 +11,14 @@ public class AlbumValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return AlbumDto.class.isAssignableFrom(clazz);
+        return MultiPhotoUploadDto.class.isAssignableFrom(clazz);
     }
 
 
     @Override
     public void validate(Object o, Errors errors) {
 
-        AlbumDto album = (AlbumDto) o;
+        MultiPhotoUploadDto album = (MultiPhotoUploadDto) o;
 
         for(MultipartFile file:album.getFiles()){
             if(file.getSize()>2097152){ //2 MB
