@@ -1,4 +1,4 @@
-package com.alinso.myapp.dto;
+package com.alinso.myapp.dto.photo;
 
 import java.util.List;
 

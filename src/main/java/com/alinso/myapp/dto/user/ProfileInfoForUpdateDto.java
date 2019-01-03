@@ -1,4 +1,4 @@
-package com.alinso.myapp.dto;
+package com.alinso.myapp.dto.user;
 
 import com.alinso.myapp.entity.enums.Gender;
 import org.springframework.stereotype.Component;
@@ -8,7 +8,7 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
 
 @Component
-public class UserDto {
+public class ProfileInfoForUpdateDto {
 
     @NotNull
     private Long id;
@@ -34,7 +34,6 @@ public class UserDto {
 
     private String bDateString;
 
-    private Integer age;
 
     @NotNull(message = "Cinsiyet Seçiniz")
     @Enumerated(EnumType.ORDINAL)
@@ -54,15 +53,6 @@ public class UserDto {
     private Integer eventCount = 0;
 
 //getter setter
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
 
     public Long getId() {
         return id;

@@ -1,13 +1,10 @@
-package com.alinso.myapp.service;
+package com.alinso.myapp.service.security;
 
-import com.alinso.myapp.dto.ResetPasswordDto;
 import com.alinso.myapp.entity.ForgottenPasswordToken;
-import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.SMTPEmail;
 import com.alinso.myapp.repository.ForgottenPasswordTokenRepository;
-import com.alinso.myapp.repository.MailVerificationTokenRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

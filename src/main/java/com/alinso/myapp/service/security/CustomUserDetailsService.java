@@ -1,4 +1,4 @@
-package com.alinso.myapp.service;
+package com.alinso.myapp.service.security;
 
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserWarningException;

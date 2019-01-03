@@ -11,8 +11,6 @@ import java.util.Optional;
 @Repository
 public interface PhotoRepository extends JpaRepository<Photo,Long> {
 
-    @Override
-    Optional<Photo> findById(Long aLong);
     List<Photo> findByUser(User user);
     Optional<Photo> findByFileName(String fileName);
 

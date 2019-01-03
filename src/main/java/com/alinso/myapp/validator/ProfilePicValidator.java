@@ -1,7 +1,7 @@
 package com.alinso.myapp.validator;
 
 
-import com.alinso.myapp.dto.PhotoUploadDto;
+import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -12,15 +12,15 @@ public class ProfilePicValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return PhotoUploadDto.class.isAssignableFrom(clazz);
+        return SinglePhotoUploadDto.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        PhotoUploadDto photoUploadDto = (PhotoUploadDto) target;
+        SinglePhotoUploadDto singlePhotoUploadDto = (SinglePhotoUploadDto) target;
 
 
-        MultipartFile file = photoUploadDto.getFile();
+        MultipartFile file = singlePhotoUploadDto.getFile();
 
         if (file != null && file.isEmpty()){
             errors.rejectValue("util", "Match","Dosya Seçiniz");

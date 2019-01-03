@@ -1,14 +1,16 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.ChangePasswordDto;
-import com.alinso.myapp.dto.PhotoUploadDto;
-import com.alinso.myapp.dto.ResetPasswordDto;
-import com.alinso.myapp.dto.UserDto;
+import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
+import com.alinso.myapp.dto.security.ChangePasswordDto;
+import com.alinso.myapp.dto.security.ResetPasswordDto;
+import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.ForgottenPasswordToken;
 import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.exception.UserWarningException;
+import com.alinso.myapp.service.security.ForgottenPasswordTokenService;
+import com.alinso.myapp.service.security.MailVerificationTokenService;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.util.UserUtil;
@@ -78,7 +80,7 @@ public class UserService {
             throw new UserWarningException("Geçersiz link");
         }
 
-        User user = token.getUser();
+        User user = userRepository.findById(token.getUser().getId()).get();
         user.setEnabled(true);
         userRepository.save(user);
     }
@@ -86,20 +88,20 @@ public class UserService {
     public void resetPassword(ResetPasswordDto resetPasswordDto) {
         ForgottenPasswordToken token = forgottenPasswordTokenService.findByToken(resetPasswordDto.getToken());
 
-        User user = token.getUser();
+        User user = userRepository.findById(token.getUser().getId()).get();
         user.setPassword(bCryptPasswordEncoder.encode(resetPasswordDto.getPassword()));
         forgottenPasswordTokenService.delete(token);
         userRepository.save(user);
     }
 
 
-    public UserDto update(UserDto userDto) {
-        User user = modelMapper.map(userDto, User.class);
+    public ProfileInfoForUpdateDto update(ProfileInfoForUpdateDto profileInfoForUpdateDto) {
+        User user = modelMapper.map(profileInfoForUpdateDto, User.class);
         User userInDb;
         try {
             userInDb = userRepository.findById(user.getId()).get();
         } catch (Exception e) {
-            throw new UserWarningException("user not found id : " + userDto.getId());
+            throw new UserWarningException("user not found id : " + profileInfoForUpdateDto.getId());
         }
 
         user.setPassword(userInDb.getPassword());
@@ -107,52 +109,68 @@ public class UserService {
         user.setReferenceCode(userInDb.getReferenceCode());
         user.setEnabled(userInDb.getEnabled());
 
-        if (userDto.getbDateString()!=null && !userDto.getbDateString().equals("")) {
+        if (profileInfoForUpdateDto.getbDateString() != null && !profileInfoForUpdateDto.getbDateString().equals("")) {
             Date birthDate = null;
             try {
-                birthDate = new SimpleDateFormat("dd/MM/yyyy").parse(userDto.getbDateString());
+                birthDate = new SimpleDateFormat("dd/MM/yyyy").parse(profileInfoForUpdateDto.getbDateString());
             } catch (ParseException e) {
                 e.printStackTrace();
             }
             user.setBirthDate(birthDate);
         }
         userRepository.save(user);
-        return userDto;
+        return profileInfoForUpdateDto;
+    }
+
+    public ProfileDto getProfileById(Long id) {
+        User user;
+        try {
+             user = userRepository.findById(id).get();
+        } catch (Exception e) {
+            throw new UserWarningException("user not found id : " + id);
+        }
+            ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
+
+            if (user.getBirthDate() != null) {
+                profileDto.setAge(UserUtil.calculateAge(user));
+            }
+            return profileDto;
+
     }
 
 
-    public UserDto findById(Long id) {
+    public ProfileInfoForUpdateDto getMyProfileInfoForUpdate(Long id) {
         try {
 
             User user = userRepository.findById(id).get();
-            UserDto userDto = modelMapper.map(user, UserDto.class);
+            ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
 
             if (user.getBirthDate() != null) {
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 String birthDateString = format.format(user.getBirthDate());
-                userDto.setbDateString(birthDateString);
+                profileInfoForUpdateDto.setbDateString(birthDateString);
             }
-            return userDto;
+            return profileInfoForUpdateDto;
         } catch (Exception e) {
             throw new UserWarningException("user not found id : " + id);
         }
     }
 
-    public UserDto findByPhone(String phone) {
+    public ProfileInfoForUpdateDto findByPhone(String phone) {
         try {
             User user = userRepository.findByPhone(phone).get();
-            UserDto userDto = modelMapper.map(user, UserDto.class);
-            return userDto;
+            ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
+            return profileInfoForUpdateDto;
         } catch (Exception e) {
             return null;
         }
     }
 
-    public UserDto findByEmail(String email) {
+    public ProfileInfoForUpdateDto findByEmail(String email) {
         try {
             User user = userRepository.findByEmail(email).get();
-            UserDto userDto = modelMapper.map(user, UserDto.class);
-            return userDto;
+            ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
+            return profileInfoForUpdateDto;
         } catch (Exception e) {
             return null;
         }
@@ -167,43 +185,45 @@ public class UserService {
         }
     }
 
-    public String updateProfilePic(PhotoUploadDto photoUploadDto) {
+    public String updateProfilePic(SinglePhotoUploadDto singlePhotoUploadDto) {
 
-        String extension = FilenameUtils.getExtension(photoUploadDto.getFile().getOriginalFilename());
+        String extension = FilenameUtils.getExtension(singlePhotoUploadDto.getFile().getOriginalFilename());
         String newName = fileStorageService.makeFileName() + "." + extension;
 
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User userInDb = userRepository.findById(loggedUser.getId()).get();
 
         //save new util and remove old one
-        fileStorageService.deleteFile(profilPicUploadPath + user.getProfilePicName());
-        fileStorageService.storeFile(photoUploadDto.getFile(), profilPicUploadPath, newName);
+        fileStorageService.deleteFile(profilPicUploadPath + userInDb.getProfilePicName());
+        fileStorageService.storeFile(singlePhotoUploadDto.getFile(), profilPicUploadPath, newName);
 
         //update database
-        user.setProfilePicName(newName);
-        userRepository.save(user);
+        userInDb.setProfilePicName(newName);
+        userRepository.save(userInDb);
         return newName;
     }
 
 
     public Boolean changePassword(ChangePasswordDto changePasswordDto) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        user.setPassword(bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword()));
+        User userInDb = userRepository.findById(loggedUser.getId()).get();
+        userInDb.setPassword(bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword()));
 
-        userRepository.save(user);
+        userRepository.save(userInDb);
 
         return true;
     }
 
-    public List<UserDto> searchUser(String searchText) {
+    public List<ProfileDto> searchUser(String searchText) {
 
         List<User> users = userRepository.searchUser("%" + searchText + "%");
-        List<UserDto> userDtos = new ArrayList<>();
+        List<ProfileDto> profileDtos = new ArrayList<>();
         for (User user : users) {
-            UserDto userDto = modelMapper.map(user, UserDto.class);
-            userDto.setAge(UserUtil.calculateAge(user));
-            userDtos.add(userDto);
+            ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
+            profileDto.setAge(UserUtil.calculateAge(user));
+            profileDtos.add(profileDto);
         }
-        return userDtos;
+        return profileDtos;
     }
 }

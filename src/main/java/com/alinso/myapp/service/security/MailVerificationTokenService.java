@@ -1,13 +1,15 @@
-package com.alinso.myapp.service;
+package com.alinso.myapp.service.security;
 
 import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.SMTPEmail;
 import com.alinso.myapp.repository.MailVerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -45,7 +47,11 @@ public class MailVerificationTokenService {
 
 
     public MailVerificationToken findByToken(String token){
-        return mailVerificationTokenRepository.findByToken(token).get();
+        try {
+            return mailVerificationTokenRepository.findByToken(token).get();
+        }catch (NoSuchElementException e){
+            throw new UserWarningException("Geçersiz Link");
+        }
     }
 
 

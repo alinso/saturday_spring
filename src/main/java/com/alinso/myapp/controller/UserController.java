@@ -1,18 +1,17 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.dto.ChangePasswordDto;
-import com.alinso.myapp.dto.PhotoUploadDto;
-import com.alinso.myapp.dto.ResetPasswordDto;
-import com.alinso.myapp.dto.UserDto;
+import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
+import com.alinso.myapp.dto.security.ChangePasswordDto;
+import com.alinso.myapp.dto.security.ResetPasswordDto;
+import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.security.JwtTokenProvider;
 import com.alinso.myapp.security.SecurityConstants;
 import com.alinso.myapp.security.payload.JWTLoginSucessReponse;
 import com.alinso.myapp.security.payload.LoginRequest;
-import com.alinso.myapp.service.MapValidationErrorService;
+import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.service.UserService;
-import com.alinso.myapp.util.UserUtil;
 import com.alinso.myapp.validator.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,8 +24,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -47,7 +44,7 @@ public class UserController {
     UserUpdateValidator userUpdateValidator;
 
     @Autowired
-    MapValidationErrorService mapValidationErrorService;
+    MapValidationErrorUtil mapValidationErrorUtil;
 
     @Autowired
     UserService userService;
@@ -63,7 +60,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result) {
-        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
+        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
         Authentication authentication = authenticationManager.authenticate(
@@ -73,7 +70,7 @@ public class UserController {
                 )
         );
 
-        UserDto user = userService.findByEmail(loginRequest.getUsername());
+        ProfileInfoForUpdateDto user = userService.findByEmail(loginRequest.getUsername());
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = SecurityConstants.TOKEN_PREFIX + tokenProvider.generateToken(authentication);
@@ -97,7 +94,7 @@ public class UserController {
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDto resetPassword, BindingResult result) {
         resetPasswordValidator.validate(resetPassword, result);
 
-        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
+        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
         userService.resetPassword(resetPassword);
@@ -110,7 +107,7 @@ public class UserController {
         // Validate passwords match
         userValidator.validate(user, result);
 
-        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
+        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
         user.setPassword(user.getPassword());
@@ -120,29 +117,29 @@ public class UserController {
     }
 
     @GetMapping("/myProfile")
-    public ResponseEntity<?> findById() {
+    public ResponseEntity<?> getMyProfileInfoForUpdate() {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDto userDto = userService.findById(user.getId());
+        ProfileInfoForUpdateDto profileInfoForUpdateDto = userService.getMyProfileInfoForUpdate(user.getId());
 
-        return new ResponseEntity<UserDto>(userDto, HttpStatus.CREATED);
+        return new ResponseEntity<ProfileInfoForUpdateDto>(profileInfoForUpdateDto, HttpStatus.CREATED);
     }
 
     @PostMapping("/updateInfo")
-    public ResponseEntity<?> update(@Valid @RequestBody UserDto userDto, BindingResult result) {
+    public ResponseEntity<?> update(@Valid @RequestBody ProfileInfoForUpdateDto profileInfoForUpdateDto, BindingResult result) {
 
 
         //set logged usre id because of security issues
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        userDto.setId(loggedUser.getId());
+        profileInfoForUpdateDto.setId(loggedUser.getId());
 
-        userUpdateValidator.validate(userDto, result);
-        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
+        userUpdateValidator.validate(profileInfoForUpdateDto, result);
+        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
-        UserDto newUserDto = userService.update(userDto);
+        ProfileInfoForUpdateDto newProfileInfoForUpdateDto = userService.update(profileInfoForUpdateDto);
 
-        return new ResponseEntity<UserDto>(newUserDto, HttpStatus.ACCEPTED);
+        return new ResponseEntity<ProfileInfoForUpdateDto>(newProfileInfoForUpdateDto, HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/updatePassword")
@@ -150,7 +147,7 @@ public class UserController {
 
         changePasswordValidator.validate(changePasswordDto, result);
 
-        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
+        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
         userService.changePassword(changePasswordDto);
@@ -159,14 +156,14 @@ public class UserController {
     }
 
     @PostMapping("/updateProfilePic")
-    public ResponseEntity<?> changeProfilePic(PhotoUploadDto photoUploadDto, BindingResult result) {
+    public ResponseEntity<?> changeProfilePic(SinglePhotoUploadDto singlePhotoUploadDto, BindingResult result) {
 
-        profilePicValidator.validate(photoUploadDto, result);
+        profilePicValidator.validate(singlePhotoUploadDto, result);
 
-        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
+        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
-        String picName = userService.updateProfilePic(photoUploadDto);
+        String picName = userService.updateProfilePic(singlePhotoUploadDto);
         return new ResponseEntity<String>(picName, HttpStatus.ACCEPTED);
     }
 
@@ -179,19 +176,17 @@ public class UserController {
 
     @GetMapping("search/{searchText}")
     public ResponseEntity<?> search(@PathVariable("searchText") String searchText) {
-        List<UserDto> userDtoList = userService.searchUser(searchText);
-        return new ResponseEntity<>(userDtoList, HttpStatus.OK);
+        List<ProfileDto> profileDtos = userService.searchUser(searchText);
+        return new ResponseEntity<>(profileDtos, HttpStatus.OK);
     }
 
     @GetMapping("/profile/{id}")
     public ResponseEntity<?> profile(@PathVariable("id") Long id) {
-        UserDto userDto = userService.findById(id);
-
-        userDto.setAge(UserUtil.calculateAge(userDto));
+        ProfileDto profileDto = userService.getProfileById(id);
 
         //TODO: references and reviews will be loaded too..
 
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+        return new ResponseEntity<>(profileDto, HttpStatus.OK);
     }
 
 }

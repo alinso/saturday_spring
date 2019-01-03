@@ -1,7 +1,7 @@
 package com.alinso.myapp.security;
 
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.service.CustomUserDetailsService;
+import com.alinso.myapp.service.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

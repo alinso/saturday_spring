@@ -1,7 +1,6 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.dto.UserDto;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,27 +16,27 @@ public class UserUpdateValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return UserDto.class.equals(aClass);
+        return ProfileInfoForUpdateDto.class.equals(aClass);
     }
 
     @Override
     public void validate(Object object, Errors errors) {
 
-        UserDto userDto = (UserDto) object;
-        UserDto userDtoInDbPhone  = userService.findByPhone(userDto.getPhone());
+        ProfileInfoForUpdateDto profileInfoForUpdateDto = (ProfileInfoForUpdateDto) object;
+        ProfileInfoForUpdateDto profileInfoForUpdateDtoInDbPhone = userService.findByPhone(profileInfoForUpdateDto.getPhone());
 
 
-        if(userDtoInDbPhone!=null && userDtoInDbPhone.getId().longValue()!=userDto.getId().longValue()){
+        if(profileInfoForUpdateDtoInDbPhone !=null && profileInfoForUpdateDtoInDbPhone.getId().longValue()!= profileInfoForUpdateDto.getId().longValue()){
             errors.rejectValue("phone","Match", "Bu telefon numarası ile kayıt olunmuş");
         }
 
-        UserDto userDtoInDbEmail  = userService.findByEmail(userDto.getEmail());
+        ProfileInfoForUpdateDto profileInfoForUpdateDtoInDbEmail = userService.findByEmail(profileInfoForUpdateDto.getEmail());
 
-        if(userDtoInDbEmail!=null && userDto.getId().longValue()!=userDtoInDbEmail.getId().longValue()){
+        if(profileInfoForUpdateDtoInDbEmail !=null && profileInfoForUpdateDto.getId().longValue()!= profileInfoForUpdateDtoInDbEmail.getId().longValue()){
             errors.rejectValue("email","Match", "Bu email adresi ile daha önce kayıt olunmuş");
         }
 
-        if(userDto.getGender()== Gender.UNSELECTED){
+        if(profileInfoForUpdateDto.getGender()== Gender.UNSELECTED){
             errors.rejectValue("gender","Match", "Cinsiyet Seçiniz");
         }
 

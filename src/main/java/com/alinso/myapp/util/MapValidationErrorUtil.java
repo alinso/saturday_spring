@@ -1,4 +1,4 @@
-package com.alinso.myapp.service;
+package com.alinso.myapp.util;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class MapValidationErrorService {
+public class MapValidationErrorUtil {
 
     public ResponseEntity<?> MapValidationService(BindingResult result){
 

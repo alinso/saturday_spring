@@ -1,6 +1,6 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.dto.MultiPhotoUploadDto;
+import com.alinso.myapp.dto.photo.MultiPhotoUploadDto;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

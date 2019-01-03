@@ -1,6 +1,6 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.dto.UserDto;
+import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.service.UserService;
@@ -34,15 +34,15 @@ public class UserValidator implements Validator {
 
         }
 
-        UserDto userDtoInDbPhone  = userService.findByPhone(user.getPhone());
+        ProfileInfoForUpdateDto profileInfoForUpdateDtoInDbPhone = userService.findByPhone(user.getPhone());
 
-        if(userDtoInDbPhone!=null){
+        if(profileInfoForUpdateDtoInDbPhone !=null){
             errors.rejectValue("phone","Match", "Bu telefon numarası ile kayıt olunmuş");
         }
 
-        UserDto userDtoInDbEmail  = userService.findByEmail(user.getEmail());
+        ProfileInfoForUpdateDto profileInfoForUpdateDtoInDbEmail = userService.findByEmail(user.getEmail());
 
-        if(userDtoInDbEmail!=null){
+        if(profileInfoForUpdateDtoInDbEmail !=null){
             errors.rejectValue("email","Match", "Bu email adresi ile daha önce kayıt olunmuş");
         }
 

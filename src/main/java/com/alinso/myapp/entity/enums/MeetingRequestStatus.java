@@ -1,5 +1,5 @@
 package com.alinso.myapp.entity.enums;
 
-public enum EventApplicantStatus {
+public enum MeetingRequestStatus {
 WAITING,REJECTED,APPROVED
 }

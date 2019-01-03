@@ -1,9 +1,7 @@
 package com.alinso.myapp.security;
 
-import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.repository.UserRepository;
-import com.alinso.myapp.service.CustomUserDetailsService;
+import com.alinso.myapp.service.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

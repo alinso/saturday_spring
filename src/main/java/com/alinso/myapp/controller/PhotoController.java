@@ -1,11 +1,12 @@
 package com.alinso.myapp.controller;
 
 
-import com.alinso.myapp.dto.AlbumDto;
-import com.alinso.myapp.dto.MultiPhotoUploadDto;
-import com.alinso.myapp.dto.UserDto;
+import com.alinso.myapp.dto.photo.AlbumDto;
+import com.alinso.myapp.dto.photo.MultiPhotoUploadDto;
+import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.Photo;
-import com.alinso.myapp.service.MapValidationErrorService;
+import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.service.PhotoService;
 import com.alinso.myapp.service.UserService;
 import com.alinso.myapp.validator.AlbumValidator;
@@ -28,7 +29,7 @@ public class PhotoController {
     AlbumValidator albumValidator;
 
     @Autowired
-    MapValidationErrorService mapValidationErrorService;
+    MapValidationErrorUtil mapValidationErrorUtil;
 
     @Autowired
     PhotoService photoService;
@@ -46,7 +47,7 @@ public class PhotoController {
         binder.setValidator(albumValidator);
         binder.validate();
 
-        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(binder.getBindingResult());
+        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(binder.getBindingResult());
         if (errorMap != null) return errorMap;
 
         List<String> photoNames = photoService.savePhotos(files);
@@ -59,7 +60,7 @@ public class PhotoController {
     public ResponseEntity<?> getAlbum(@PathVariable("id") Long id) {
 
         AlbumDto albumDto = new AlbumDto();
-        UserDto user  = userService.findById(id);
+        ProfileDto user  = userService.getProfileById(id);
 
 
         List<Photo> photos = photoService.findByUserId(id);
