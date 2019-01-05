@@ -16,7 +16,8 @@ public class MeetingDto {
     private MultipartFile file;
     private String updatedAt;
     private List<ProfileDto> attendants;
-    private Boolean isThisUserJoins;
+    private List<MeetingRequestDto> requests;
+    private Boolean isThisUserJoined;
 
     public Long getId() {
         return id;
@@ -76,11 +77,19 @@ public class MeetingDto {
         this.attendants = attendants;
     }
 
-    public Boolean getThisUserJoins() {
-        return isThisUserJoins;
+    public Boolean getThisUserJoined() {
+        return isThisUserJoined;
     }
 
-    public void setThisUserJoins(Boolean thisUserJoins) {
-        isThisUserJoins = thisUserJoins;
+    public void setThisUserJoined(Boolean thisUserJoins) {
+        isThisUserJoined = thisUserJoins;
+    }
+
+    public List<MeetingRequestDto> getRequests() {
+        return requests;
+    }
+
+    public void setRequests(List<MeetingRequestDto> requests) {
+        this.requests = requests;
     }
 }

@@ -9,16 +9,15 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class MeetingRequest extends BaseEntity{
 
-    @OneToOne
+    @ManyToOne
     @NotNull
     private Meeting meeting;
 
 
-    @OneToOne
+    @ManyToOne
     @NotNull
     private User applicant;
 
-    private String message;
 
     @Column
     @Enumerated(EnumType.ORDINAL)
@@ -49,11 +48,4 @@ public class MeetingRequest extends BaseEntity{
         this.meetingRequestStatus = meetingRequestStatus;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

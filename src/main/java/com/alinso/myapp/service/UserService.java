@@ -193,7 +193,7 @@ public class UserService {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User userInDb = userRepository.findById(loggedUser.getId()).get();
 
-        //save new util and remove old one
+        //save new file and remove old one
         fileStorageService.deleteFile(profilPicUploadPath + userInDb.getProfilePicName());
         fileStorageService.storeFile(singlePhotoUploadDto.getFile(), profilPicUploadPath, newName);
 

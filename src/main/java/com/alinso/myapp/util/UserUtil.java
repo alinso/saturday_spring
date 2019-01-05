@@ -1,26 +1,18 @@
 package com.alinso.myapp.util;
 
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.exception.UserWarningException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Calendar;
 
 public class UserUtil {
-//    public static Integer calculateAge(UserProfileDto userProfileDto){
-//        Integer ageInt=null;
-//        if(userProfileDto.getbDateString()!=null) {
-//            Date birthDate = null;
-//            Calendar calenderNow = Calendar.getInstance();
-//            Calendar calenderBirthDate = Calendar.getInstance();
-//            try {
-//                birthDate = new SimpleDateFormat("dd/MM/yyyy").parse(userProfileDto.getbDateString());
-//                calenderBirthDate.setTime(birthDate);
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//            ageInt = calenderNow.get(Calendar.YEAR) - calenderBirthDate.get(Calendar.YEAR);
-//        }
-//        return ageInt;
-//    }
+
+    public static void checkUserOwner(Long ownerIdOfEntity){
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(ownerIdOfEntity != loggedUser.getId())
+            throw new UserWarningException("Bunu yapmaya yetkiniz yok");
+    }
 
     public static Integer calculateAge(User user){
         Integer ageInt=null;

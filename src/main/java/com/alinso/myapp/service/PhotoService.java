@@ -6,6 +6,7 @@ import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.repository.PhotoRepository;
 import com.alinso.myapp.repository.UserRepository;
+import com.alinso.myapp.util.UserUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,11 +67,7 @@ public class PhotoService {
 
     public void deletePhoto(String photoName){
         Photo photo = photoRepository.findByFileName(photoName).get();
-
-        User loggedUser  =(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(loggedUser.getId()!=photo.getUser().getId()){
-            throw  new UserWarningException("Bu fotoğrafı silmeye yetkiniz yok");
-        }
+        UserUtil.checkUserOwner(photo.getUser().getId());
 
         if(photo!=null){
             fileStorageService.deleteFile(fileUploadPath+photoName);

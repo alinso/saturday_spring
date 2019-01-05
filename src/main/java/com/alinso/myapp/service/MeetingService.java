@@ -1,12 +1,15 @@
 package com.alinso.myapp.service;
 
 import com.alinso.myapp.dto.meeting.MeetingDto;
-import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
+import com.alinso.myapp.dto.meeting.MeetingRequestDto;
 import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Meeting;
+import com.alinso.myapp.entity.MeetingRequest;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.enums.MeetingRequestStatus;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.MeetingRepository;
+import com.alinso.myapp.repository.MeetingRequesRepository;
 import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.util.UserUtil;
@@ -16,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +29,9 @@ public class MeetingService {
 
     @Autowired
     MeetingRepository meetingRepository;
+
+    @Autowired
+    MeetingRequesRepository meetingRequesRepository;
 
     @Autowired
     ModelMapper modelMapper;
@@ -40,30 +45,37 @@ public class MeetingService {
     @Value("${upload.path}")
     private String fileUploadPath;
 
+    private Boolean isThisUserJoined(Long meetingId){
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Boolean isThisUserJoined=false;
+        List<MeetingRequest> meetingRequests  =meetingRequesRepository.findByMeetingId(meetingId);
+        for(MeetingRequest meetingRequest:meetingRequests){
+            if(meetingRequest.getApplicant().getId()==loggedUser.getId()){
+                isThisUserJoined=true;
+            }
+        }
+        return isThisUserJoined;
+    }
+
+    private void checkMaxApproveCountExceeded(Meeting meeting){
+        Integer c= meetingRequesRepository.countOfAprrovedForThisMeetingId(meeting,MeetingRequestStatus.APPROVED);
+        if(c==2){
+            throw  new UserWarningException("Her aktivite için en fazla 2 kişi onaylayabilirsiniz");
+        }
+    }
+
 
     public MeetingDto findById(Long id) {
         Meeting meeting = meetingRepository.getOne(id);
+
+        UserUtil.checkUserOwner(meeting.getCreator().getId());
+
         ProfileDto profileDto = modelMapper.map(meeting.getCreator(), ProfileDto.class);
-        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         MeetingDto meetingDto = modelMapper.map(meeting, MeetingDto.class);
         meetingDto.setProfileDto(profileDto);
 
-
-        //set meetingDto attendant dtos
-        Boolean isThisUserJoins=false;
-        List<ProfileDto> attendantDtos =  new ArrayList<>();
-        for(User attendant:meeting.getAttendants()){
-            if(attendant.getId()==loggedUser.getId()){
-                isThisUserJoins=true;
-            }
-            ProfileDto attendantDto  =modelMapper.map(attendant,ProfileDto.class);
-            attendantDtos.add(attendantDto);
-        }
-
-        meetingDto.setAttendants(attendantDtos);
-        meetingDto.setThisUserJoins(isThisUserJoins);
-
+        meetingDto.setThisUserJoined(isThisUserJoined(meeting.getId()));
 
 
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
@@ -94,7 +106,6 @@ public class MeetingService {
         }
         meeting.setPhotoName(newName);
 
-
         //update users event Count
         creator.setMeetingCount((creator.getMeetingCount() + 1));
 
@@ -106,10 +117,8 @@ public class MeetingService {
 
         Meeting meetingInDb = meetingRepository.findById(meetingDto.getId()).get();
 
-        User creator = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (meetingInDb.getCreator().getId() != creator.getId()) {
-            throw new UserWarningException("Bu buluşmayı düzenleyemezsiniz");
-        }
+        //check user owner
+        UserUtil.checkUserOwner(meetingInDb.getCreator().getId());
 
 
         //save new photo and remove old one
@@ -128,7 +137,6 @@ public class MeetingService {
     public List<MeetingDto> findAll() {
         List<Meeting> meetings = meetingRepository.findAllByOrderByIdDesc();
         List<MeetingDto> meetingDtos = new ArrayList<>();
-        User loggedUser = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 
         for (Meeting meeting : meetings) {
@@ -136,20 +144,7 @@ public class MeetingService {
             profileDto.setAge(UserUtil.calculateAge(meeting.getCreator()));
 
             MeetingDto meetingDto = modelMapper.map(meeting, MeetingDto.class);
-
-            //set meetingDto attendant dtos
-            Boolean isThisUserJoins=false;
-            List<ProfileDto> attendantDtos =  new ArrayList<>();
-            for(User attendant:meeting.getAttendants()){
-                    if(attendant.getId()==loggedUser.getId()){
-                        isThisUserJoins=true;
-                    }
-                    ProfileDto attendantDto  =modelMapper.map(attendant,ProfileDto.class);
-                    attendantDtos.add(attendantDto);
-            }
-
-            meetingDto.setAttendants(attendantDtos);
-            meetingDto.setThisUserJoins(isThisUserJoins);
+            meetingDto.setThisUserJoined(isThisUserJoined(meeting.getId()));
 
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
             String birthDateString = format.format(meeting.getUpdatedAt());
@@ -167,11 +162,22 @@ public class MeetingService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Meeting meetingInDb = meetingRepository.findById(id).get();
 
-        if (user.getId() != meetingInDb.getCreator().getId()) {
-            throw new UserWarningException("Bunu silmeye yetkiniz yok");
-        }
+        //check user authorized
+        UserUtil.checkUserOwner(meetingInDb.getCreator().getId());
 
+
+        //decrease user's meeting count
+        Integer meetingCount = user.getMeetingCount()-1;
+        user.setMeetingCount(meetingCount);
+        userRepository.save(user);
+
+        //delete file
         fileStorageUtil.deleteFile(fileUploadPath + meetingInDb.getPhotoName());
+
+        //delete requests
+        for(MeetingRequest meetingRequest:meetingRequesRepository.findByMeetingId(id)){
+            meetingRequesRepository.delete(meetingRequest);
+        }
 
         meetingRepository.deleteById(id);
     }
@@ -192,6 +198,7 @@ public class MeetingService {
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
             String birthDateString = format.format(meeting.getUpdatedAt());
             meetingDto.setUpdatedAt(birthDateString);
+            meetingDto.setThisUserJoined(isThisUserJoined(meeting.getId()));
 
             meetingDto.setProfileDto(profileDto);
             meetingDtos.add(meetingDto);
@@ -202,28 +209,68 @@ public class MeetingService {
     public Boolean join(Long id) {
         Meeting meeting = meetingRepository.findById(id).get();
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User userInDb  =userRepository.findById(loggedUser.getId()).get();
 
+        Boolean isThisUserJoined = isThisUserJoined(meeting.getId());
 
-        Boolean isThisUserJoins = true;
-        List<User> attendants = meeting.getAttendants();
-        for (User attendant : attendants) {
-            if (userInDb.getId() == attendant.getId()) {
-                isThisUserJoins = false;
-            }
+        if(!isThisUserJoined){
+            MeetingRequest newMeetingRequest  =new MeetingRequest();
+            newMeetingRequest.setApplicant(loggedUser);
+            newMeetingRequest.setMeeting(meeting);
+            newMeetingRequest.setMeetingRequestStatus(MeetingRequestStatus.WAITING);
+            meetingRequesRepository.save(newMeetingRequest);
+        }
+        else{
+            MeetingRequest meetingRequest  =meetingRequesRepository.findByMeetingaAndApplicant(loggedUser,meeting);
+            meetingRequesRepository.delete(meetingRequest);
         }
 
+        //we have changed the status in above if-else condition
+        //so we need to return opposite of initial value
+        return !isThisUserJoined;
+    }
 
+    public MeetingDto getMeetingWithRequests(Long id) {
 
-        if(isThisUserJoins){
-            attendants.add(userInDb);
-        }else{
-            attendants.remove(userInDb);
+        List<MeetingRequest> meetingRequests  =meetingRequesRepository.findByMeetingId(id);
+        Meeting meeting  =meetingRepository.findById(id).get();
+
+        MeetingDto meetingDto = modelMapper.map(meeting,MeetingDto.class);
+
+        List<MeetingRequestDto> meetingRequestDtos =  new ArrayList<>();
+        for(MeetingRequest meetingRequest :meetingRequests){
+            MeetingRequestDto meetingRequestDto  = modelMapper.map(meetingRequest,MeetingRequestDto.class);
+
+            ProfileDto profileDto  =modelMapper.map(meetingRequest.getApplicant(),ProfileDto.class);
+            Integer age = UserUtil.calculateAge(meetingRequest.getApplicant());
+            profileDto.setAge(age);
+
+            meetingRequestDto.setProfileDto(profileDto);
+            meetingRequestDtos.add(meetingRequestDto);
         }
 
-        meeting.setAttendants(attendants);
-        meetingRepository.save(meeting);
-        return isThisUserJoins;
+        meetingDto.setRequests(meetingRequestDtos);
+
+        return meetingDto;
+    }
+
+    public MeetingRequestStatus approveRequest(Long id) {
+        MeetingRequest meetingRequest = meetingRequesRepository.findById(id).get();
+
+        //check user owner
+        UserUtil.checkUserOwner(meetingRequest.getMeeting().getCreator().getId());
+
+
+        if(meetingRequest.getMeetingRequestStatus()==MeetingRequestStatus.WAITING){
+            checkMaxApproveCountExceeded(meetingRequest.getMeeting());
+            meetingRequest.setMeetingRequestStatus(MeetingRequestStatus.APPROVED);
+            meetingRequesRepository.save(meetingRequest);
+        }
+        else{
+            meetingRequest.setMeetingRequestStatus(MeetingRequestStatus.WAITING);
+            meetingRequesRepository.save(meetingRequest);
+        }
+
+        return meetingRequest.getMeetingRequestStatus();
     }
 }
 

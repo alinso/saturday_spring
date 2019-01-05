@@ -4,6 +4,7 @@ package com.alinso.myapp.controller;
 import com.alinso.myapp.dto.meeting.MeetingDto;
 import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.entity.Meeting;
+import com.alinso.myapp.entity.enums.MeetingRequestStatus;
 import com.alinso.myapp.service.MeetingService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.validator.MeetingValidator;
@@ -61,6 +62,20 @@ public class MeetingController {
         Boolean isThisUserJoins = meetingService.join(id);
 
         return new ResponseEntity<>(isThisUserJoins,HttpStatus.OK);
+    }
+
+    @GetMapping("approveRequest/{id}")
+    public ResponseEntity<?> approveRequest(@PathVariable("id") Long id){
+
+        MeetingRequestStatus status = meetingService.approveRequest(id);
+        return new ResponseEntity<>(status,HttpStatus.OK);
+    }
+
+
+    @GetMapping("requests/{id}")
+    public ResponseEntity<?> requests(@PathVariable("id") Long id){
+        MeetingDto meetingDto  =meetingService.getMeetingWithRequests(id);
+        return new ResponseEntity<>(meetingDto,HttpStatus.OK);
     }
 
 

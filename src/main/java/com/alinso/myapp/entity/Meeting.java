@@ -20,7 +20,6 @@ public class Meeting extends BaseEntity {
     public Meeting(@NotBlank(message = "Bu kısmı boş bırakamazsınız") String detail, User creator, List<User> attendants, String photoName) {
         this.detail = detail;
         this.creator = creator;
-        this.attendants = attendants;
         this.photoName = photoName;
     }
 
@@ -28,9 +27,6 @@ public class Meeting extends BaseEntity {
 
     @OneToOne
     private User creator;
-
-    @ManyToMany
-    private List<User> attendants;
 
     @Column
     private String photoName;
@@ -49,14 +45,6 @@ public class Meeting extends BaseEntity {
 
     public void setCreator(User creator) {
         this.creator = creator;
-    }
-
-    public List<User> getAttendants() {
-        return attendants;
-    }
-
-    public void setAttendants(List<User> attendants) {
-        this.attendants = attendants;
     }
 
     public String getPhotoName() {
