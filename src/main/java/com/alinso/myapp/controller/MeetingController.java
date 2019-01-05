@@ -2,17 +2,22 @@ package com.alinso.myapp.controller;
 
 
 import com.alinso.myapp.dto.meeting.MeetingDto;
+import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.entity.Meeting;
 import com.alinso.myapp.service.MeetingService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
+import com.alinso.myapp.validator.MeetingValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/meeting")
@@ -25,14 +30,20 @@ public class MeetingController {
     @Autowired
     MapValidationErrorUtil mapValidationErrorUtil;
 
+    @Autowired
+    MeetingValidator  meetingValidator;
+
+
     @PostMapping("/create")
-    public ResponseEntity<?> save(@Valid @RequestBody Meeting meeting, BindingResult result){
+    public ResponseEntity<?> save(@Valid  MeetingDto meetingDto,BindingResult result){
+
+        meetingValidator.validate(meetingDto,result);
 
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
-        meetingService.save(meeting);
-        return new ResponseEntity<>(meeting,HttpStatus.ACCEPTED);
+        meetingService.save(meetingDto);
+        return new ResponseEntity<>(meetingDto,HttpStatus.ACCEPTED);
     }
 
 
@@ -44,6 +55,23 @@ public class MeetingController {
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }
 
+    @GetMapping("join/{id}")
+    public ResponseEntity<?> join(@PathVariable("id") Long id){
+
+        Boolean isThisUserJoins = meetingService.join(id);
+
+        return new ResponseEntity<>(isThisUserJoins,HttpStatus.OK);
+    }
+
+
+    @GetMapping("findByUserId/{id}")
+    public ResponseEntity<?> findByUserId(@PathVariable("id") Long id){
+        List<MeetingDto>  meetings = meetingService.findByUserId(id);
+
+        return new ResponseEntity<>(meetings,HttpStatus.OK);
+    }
+
+
     @GetMapping("delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
 
@@ -53,14 +81,14 @@ public class MeetingController {
     }
 
     @PostMapping("update")
-    public ResponseEntity<?> update(@Valid @RequestBody Meeting meeting,BindingResult result){
+    public ResponseEntity<?> update(@Valid  MeetingDto meetingDto,BindingResult result){
 
+        meetingValidator.validate(meetingDto,result);
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
 
-        meetingService.update(meeting);
-        MeetingDto meetingDto  =meetingService.findById(meeting.getId());
+        meetingService.update(meetingDto);
 
         return new ResponseEntity<>(meetingDto,HttpStatus.ACCEPTED);
 

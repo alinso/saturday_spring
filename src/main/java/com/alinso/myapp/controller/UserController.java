@@ -38,7 +38,7 @@ public class UserController {
     ChangePasswordValidator changePasswordValidator;
 
     @Autowired
-    ProfilePicValidator profilePicValidator;
+    PhotoValidator profilePicValidator;
 
     @Autowired
     UserUpdateValidator userUpdateValidator;

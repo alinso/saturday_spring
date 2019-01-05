@@ -63,11 +63,11 @@ public class User extends BaseEntity implements UserDetails {
     @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
 
-    @Column
+    @Column( columnDefinition = "int default 0.0")
     private Double rate = 0.0;
 
-    @Column
-    private Integer eventCount = 0;
+    @Column( columnDefinition = "int default 0")
+    private Integer meetingCount = 0;
 
     public Double getRate() {
         return rate;
@@ -125,12 +125,12 @@ public class User extends BaseEntity implements UserDetails {
         this.referenceCode = referenceCode;
     }
 
-    public Integer getEventCount() {
-        return eventCount;
+    public Integer getMeetingCount() {
+        return meetingCount;
     }
 
-    public void setEventCount(Integer eventCount) {
-        this.eventCount = eventCount;
+    public void setMeetingCount(Integer meetingCount) {
+        this.meetingCount = meetingCount;
     }
 
     public String getEmail() {

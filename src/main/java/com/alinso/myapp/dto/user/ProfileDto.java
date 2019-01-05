@@ -42,7 +42,7 @@ public class ProfileDto {
     private Double rate = 1.0;
 
     @NotNull
-    private Integer eventCount = 0;
+    private Integer meetingCount = 0;
 
 //getter setter
 
@@ -112,12 +112,12 @@ public class ProfileDto {
         this.rate = rate;
     }
 
-    public Integer getEventCount() {
-        return eventCount;
+    public Integer getMeetingCount() {
+        return meetingCount;
     }
 
-    public void setEventCount(Integer eventCount) {
-        this.eventCount = eventCount;
+    public void setMeetingCount(Integer meetingCount) {
+        this.meetingCount = meetingCount;
     }
 
 

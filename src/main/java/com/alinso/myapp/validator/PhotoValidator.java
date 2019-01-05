@@ -8,7 +8,7 @@ import org.springframework.validation.Validator;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
-public class ProfilePicValidator implements Validator {
+public class PhotoValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
