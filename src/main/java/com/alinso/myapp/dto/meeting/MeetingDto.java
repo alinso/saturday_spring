@@ -4,6 +4,7 @@ import com.alinso.myapp.dto.user.ProfileDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class MeetingDto {
@@ -14,10 +15,14 @@ public class MeetingDto {
     private String detail;
     private String photoName;
     private MultipartFile file;
-    private String updatedAt;
     private List<ProfileDto> attendants;
     private List<MeetingRequestDto> requests;
     private Boolean isThisUserJoined;
+    private Boolean isExpired;
+
+    @NotBlank(message="İleri bir zaman seçmelisiniz(10 dk sonra, 1 saat sonra...)")
+    private String deadLineString;
+
 
     public Long getId() {
         return id;
@@ -51,14 +56,6 @@ public class MeetingDto {
         this.photoName = photoName;
     }
 
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     public MultipartFile getFile() {
         return file;
     }
@@ -66,8 +63,6 @@ public class MeetingDto {
     public void setFile(MultipartFile file) {
         this.file = file;
     }
-
-
 
     public List<ProfileDto> getAttendants() {
         return attendants;
@@ -91,5 +86,21 @@ public class MeetingDto {
 
     public void setRequests(List<MeetingRequestDto> requests) {
         this.requests = requests;
+    }
+
+    public String getDeadLineString() {
+        return deadLineString;
+    }
+
+    public void setDeadLineString(String deadLineString) {
+        this.deadLineString = deadLineString;
+    }
+
+    public Boolean getExpired() {
+        return isExpired;
+    }
+
+    public void setExpired(Boolean expired) {
+        isExpired = expired;
     }
 }

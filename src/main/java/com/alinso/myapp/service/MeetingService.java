@@ -11,6 +11,7 @@ import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.MeetingRepository;
 import com.alinso.myapp.repository.MeetingRequesRepository;
 import com.alinso.myapp.repository.UserRepository;
+import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.util.UserUtil;
 import org.apache.commons.io.FilenameUtils;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -74,13 +76,8 @@ public class MeetingService {
 
         MeetingDto meetingDto = modelMapper.map(meeting, MeetingDto.class);
         meetingDto.setProfileDto(profileDto);
-
+        meetingDto.setDeadLineString(DateUtil.dateToString(meeting.getDeadLine(),"dd/MM/yyyy HH:mm"));
         meetingDto.setThisUserJoined(isThisUserJoined(meeting.getId()));
-
-
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-        String birthDateString = format.format(meeting.getUpdatedAt());
-        meetingDto.setUpdatedAt(birthDateString);
 
 
         return meetingDto;
@@ -96,6 +93,7 @@ public class MeetingService {
         User creator = userRepository.findById(loggedUser.getId()).get();
 
         meeting.setCreator(creator);
+        meeting.setDeadLine(DateUtil.stringToDate(meetingDto.getDeadLineString(),"dd/MM/yyyy HH:mm"));
 
         //save new photo
         String newName = null;
@@ -130,27 +128,25 @@ public class MeetingService {
             fileStorageUtil.deleteFile(fileUploadPath + meetingInDb.getPhotoName());
             meetingInDb.setPhotoName(newName);
         }
+
+        meetingInDb.setDeadLine(DateUtil.stringToDate(meetingDto.getDeadLineString(),"dd/MM/yyyy HH:mm"));
         meetingInDb.setDetail(meetingDto.getDetail());
         return meetingRepository.save(meetingInDb);
     }
 
     public List<MeetingDto> findAll() {
-        List<Meeting> meetings = meetingRepository.findAllByOrderByIdDesc();
+        List<Meeting> meetings = meetingRepository.findAllNonExpired(new Date());
         List<MeetingDto> meetingDtos = new ArrayList<>();
 
 
         for (Meeting meeting : meetings) {
+
             ProfileDto profileDto = modelMapper.map(meeting.getCreator(), ProfileDto.class);
             profileDto.setAge(UserUtil.calculateAge(meeting.getCreator()));
 
             MeetingDto meetingDto = modelMapper.map(meeting, MeetingDto.class);
             meetingDto.setThisUserJoined(isThisUserJoined(meeting.getId()));
-
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-            String birthDateString = format.format(meeting.getUpdatedAt());
-            meetingDto.setUpdatedAt(birthDateString);
-
-
+            meetingDto.setDeadLineString(DateUtil.dateToString(meeting.getDeadLine(),"dd/MM/yyyy HH:mm"));
             meetingDto.setProfileDto(profileDto);
             meetingDtos.add(meetingDto);
         }
@@ -194,12 +190,13 @@ public class MeetingService {
             profileDto.setAge(UserUtil.calculateAge(meeting.getCreator()));
 
             MeetingDto meetingDto = modelMapper.map(meeting, MeetingDto.class);
+            meetingDto.setDeadLineString(DateUtil.dateToString(meeting.getDeadLine(),"dd/MM/yyyy hh:mm"));
+            if(meeting.getDeadLine().compareTo(new Date()) < 0)
+                meetingDto.setExpired(true);
+            else
+                meetingDto.setExpired(false);
 
-            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-            String birthDateString = format.format(meeting.getUpdatedAt());
-            meetingDto.setUpdatedAt(birthDateString);
             meetingDto.setThisUserJoined(isThisUserJoined(meeting.getId()));
-
             meetingDto.setProfileDto(profileDto);
             meetingDtos.add(meetingDto);
         }
@@ -208,10 +205,12 @@ public class MeetingService {
 
     public Boolean join(Long id) {
         Meeting meeting = meetingRepository.findById(id).get();
+        if(meeting.getDeadLine().compareTo(new Date())<0)
+            throw new UserWarningException("Geçmiş tarihli bir aktivitede düzenleme yapamazsınız");
+
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Boolean isThisUserJoined = isThisUserJoined(meeting.getId());
-
         if(!isThisUserJoined){
             MeetingRequest newMeetingRequest  =new MeetingRequest();
             newMeetingRequest.setApplicant(loggedUser);
@@ -234,8 +233,6 @@ public class MeetingService {
         List<MeetingRequest> meetingRequests  =meetingRequesRepository.findByMeetingId(id);
         Meeting meeting  =meetingRepository.findById(id).get();
 
-        MeetingDto meetingDto = modelMapper.map(meeting,MeetingDto.class);
-
         List<MeetingRequestDto> meetingRequestDtos =  new ArrayList<>();
         for(MeetingRequest meetingRequest :meetingRequests){
             MeetingRequestDto meetingRequestDto  = modelMapper.map(meetingRequest,MeetingRequestDto.class);
@@ -248,6 +245,8 @@ public class MeetingService {
             meetingRequestDtos.add(meetingRequestDto);
         }
 
+        MeetingDto meetingDto = modelMapper.map(meeting,MeetingDto.class);
+        meetingDto.setDeadLineString(DateUtil.dateToString(meeting.getDeadLine(),"dd/MM/yyyy hh:mm"));
         meetingDto.setRequests(meetingRequestDtos);
 
         return meetingDto;

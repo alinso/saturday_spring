@@ -2,8 +2,6 @@ package com.alinso.myapp.controller;
 
 
 import com.alinso.myapp.dto.meeting.MeetingDto;
-import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
-import com.alinso.myapp.entity.Meeting;
 import com.alinso.myapp.entity.enums.MeetingRequestStatus;
 import com.alinso.myapp.service.MeetingService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
@@ -13,12 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/meeting")
@@ -39,7 +34,6 @@ public class MeetingController {
     public ResponseEntity<?> save(@Valid  MeetingDto meetingDto,BindingResult result){
 
         meetingValidator.validate(meetingDto,result);
-
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 

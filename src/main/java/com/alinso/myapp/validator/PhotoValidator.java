@@ -23,17 +23,17 @@ public class PhotoValidator implements Validator {
         MultipartFile file = singlePhotoUploadDto.getFile();
 
         if (file != null && file.isEmpty()){
-            errors.rejectValue("util", "Match","Dosya Seçiniz");
+            errors.rejectValue("file", "Match","Dosya Seçiniz");
         }
 
         if(!(file.getContentType().toLowerCase().equals("image/jpg")
                 || file.getContentType().toLowerCase().equals("image/jpeg")
                 || file.getContentType().toLowerCase().equals("image/png"))){
-            errors.rejectValue("util", "","Yalnızca jpeg/jpg/png türündeki dosyaları yükleyebilirsiniz");
+            errors.rejectValue("file", "","Yalnızca jpeg/jpg/png türündeki dosyaları yükleyebilirsiniz");
         }
 
         if(file.getSize()>2097152){ //2 MB
-            errors.rejectValue("util","","Max dosya boyutu 2 MB olabilir");
+            errors.rejectValue("file","","Max dosya boyutu 2 MB olabilir");
         }
 
     }

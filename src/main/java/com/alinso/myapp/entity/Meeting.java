@@ -3,6 +3,7 @@ package com.alinso.myapp.entity;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -24,6 +25,10 @@ public class Meeting extends BaseEntity {
     }
 
     public Meeting(){}
+
+    @Column
+    @NotNull
+    private Date deadLine;
 
     @OneToOne
     private User creator;
@@ -53,5 +58,13 @@ public class Meeting extends BaseEntity {
 
     public void setPhotoName(String photoName) {
         this.photoName = photoName;
+    }
+
+    public Date getDeadLine() {
+        return deadLine;
+    }
+
+    public void setDeadLine(Date deadLine) {
+        this.deadLine = deadLine;
     }
 }

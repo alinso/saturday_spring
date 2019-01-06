@@ -9,10 +9,11 @@ import com.alinso.myapp.entity.ForgottenPasswordToken;
 import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserWarningException;
+import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.service.security.ForgottenPasswordTokenService;
 import com.alinso.myapp.service.security.MailVerificationTokenService;
+import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
-import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.util.UserUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
@@ -22,9 +23,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class UserService {
@@ -109,15 +110,8 @@ public class UserService {
         user.setReferenceCode(userInDb.getReferenceCode());
         user.setEnabled(userInDb.getEnabled());
 
-        if (profileInfoForUpdateDto.getbDateString() != null && !profileInfoForUpdateDto.getbDateString().equals("")) {
-            Date birthDate = null;
-            try {
-                birthDate = new SimpleDateFormat("dd/MM/yyyy").parse(profileInfoForUpdateDto.getbDateString());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            user.setBirthDate(birthDate);
-        }
+        user.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(),"dd/MM/yyyy"));
+
         userRepository.save(user);
         return profileInfoForUpdateDto;
     }
@@ -143,13 +137,10 @@ public class UserService {
         try {
 
             User user = userRepository.findById(id).get();
-            ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
 
-            if (user.getBirthDate() != null) {
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-                String birthDateString = format.format(user.getBirthDate());
-                profileInfoForUpdateDto.setbDateString(birthDateString);
-            }
+            ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
+            profileInfoForUpdateDto.setbDateString(DateUtil.dateToString(user.getBirthDate(),"dd/MM/yyyy"));
+
             return profileInfoForUpdateDto;
         } catch (Exception e) {
             throw new UserWarningException("user not found id : " + id);
