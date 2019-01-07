@@ -18,7 +18,8 @@ public class MeetingDto {
     private List<ProfileDto> attendants;
     private List<MeetingRequestDto> requests;
     private Boolean isThisUserJoined;
-    private Boolean isExpired;
+    private Boolean isExpired
+            ;
 
     @NotBlank(message="İleri bir zaman seçmelisiniz(10 dk sonra, 1 saat sonra...)")
     private String deadLineString;

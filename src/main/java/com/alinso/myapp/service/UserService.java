@@ -8,6 +8,7 @@ import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.ForgottenPasswordToken;
 import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.service.security.ForgottenPasswordTokenService;
@@ -24,6 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -54,7 +56,6 @@ public class UserService {
 
     public User register(User newUser) {
 
-        newUser.setEmail(newUser.getEmail());
         newUser.setConfirmPassword("");
         newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
         User user = userRepository.save(newUser);
@@ -78,7 +79,7 @@ public class UserService {
         MailVerificationToken token = mailVerificationTokenService.findByToken(tokenString);
 
         if (token == null) {
-            throw new UserWarningException("Geçersiz link");
+            throw new RecordNotFound404Exception("Geçersiz link");
         }
 
         User user = userRepository.findById(token.getUser().getId()).get();
@@ -87,6 +88,10 @@ public class UserService {
     }
 
     public void resetPassword(ResetPasswordDto resetPasswordDto) {
+        if (resetPasswordDto.getToken() == null) {
+            throw new RecordNotFound404Exception("Geçersiz link");
+        }
+
         ForgottenPasswordToken token = forgottenPasswordTokenService.findByToken(resetPasswordDto.getToken());
 
         User user = userRepository.findById(token.getUser().getId()).get();
@@ -97,22 +102,19 @@ public class UserService {
 
 
     public ProfileInfoForUpdateDto update(ProfileInfoForUpdateDto profileInfoForUpdateDto) {
-        User user = modelMapper.map(profileInfoForUpdateDto, User.class);
-        User userInDb;
-        try {
-            userInDb = userRepository.findById(user.getId()).get();
-        } catch (Exception e) {
-            throw new UserWarningException("user not found id : " + profileInfoForUpdateDto.getId());
-        }
+        User loggedUser  =(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        user.setPassword(userInDb.getPassword());
-        user.setProfilePicName(userInDb.getProfilePicName());
-        user.setReferenceCode(userInDb.getReferenceCode());
-        user.setEnabled(userInDb.getEnabled());
+        loggedUser.setName(profileInfoForUpdateDto.getName());
+        loggedUser.setSurname(profileInfoForUpdateDto.getSurname());
+        loggedUser.setEmail(profileInfoForUpdateDto.getEmail());
+        loggedUser.setPhone(profileInfoForUpdateDto.getPhone());
+        loggedUser.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(),"dd/MM/yyyy"));
+        loggedUser.setMotivation(profileInfoForUpdateDto.getMotivation());
+        loggedUser.setAbout(profileInfoForUpdateDto.getAbout());
+        loggedUser.setGender(profileInfoForUpdateDto.getGender());
+        loggedUser.setReferenceCode(profileInfoForUpdateDto.getReferenceCode());
 
-        user.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(),"dd/MM/yyyy"));
-
-        userRepository.save(user);
+        userRepository.save(loggedUser);
         return profileInfoForUpdateDto;
     }
 
@@ -121,7 +123,7 @@ public class UserService {
         try {
              user = userRepository.findById(id).get();
         } catch (Exception e) {
-            throw new UserWarningException("user not found id : " + id);
+            throw new RecordNotFound404Exception("Kullanıcı Bulunamadı: " + id);
         }
             ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
 
@@ -129,21 +131,19 @@ public class UserService {
                 profileDto.setAge(UserUtil.calculateAge(user));
             }
             return profileDto;
-
     }
 
 
-    public ProfileInfoForUpdateDto getMyProfileInfoForUpdate(Long id) {
+    public ProfileInfoForUpdateDto getMyProfileInfoForUpdate() {
         try {
 
-            User user = userRepository.findById(id).get();
-
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             profileInfoForUpdateDto.setbDateString(DateUtil.dateToString(user.getBirthDate(),"dd/MM/yyyy"));
 
             return profileInfoForUpdateDto;
         } catch (Exception e) {
-            throw new UserWarningException("user not found id : " + id);
+            throw new UserWarningException("Hata oluştu" );
         }
     }
 
@@ -182,26 +182,22 @@ public class UserService {
         String newName = fileStorageService.makeFileName() + "." + extension;
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User userInDb = userRepository.findById(loggedUser.getId()).get();
 
         //save new file and remove old one
-        fileStorageService.deleteFile(profilPicUploadPath + userInDb.getProfilePicName());
+        fileStorageService.deleteFile(profilPicUploadPath + loggedUser.getProfilePicName());
         fileStorageService.storeFile(singlePhotoUploadDto.getFile(), profilPicUploadPath, newName);
 
         //update database
-        userInDb.setProfilePicName(newName);
-        userRepository.save(userInDb);
+        loggedUser.setProfilePicName(newName);
+        userRepository.save(loggedUser);
         return newName;
     }
 
 
     public Boolean changePassword(ChangePasswordDto changePasswordDto) {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        User userInDb = userRepository.findById(loggedUser.getId()).get();
-        userInDb.setPassword(bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword()));
-
-        userRepository.save(userInDb);
+        loggedUser.setPassword(bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword()));
+        userRepository.save(loggedUser);
 
         return true;
     }

@@ -41,7 +41,7 @@ public class PhotoService {
 
         for (MultipartFile file : multipartPhotos) {
 
-            //store photo util
+            //store photo file
             String extension =  FilenameUtils.getExtension(file.getOriginalFilename());
             String newName = fileStorageService.makeFileName()+"."+extension;
 

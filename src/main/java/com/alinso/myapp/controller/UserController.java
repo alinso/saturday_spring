@@ -119,8 +119,7 @@ public class UserController {
     @GetMapping("/myProfile")
     public ResponseEntity<?> getMyProfileInfoForUpdate() {
 
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        ProfileInfoForUpdateDto profileInfoForUpdateDto = userService.getMyProfileInfoForUpdate(user.getId());
+        ProfileInfoForUpdateDto profileInfoForUpdateDto = userService.getMyProfileInfoForUpdate();
 
         return new ResponseEntity<ProfileInfoForUpdateDto>(profileInfoForUpdateDto, HttpStatus.CREATED);
     }

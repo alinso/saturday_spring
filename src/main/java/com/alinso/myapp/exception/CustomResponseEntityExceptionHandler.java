@@ -20,4 +20,10 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler
+    public final ResponseEntity<Object> handleRecordNotFound404(RecordNotFound404Exception ex, WebRequest request){
+        RecordNotFound404ExceptionResponse exceptionResponse = new RecordNotFound404ExceptionResponse(ex.getMessage());
+        return new ResponseEntity(exceptionResponse, HttpStatus.NOT_FOUND);
+    }
+
 }

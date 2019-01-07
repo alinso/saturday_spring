@@ -1,6 +1,7 @@
 package com.alinso.myapp.util;
 
 import com.alinso.myapp.exception.UserWarningException;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +22,6 @@ public class FileStorageUtil {
     @Autowired
     public FileStorageUtil() {
     }
-
 
 
     public String makeFileName() {
@@ -60,4 +60,17 @@ public class FileStorageUtil {
         file.delete();
     }
 
+    public String saveFileAndReturnName(MultipartFile file, String fileUploadPath) {
+        String newName = null;
+        if (file != null) {
+            String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+            newName = makeFileName() + "." + extension;
+            storeFile(file, fileUploadPath, newName);
+        }
+        return newName;
+    }
+
 }
+
+
+

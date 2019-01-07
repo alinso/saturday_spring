@@ -63,19 +63,11 @@ public class User extends BaseEntity implements UserDetails {
     @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
 
-    @Column( columnDefinition = "int default 0.0")
-    private Double rate = 0.0;
+    @Column( columnDefinition = "int default ")
+    private Integer point ;
 
     @Column( columnDefinition = "int default 0")
     private Integer meetingCount = 0;
-
-    public Double getRate() {
-        return rate;
-    }
-
-    public void setRate(Double rate) {
-        this.rate = rate;
-    }
 
     public String getName() {
         return name;
@@ -221,5 +213,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public Integer getPoint() {
+        return point;
+    }
+
+    public void setPoint(Integer point) {
+        this.point = point;
     }
 }

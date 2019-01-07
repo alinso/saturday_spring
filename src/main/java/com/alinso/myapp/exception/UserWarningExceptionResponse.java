@@ -3,8 +3,8 @@ public class UserWarningExceptionResponse {
 
     private String userWarningMessage;
 
-    public UserWarningExceptionResponse(String userNotFound) {
-        this.userWarningMessage = userNotFound;
+    public UserWarningExceptionResponse(String message) {
+        this.userWarningMessage = message;
     }
 
     public String getUserWarningMessage() {

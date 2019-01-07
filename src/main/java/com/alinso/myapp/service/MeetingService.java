@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +42,10 @@ public class MeetingService {
 
     @Autowired
     FileStorageUtil fileStorageUtil;
+
+    @Autowired
+    UserStatsService userStatsService;
+
 
     @Value("${upload.path}")
     private String fileUploadPath;
@@ -88,25 +91,12 @@ public class MeetingService {
     public Meeting save(MeetingDto meetingDto) {
 
         Meeting meeting = new Meeting(meetingDto.getDetail());
-
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User creator = userRepository.findById(loggedUser.getId()).get();
 
-        meeting.setCreator(creator);
+        meeting.setCreator(loggedUser);
         meeting.setDeadLine(DateUtil.stringToDate(meetingDto.getDeadLineString(),"dd/MM/yyyy HH:mm"));
-
-        //save new photo
-        String newName = null;
-        if (meetingDto.getFile() != null) {
-            String extension = FilenameUtils.getExtension(meetingDto.getFile().getOriginalFilename());
-            newName = fileStorageUtil.makeFileName() + "." + extension;
-            fileStorageUtil.storeFile(meetingDto.getFile(), fileUploadPath, newName);
-        }
-        meeting.setPhotoName(newName);
-
-        //update users event Count
-        creator.setMeetingCount((creator.getMeetingCount() + 1));
-
+        meeting.setPhotoName(fileStorageUtil.saveFileAndReturnName(meetingDto.getFile(),fileUploadPath));
+        userStatsService.newMeetingCreated();
 
         return meetingRepository.save(meeting);
     }
@@ -120,13 +110,9 @@ public class MeetingService {
 
 
         //save new photo and remove old one
-        String newName = null;
         if (meetingDto.getFile() != null) {
-            String extension = FilenameUtils.getExtension(meetingDto.getFile().getOriginalFilename());
-            newName = fileStorageUtil.makeFileName() + "." + extension;
-            fileStorageUtil.storeFile(meetingDto.getFile(), fileUploadPath, newName);
             fileStorageUtil.deleteFile(fileUploadPath + meetingInDb.getPhotoName());
-            meetingInDb.setPhotoName(newName);
+            meetingInDb.setPhotoName(fileStorageUtil.saveFileAndReturnName(meetingDto.getFile(),fileUploadPath));
         }
 
         meetingInDb.setDeadLine(DateUtil.stringToDate(meetingDto.getDeadLineString(),"dd/MM/yyyy HH:mm"));
@@ -161,11 +147,8 @@ public class MeetingService {
         //check user authorized
         UserUtil.checkUserOwner(meetingInDb.getCreator().getId());
 
-
         //decrease user's meeting count
-        Integer meetingCount = user.getMeetingCount()-1;
-        user.setMeetingCount(meetingCount);
-        userRepository.save(user);
+        userStatsService.meetingDeleted();
 
         //delete file
         fileStorageUtil.deleteFile(fileUploadPath + meetingInDb.getPhotoName());
