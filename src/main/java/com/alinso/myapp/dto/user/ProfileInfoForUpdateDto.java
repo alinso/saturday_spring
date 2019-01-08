@@ -1,5 +1,6 @@
 package com.alinso.myapp.dto.user;
 
+import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.enums.Gender;
 import org.springframework.stereotype.Component;
 
@@ -44,13 +45,7 @@ public class ProfileInfoForUpdateDto {
     @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
 
-    @NotNull
-    @Min(1)
-    @Max(5)
-    private Double rate = 1.0;
-
-    @NotNull
-    private Integer eventCount = 0;
+    private Long cityId;
 
 //getter setter
 
@@ -118,22 +113,6 @@ public class ProfileInfoForUpdateDto {
         this.referenceCode = referenceCode;
     }
 
-    public Double getRate() {
-        return rate;
-    }
-
-    public void setRate(Double rate) {
-        this.rate = rate;
-    }
-
-    public Integer getEventCount() {
-        return eventCount;
-    }
-
-    public void setEventCount(Integer eventCount) {
-        this.eventCount = eventCount;
-    }
-
     public String getPhone() {
         return phone;
     }
@@ -157,5 +136,13 @@ public class ProfileInfoForUpdateDto {
 
     public void setbDateString(String bDateString) {
         this.bDateString = bDateString;
+    }
+
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
     }
 }

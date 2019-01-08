@@ -25,7 +25,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -45,10 +44,16 @@ public class UserService {
     FileStorageUtil fileStorageService;
 
     @Autowired
+    ReferenceService referenceService;
+
+    @Autowired
     MailVerificationTokenService mailVerificationTokenService;
 
     @Autowired
     ForgottenPasswordTokenService forgottenPasswordTokenService;
+
+    @Autowired
+    CityService cityService;
 
 
     @Value("${upload.profile.path}")
@@ -61,6 +66,8 @@ public class UserService {
         User user = userRepository.save(newUser);
         String token = mailVerificationTokenService.saveToken(user);
         mailVerificationTokenService.sendMail(token, user.getEmail());
+        referenceService.useReferenceCode(newUser);
+        referenceService.createNewReferenceCodes(user);
         return user;
     }
 
@@ -105,6 +112,7 @@ public class UserService {
         User loggedUser  =(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         loggedUser.setName(profileInfoForUpdateDto.getName());
+        loggedUser.setCity(cityService.findById(profileInfoForUpdateDto.getCityId()));
         loggedUser.setSurname(profileInfoForUpdateDto.getSurname());
         loggedUser.setEmail(profileInfoForUpdateDto.getEmail());
         loggedUser.setPhone(profileInfoForUpdateDto.getPhone());
@@ -184,6 +192,7 @@ public class UserService {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //save new file and remove old one
+        if(!loggedUser.getProfilePicName().equals(""))
         fileStorageService.deleteFile(profilPicUploadPath + loggedUser.getProfilePicName());
         fileStorageService.storeFile(singlePhotoUploadDto.getFile(), profilPicUploadPath, newName);
 

@@ -1,5 +1,6 @@
 package com.alinso.myapp.repository;
 
+import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.Meeting;
 import com.alinso.myapp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,8 +14,12 @@ import java.util.List;
 @Repository
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
-    @Query("select meeting from Meeting meeting where meeting.deadLine > :now ")
-    public List<Meeting> findAllNonExpired(@Param("now") Date now);
+    @Query("select meeting from Meeting meeting where meeting.deadLine > :now and meeting.city= :city")
+    public List<Meeting> findAllNonExpiredByCityId(@Param("now") Date now, @Param("city")City city);
 
     public List<Meeting> findByCreatorOrderByIdDesc(User creator);
+
+    @Query("select meeting from Meeting meeting where meeting.deadLine > :start and meeting.deadLine < :finish and meeting.creator=:user")
+    List<Meeting> recentMeetingsOfCreator(@Param("start")Date start, @Param("finish")Date finish, @Param("user")User user);
+
 }

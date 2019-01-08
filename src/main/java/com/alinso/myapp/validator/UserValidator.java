@@ -1,8 +1,11 @@
 package com.alinso.myapp.validator;
 
+import com.alinso.myapp.dto.reference.ReferenceDto;
 import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
+import com.alinso.myapp.entity.Reference;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.Gender;
+import com.alinso.myapp.service.ReferenceService;
 import com.alinso.myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,6 +17,9 @@ public class UserValidator implements Validator {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    ReferenceService referenceService;
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -48,6 +54,11 @@ public class UserValidator implements Validator {
 
         if(user.getGender()== Gender.UNSELECTED){
             errors.rejectValue("gender","Match", "Cinsiyet Seçiniz");
+        }
+
+        ReferenceDto referenceDto  = referenceService.findByCode(user.getReferenceCode());
+        if(referenceDto==null || referenceDto.getChild()!=null){
+            errors.rejectValue("referenceCode","Match", "Geçersiz Referans Kodu");
         }
 
 

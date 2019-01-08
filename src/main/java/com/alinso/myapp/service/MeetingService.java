@@ -3,6 +3,7 @@ package com.alinso.myapp.service;
 import com.alinso.myapp.dto.meeting.MeetingDto;
 import com.alinso.myapp.dto.meeting.MeetingRequestDto;
 import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.Meeting;
 import com.alinso.myapp.entity.MeetingRequest;
 import com.alinso.myapp.entity.User;
@@ -14,7 +15,6 @@ import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.util.UserUtil;
-import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +45,9 @@ public class MeetingService {
 
     @Autowired
     UserStatsService userStatsService;
+
+    @Autowired
+    CityService cityService;
 
 
     @Value("${upload.path}")
@@ -92,11 +95,13 @@ public class MeetingService {
 
         Meeting meeting = new Meeting(meetingDto.getDetail());
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        City city = cityService.findById(meetingDto.getCityId());
 
+        meeting.setCity(city);
         meeting.setCreator(loggedUser);
         meeting.setDeadLine(DateUtil.stringToDate(meetingDto.getDeadLineString(),"dd/MM/yyyy HH:mm"));
         meeting.setPhotoName(fileStorageUtil.saveFileAndReturnName(meetingDto.getFile(),fileUploadPath));
-        userStatsService.newMeetingCreated();
+        userStatsService.newMeeting(loggedUser);
 
         return meetingRepository.save(meeting);
     }
@@ -107,6 +112,9 @@ public class MeetingService {
 
         //check user owner
         UserUtil.checkUserOwner(meetingInDb.getCreator().getId());
+
+        City city = cityService.findById(meetingDto.getCityId());
+        meetingInDb.setCity(city);
 
 
         //save new photo and remove old one
@@ -120,10 +128,10 @@ public class MeetingService {
         return meetingRepository.save(meetingInDb);
     }
 
-    public List<MeetingDto> findAll() {
-        List<Meeting> meetings = meetingRepository.findAllNonExpired(new Date());
-        List<MeetingDto> meetingDtos = new ArrayList<>();
+    public List<MeetingDto> findAllNonExpiredByCityId(Long cityId) {
 
+        List<Meeting> meetings = meetingRepository.findAllNonExpiredByCityId(new Date(),cityService.findById(cityId));
+        List<MeetingDto> meetingDtos = new ArrayList<>();
 
         for (Meeting meeting : meetings) {
 
@@ -148,7 +156,7 @@ public class MeetingService {
         UserUtil.checkUserOwner(meetingInDb.getCreator().getId());
 
         //decrease user's meeting count
-        userStatsService.meetingDeleted();
+        userStatsService.removeMeeting(user);
 
         //delete file
         fileStorageUtil.deleteFile(fileUploadPath + meetingInDb.getPhotoName());
@@ -161,11 +169,15 @@ public class MeetingService {
         meetingRepository.deleteById(id);
     }
 
-    public List<MeetingDto> findByUserId(Long id) {
-
+    public List<MeetingDto> meetingsOfUser(Long id) {
         User user = userRepository.findById(id).get();
+        List<Meeting> meetingsCreatedByUser = meetingRepository.findByCreatorOrderByIdDesc(user);
+        List <Meeting> meetingsAttendedByUser  =meetingRequesRepository.meetingsAttendedByUser(user,MeetingRequestStatus.APPROVED);
 
-        List<Meeting> meetings = meetingRepository.findByCreatorOrderByIdDesc(user);
+        List<Meeting> meetings = new ArrayList<>();
+        meetings.addAll(meetingsCreatedByUser);
+        meetings.addAll(meetingsAttendedByUser);
+
         List<MeetingDto> meetingDtos = new ArrayList<>();
         for (Meeting meeting : meetings) {
 
@@ -246,10 +258,13 @@ public class MeetingService {
             checkMaxApproveCountExceeded(meetingRequest.getMeeting());
             meetingRequest.setMeetingRequestStatus(MeetingRequestStatus.APPROVED);
             meetingRequesRepository.save(meetingRequest);
+            userStatsService.newMeeting(meetingRequest.getApplicant());
         }
         else{
             meetingRequest.setMeetingRequestStatus(MeetingRequestStatus.WAITING);
             meetingRequesRepository.save(meetingRequest);
+            userStatsService.removeMeeting(meetingRequest.getApplicant());
+
         }
 
         return meetingRequest.getMeetingRequestStatus();

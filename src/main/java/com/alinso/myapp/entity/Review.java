@@ -10,8 +10,8 @@ import javax.validation.constraints.NotNull;
 public class Review extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
-    @NotBlank(message = "Referans metni boş olamaz")
-    private String reference;
+    @NotBlank(message = "Yorum metni boş olamaz")
+    private String review;
 
     @ManyToOne
     @NotNull
@@ -30,13 +30,13 @@ public class Review extends BaseEntity {
     @NotNull
     private Boolean isPositive;
 
-    
-    public String getReference() {
-        return reference;
+
+    public String getReview() {
+        return review;
     }
 
-    public void setReference(String reference) {
-        this.reference = reference;
+    public void setReview(String review) {
+        this.review = review;
     }
 
     public User getReader() {

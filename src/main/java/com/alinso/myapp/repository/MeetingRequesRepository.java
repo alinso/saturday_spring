@@ -14,6 +14,7 @@ import java.util.List;
 public interface MeetingRequesRepository extends JpaRepository<MeetingRequest, Long> {
 
 
+
     @Query("select meetingRequest from MeetingRequest meetingRequest where  meetingRequest.applicant = :applicant and meetingRequest.meeting=:meeting")
     public MeetingRequest findByMeetingaAndApplicant(@Param("applicant") User applicant, @Param("meeting") Meeting meeting);
 
@@ -23,4 +24,9 @@ public interface MeetingRequesRepository extends JpaRepository<MeetingRequest, L
     @Query("select count(meetingRequest) from MeetingRequest meetingRequest " +
             "where  meetingRequest.meetingRequestStatus=:status and meetingRequest.meeting=:meeting")
     Integer countOfAprrovedForThisMeetingId(@Param("meeting") Meeting meeting, @Param("status")MeetingRequestStatus status);
+
+    @Query("select meetingRequest.meeting from MeetingRequest meetingRequest " +
+            "where  meetingRequest.meetingRequestStatus=:status and meetingRequest.applicant=:user")
+
+    List<Meeting> meetingsAttendedByUser(@Param("user") User user,@Param("status") MeetingRequestStatus status);
 }

@@ -33,6 +33,9 @@ public class Meeting extends BaseEntity {
     @OneToOne
     private User creator;
 
+    @ManyToOne
+    private City city;
+
     @Column
     private String photoName;
 
@@ -66,5 +69,13 @@ public class Meeting extends BaseEntity {
 
     public void setDeadLine(Date deadLine) {
         this.deadLine = deadLine;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 }

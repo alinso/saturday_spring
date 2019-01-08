@@ -32,6 +32,9 @@ public class PhotoService {
     @Value("${upload.path}")
     private String fileUploadPath;
 
+    @Autowired
+    UserStatsService userStatsService;
+
 
 
     public List<String> savePhotos(MultipartFile[] multipartPhotos) {
@@ -53,6 +56,7 @@ public class PhotoService {
             photo.setFileName(newName);
             photo.setUser(user);
             photoRepository.save(photo);
+            userStatsService.newPhotoAdded();
 
         }
 
@@ -72,6 +76,7 @@ public class PhotoService {
         if(photo!=null){
             fileStorageService.deleteFile(fileUploadPath+photoName);
             photoRepository.delete(photo);
+            userStatsService.photoDeleted();
         }
     }
 

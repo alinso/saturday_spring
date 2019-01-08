@@ -1,5 +1,6 @@
 package com.alinso.myapp.dto.user;
 
+import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.enums.Gender;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,6 @@ public class ProfileDto {
     @NotBlank(message = "Soyisim boş olamaz")
     private String surname;
 
-
     private String about = "";
 
     private String bDateString;
@@ -35,16 +35,39 @@ public class ProfileDto {
 
     private String motivation = "";
 
+    private Integer meetingCount;
+    private Integer reviewCount;
+    private Integer photoCount;
+    private Integer point;
 
-    @NotNull
-    @Min(1)
-    @Max(5)
-    private Double rate = 1.0;
 
-    @NotNull
-    private Integer meetingCount = 0;
+
 
 //getter setter
+
+    public Integer getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
+    public Integer getPhotoCount() {
+        return photoCount;
+    }
+
+    public void setPhotoCount(Integer photoCount) {
+        this.photoCount = photoCount;
+    }
+
+    public Integer getPoint() {
+        return point;
+    }
+
+    public void setPoint(Integer point) {
+        this.point = point;
+    }
 
     public Integer getAge() {
         return age;
@@ -104,14 +127,6 @@ public class ProfileDto {
     }
 
 
-    public Double getRate() {
-        return rate;
-    }
-
-    public void setRate(Double rate) {
-        this.rate = rate;
-    }
-
     public Integer getMeetingCount() {
         return meetingCount;
     }
@@ -137,4 +152,5 @@ public class ProfileDto {
     public void setbDateString(String bDateString) {
         this.bDateString = bDateString;
     }
+
 }

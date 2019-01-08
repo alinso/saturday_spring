@@ -1,10 +1,10 @@
 package com.alinso.myapp.dto.meeting;
 
 import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.entity.City;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class MeetingDto {
@@ -18,8 +18,9 @@ public class MeetingDto {
     private List<ProfileDto> attendants;
     private List<MeetingRequestDto> requests;
     private Boolean isThisUserJoined;
-    private Boolean isExpired
-            ;
+    private Boolean isExpired;
+    private City city;
+    private Long cityId;
 
     @NotBlank(message="İleri bir zaman seçmelisiniz(10 dk sonra, 1 saat sonra...)")
     private String deadLineString;
@@ -103,5 +104,21 @@ public class MeetingDto {
 
     public void setExpired(Boolean expired) {
         isExpired = expired;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
     }
 }

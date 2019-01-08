@@ -63,11 +63,37 @@ public class User extends BaseEntity implements UserDetails {
     @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
 
-    @Column( columnDefinition = "int default ")
+    @Column( columnDefinition = "int default 0")
     private Integer point ;
 
     @Column( columnDefinition = "int default 0")
-    private Integer meetingCount = 0;
+    private Integer meetingCount;
+
+    @Column( columnDefinition = "int default 0")
+    private Integer photoCount;
+
+    @Column( columnDefinition = "int default 0")
+    private Integer reviewCount;
+
+    @ManyToOne
+    private City city;
+
+
+    public Integer getPhotoCount() {
+        return photoCount;
+    }
+
+    public void setPhotoCount(Integer photoCount) {
+        this.photoCount = photoCount;
+    }
+
+    public Integer getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+        this.reviewCount = reviewCount;
+    }
 
     public String getName() {
         return name;
@@ -221,5 +247,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setPoint(Integer point) {
         this.point = point;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 }

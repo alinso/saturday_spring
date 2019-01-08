@@ -43,9 +43,9 @@ public class MeetingController {
 
 
 
-    @GetMapping("findAll")
-    public ResponseEntity<?> findAll(){
-        List<MeetingDto>  meetings = meetingService.findAll();
+    @GetMapping("findAllByCityId/{cityId}")
+    public ResponseEntity<?> findAll(@PathVariable("cityId") Long cityId){
+        List<MeetingDto>  meetings = meetingService.findAllNonExpiredByCityId(cityId);
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }
@@ -75,7 +75,7 @@ public class MeetingController {
 
     @GetMapping("findByUserId/{id}")
     public ResponseEntity<?> findByUserId(@PathVariable("id") Long id){
-        List<MeetingDto>  meetings = meetingService.findByUserId(id);
+        List<MeetingDto>  meetings = meetingService.meetingsOfUser(id);
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }

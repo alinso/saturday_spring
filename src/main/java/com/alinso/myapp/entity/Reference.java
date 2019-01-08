@@ -3,6 +3,7 @@ package com.alinso.myapp.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -14,11 +15,12 @@ public class Reference extends BaseEntity{
     @NotBlank
     private String referenceCode;
 
-
     @ManyToOne
     @NotNull
     private User parent;
 
+    @OneToOne
+    private User child;
 
     public String getReferenceCode() {
         return referenceCode;
@@ -34,5 +36,13 @@ public class Reference extends BaseEntity{
 
     public void setParent(User parent) {
         this.parent = parent;
+    }
+
+    public User getChild() {
+        return child;
+    }
+
+    public void setChild(User child) {
+        this.child = child;
     }
 }
