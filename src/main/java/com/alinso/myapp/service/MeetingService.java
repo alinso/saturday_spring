@@ -32,9 +32,6 @@ public class MeetingService {
     MeetingRepository meetingRepository;
 
     @Autowired
-    MeetingRequesRepository meetingRequesRepository;
-
-    @Autowired
     ModelMapper modelMapper;
 
     @Autowired
@@ -44,47 +41,32 @@ public class MeetingService {
     FileStorageUtil fileStorageUtil;
 
     @Autowired
-    UserStatsService userStatsService;
+    UserEventService userEventService;
 
     @Autowired
     CityService cityService;
+
+    @Autowired
+    MeetingRequestService meetingRequestService;
+
+    @Autowired
+    MeetingRequesRepository meetingRequesRepository;
 
 
     @Value("${upload.path}")
     private String fileUploadPath;
 
-    private Boolean isThisUserJoined(Long meetingId){
-        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Boolean isThisUserJoined=false;
-        List<MeetingRequest> meetingRequests  =meetingRequesRepository.findByMeetingId(meetingId);
-        for(MeetingRequest meetingRequest:meetingRequests){
-            if(meetingRequest.getApplicant().getId()==loggedUser.getId()){
-                isThisUserJoined=true;
-            }
-        }
-        return isThisUserJoined;
-    }
-
-    private void checkMaxApproveCountExceeded(Meeting meeting){
-        Integer c= meetingRequesRepository.countOfAprrovedForThisMeetingId(meeting,MeetingRequestStatus.APPROVED);
-        if(c==2){
-            throw  new UserWarningException("Her aktivite için en fazla 2 kişi onaylayabilirsiniz");
-        }
-    }
-
 
     public MeetingDto findById(Long id) {
-        Meeting meeting = meetingRepository.getOne(id);
-
-        UserUtil.checkUserOwner(meeting.getCreator().getId());
+        Meeting meeting = meetingRepository.findById(id).get();
 
         ProfileDto profileDto = modelMapper.map(meeting.getCreator(), ProfileDto.class);
 
         MeetingDto meetingDto = modelMapper.map(meeting, MeetingDto.class);
         meetingDto.setProfileDto(profileDto);
         meetingDto.setDeadLineString(DateUtil.dateToString(meeting.getDeadLine(),"dd/MM/yyyy HH:mm"));
-        meetingDto.setThisUserJoined(isThisUserJoined(meeting.getId()));
-
+        meetingDto.setThisUserJoined(meetingRequestService.isThisUserJoined(meeting.getId()));
+        meetingDto.setAttendants(meetingRequestService.findAttendants(meeting));
 
         return meetingDto;
 
@@ -101,7 +83,7 @@ public class MeetingService {
         meeting.setCreator(loggedUser);
         meeting.setDeadLine(DateUtil.stringToDate(meetingDto.getDeadLineString(),"dd/MM/yyyy HH:mm"));
         meeting.setPhotoName(fileStorageUtil.saveFileAndReturnName(meetingDto.getFile(),fileUploadPath));
-        userStatsService.newMeeting(loggedUser);
+        userEventService.newMeeting(loggedUser);
 
         return meetingRepository.save(meeting);
     }
@@ -139,7 +121,7 @@ public class MeetingService {
             profileDto.setAge(UserUtil.calculateAge(meeting.getCreator()));
 
             MeetingDto meetingDto = modelMapper.map(meeting, MeetingDto.class);
-            meetingDto.setThisUserJoined(isThisUserJoined(meeting.getId()));
+            meetingDto.setThisUserJoined(meetingRequestService.isThisUserJoined(meeting.getId()));
             meetingDto.setDeadLineString(DateUtil.dateToString(meeting.getDeadLine(),"dd/MM/yyyy HH:mm"));
             meetingDto.setProfileDto(profileDto);
             meetingDtos.add(meetingDto);
@@ -156,15 +138,13 @@ public class MeetingService {
         UserUtil.checkUserOwner(meetingInDb.getCreator().getId());
 
         //decrease user's meeting count
-        userStatsService.removeMeeting(user);
+        userEventService.removeMeeting(user);
 
         //delete file
         fileStorageUtil.deleteFile(fileUploadPath + meetingInDb.getPhotoName());
 
         //delete requests
-        for(MeetingRequest meetingRequest:meetingRequesRepository.findByMeetingId(id)){
-            meetingRequesRepository.delete(meetingRequest);
-        }
+       meetingRequestService.deleteByMeetingId(id);
 
         meetingRepository.deleteById(id);
     }
@@ -191,36 +171,12 @@ public class MeetingService {
             else
                 meetingDto.setExpired(false);
 
-            meetingDto.setThisUserJoined(isThisUserJoined(meeting.getId()));
+            meetingDto.setAttendants(meetingRequestService.findAttendants(meeting));
+            meetingDto.setThisUserJoined(meetingRequestService.isThisUserJoined(meeting.getId()));
             meetingDto.setProfileDto(profileDto);
             meetingDtos.add(meetingDto);
         }
         return meetingDtos;
-    }
-
-    public Boolean join(Long id) {
-        Meeting meeting = meetingRepository.findById(id).get();
-        if(meeting.getDeadLine().compareTo(new Date())<0)
-            throw new UserWarningException("Geçmiş tarihli bir aktivitede düzenleme yapamazsınız");
-
-        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Boolean isThisUserJoined = isThisUserJoined(meeting.getId());
-        if(!isThisUserJoined){
-            MeetingRequest newMeetingRequest  =new MeetingRequest();
-            newMeetingRequest.setApplicant(loggedUser);
-            newMeetingRequest.setMeeting(meeting);
-            newMeetingRequest.setMeetingRequestStatus(MeetingRequestStatus.WAITING);
-            meetingRequesRepository.save(newMeetingRequest);
-        }
-        else{
-            MeetingRequest meetingRequest  =meetingRequesRepository.findByMeetingaAndApplicant(loggedUser,meeting);
-            meetingRequesRepository.delete(meetingRequest);
-        }
-
-        //we have changed the status in above if-else condition
-        //so we need to return opposite of initial value
-        return !isThisUserJoined;
     }
 
     public MeetingDto getMeetingWithRequests(Long id) {
@@ -245,29 +201,6 @@ public class MeetingService {
         meetingDto.setRequests(meetingRequestDtos);
 
         return meetingDto;
-    }
-
-    public MeetingRequestStatus approveRequest(Long id) {
-        MeetingRequest meetingRequest = meetingRequesRepository.findById(id).get();
-
-        //check user owner
-        UserUtil.checkUserOwner(meetingRequest.getMeeting().getCreator().getId());
-
-
-        if(meetingRequest.getMeetingRequestStatus()==MeetingRequestStatus.WAITING){
-            checkMaxApproveCountExceeded(meetingRequest.getMeeting());
-            meetingRequest.setMeetingRequestStatus(MeetingRequestStatus.APPROVED);
-            meetingRequesRepository.save(meetingRequest);
-            userStatsService.newMeeting(meetingRequest.getApplicant());
-        }
-        else{
-            meetingRequest.setMeetingRequestStatus(MeetingRequestStatus.WAITING);
-            meetingRequesRepository.save(meetingRequest);
-            userStatsService.removeMeeting(meetingRequest.getApplicant());
-
-        }
-
-        return meetingRequest.getMeetingRequestStatus();
     }
 }
 

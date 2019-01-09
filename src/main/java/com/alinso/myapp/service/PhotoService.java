@@ -2,7 +2,6 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.Photo;
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.repository.PhotoRepository;
 import com.alinso.myapp.repository.UserRepository;
@@ -33,7 +32,7 @@ public class PhotoService {
     private String fileUploadPath;
 
     @Autowired
-    UserStatsService userStatsService;
+    UserEventService userEventService;
 
 
 
@@ -56,7 +55,7 @@ public class PhotoService {
             photo.setFileName(newName);
             photo.setUser(user);
             photoRepository.save(photo);
-            userStatsService.newPhotoAdded();
+            userEventService.newPhotoAdded();
 
         }
 
@@ -76,7 +75,7 @@ public class PhotoService {
         if(photo!=null){
             fileStorageService.deleteFile(fileUploadPath+photoName);
             photoRepository.delete(photo);
-            userStatsService.photoDeleted();
+            userEventService.photoDeleted();
         }
     }
 

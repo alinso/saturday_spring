@@ -41,8 +41,6 @@ public class MeetingController {
         return new ResponseEntity<>(meetingDto,HttpStatus.ACCEPTED);
     }
 
-
-
     @GetMapping("findAllByCityId/{cityId}")
     public ResponseEntity<?> findAll(@PathVariable("cityId") Long cityId){
         List<MeetingDto>  meetings = meetingService.findAllNonExpiredByCityId(cityId);
@@ -50,24 +48,8 @@ public class MeetingController {
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }
 
-    @GetMapping("join/{id}")
-    public ResponseEntity<?> join(@PathVariable("id") Long id){
-
-        Boolean isThisUserJoins = meetingService.join(id);
-
-        return new ResponseEntity<>(isThisUserJoins,HttpStatus.OK);
-    }
-
-    @GetMapping("approveRequest/{id}")
-    public ResponseEntity<?> approveRequest(@PathVariable("id") Long id){
-
-        MeetingRequestStatus status = meetingService.approveRequest(id);
-        return new ResponseEntity<>(status,HttpStatus.OK);
-    }
-
-
-    @GetMapping("requests/{id}")
-    public ResponseEntity<?> requests(@PathVariable("id") Long id){
+    @GetMapping("meetingWithRequests/{id}")
+    public ResponseEntity<?> meetingWithRequests(@PathVariable("id") Long id){
         MeetingDto meetingDto  =meetingService.getMeetingWithRequests(id);
         return new ResponseEntity<>(meetingDto,HttpStatus.OK);
     }

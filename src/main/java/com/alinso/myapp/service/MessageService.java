@@ -28,6 +28,8 @@ public class MessageService {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    UserEventService userEventService;
 
     public MessageDto send(MessageDto messageDto) {
         Message message = modelMapper.map(messageDto, Message.class);
@@ -39,11 +41,15 @@ public class MessageService {
 
        messageRepository.save(message);
 
-        MessageDto newMessageDto =new MessageDto();
-        newMessageDto.setMessage(message.getMessage());
-        newMessageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(),"DD/MM HH:mm"));
-        newMessageDto.setReader(modelMapper.map(message.getReader(),ProfileDto.class));
-            return newMessageDto;
+//        MessageDto newMessageDto =new MessageDto();
+//        newMessageDto.setMessage(message.getMessage());
+//        newMessageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(),"DD/MM HH:mm"));
+//        newMessageDto.setReader(modelMapper.map(message.getReader(),ProfileDto.class));
+
+        userEventService.newMessage(message.getReader());
+        messageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(),"DD/MM HH:mm"));
+        messageDto.setReader(modelMapper.map(message.getReader(),ProfileDto.class));
+        return messageDto;
     }
 
 
@@ -112,6 +118,8 @@ public class MessageService {
             myConversationDtos.add(conversationDto);
 
         }
+
+        userEventService.messaesRead();
         return myConversationDtos;
     }
 }

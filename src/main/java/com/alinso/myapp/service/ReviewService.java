@@ -41,7 +41,7 @@ public class ReviewService {
     ModelMapper modelMapper;
 
     @Autowired
-    UserStatsService userStatsService;
+    UserEventService userEventService;
 
     private final Integer DAYS_TO_WRITE_REVIEW = -10;
     private final Integer HOURS_TO_WRITE_REVIEW = -1;
@@ -112,7 +112,6 @@ public class ReviewService {
         if(isReviewedBefore(reviewDto.getReader().getId()))
             throw new UserWarningException("Bir kişi için daha önce referans yazdınız");
 
-        userStatsService.referenceWritten(reader, reviewDto.getReviewType(),reviewDto.getPositive());
 
 
         Review review = modelMapper.map(reviewDto, Review.class);
@@ -121,6 +120,7 @@ public class ReviewService {
         review.setReviewType(ReviewType.FRIEND);
 
         reviewRepository.save(review);
+        userEventService.referenceWritten(reader, review);
 
     }
 
