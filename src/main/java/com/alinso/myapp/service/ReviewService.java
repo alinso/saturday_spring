@@ -43,6 +43,9 @@ public class ReviewService {
     @Autowired
     UserEventService userEventService;
 
+    @Autowired
+    BlockService blockService;
+
     private final Integer DAYS_TO_WRITE_REVIEW = -10;
     private final Integer HOURS_TO_WRITE_REVIEW = -1;
 
@@ -106,6 +109,9 @@ public class ReviewService {
         User reader = userRepository.findById(reviewDto.getReader().getId()).get();
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        if(blockService.isBlockedByIt(reader.getId()) || blockService.isBlockedIt(reader.getId()))
+            throw new UserWarningException("Engellendiniz");
+
         if(reviewDto.getReviewType()==ReviewType.MEETING && !haveUsersMeetRecently(writer, reader))
             throw new UserWarningException("Daha önce bir aktiviteye katılmadınız!");
 
@@ -139,6 +145,11 @@ public class ReviewService {
 
     public List<ReviewDto> reviewsOfUser(Long id) {
         User user  =userRepository.findById(id).get();
+
+        if(blockService.isBlockedByIt(id) || blockService.isBlockedIt(id))
+            throw new UserWarningException("Engellendiniz");
+
+
         List<Review> reviews = reviewRepository.findByReader(user);
 
         List<ReviewDto> reviewDtos = new ArrayList<>();

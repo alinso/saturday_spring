@@ -30,10 +30,11 @@ public class MeetingRequestService {
     @Autowired
     UserEventService userEventService;
 
-
     @Autowired
     MeetingRequesRepository meetingRequesRepository;
 
+    @Autowired
+    BlockService blockService;
 
     public Boolean sendRequest(Long id) {
         Meeting meeting = meetingRepository.findById(id).get();
@@ -41,6 +42,10 @@ public class MeetingRequestService {
             throw new UserWarningException("Geçmiş tarihli bir aktivitede düzenleme yapamazsınız");
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(blockService.isBlockedByIt(meeting.getCreator().getId()))
+            throw new UserWarningException("Engellendiniz");
+
 
         Boolean isThisUserJoined = isThisUserJoined(meeting.getId());
         if(!isThisUserJoined){
@@ -67,6 +72,10 @@ public class MeetingRequestService {
 
         //check user owner
         UserUtil.checkUserOwner(meetingRequest.getMeeting().getCreator().getId());
+
+
+        if(blockService.isBlockedByIt(meetingRequest.getMeeting().getCreator().getId()))
+            throw new UserWarningException("Engellendiniz");
 
 
         if(meetingRequest.getMeetingRequestStatus()==MeetingRequestStatus.WAITING){

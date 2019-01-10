@@ -2,6 +2,7 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.Photo;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.repository.PhotoRepository;
 import com.alinso.myapp.repository.UserRepository;
@@ -34,6 +35,9 @@ public class PhotoService {
     @Autowired
     UserEventService userEventService;
 
+    @Autowired
+    BlockService  blockService;
+
 
 
     public List<String> savePhotos(MultipartFile[] multipartPhotos) {
@@ -63,6 +67,9 @@ public class PhotoService {
     }
 
     public List<Photo> findByUserId(Long id){
+        if(blockService.isBlockedByIt(id) || blockService.isBlockedIt(id))
+            throw new UserWarningException("Engellendiniz");
+
         User user  =userRepository.findById(id).get();
         return photoRepository.findByUser(user);
     }

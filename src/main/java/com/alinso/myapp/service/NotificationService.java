@@ -28,7 +28,16 @@ public class NotificationService {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    BlockService blockService;
+
     private void createNotification(User target,User trigger,NotificationType notificationType,String message){
+
+
+        if(blockService.isBlockedByIt(target.getId()) || blockService.isBlockedIt(target.getId()))
+            throw new UserWarningException("Engellendiniz");
+
+
         Notification notification = new Notification();
         notification.setNotificationType(notificationType);
         notification.setTarget(target);

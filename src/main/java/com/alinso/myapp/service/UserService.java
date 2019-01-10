@@ -55,6 +55,8 @@ public class UserService {
     @Autowired
     CityService cityService;
 
+    @Autowired
+    BlockService blockService;
 
     @Value("${upload.profile.path}")
     private String profilPicUploadPath;
@@ -128,6 +130,8 @@ public class UserService {
 
     public ProfileDto getProfileById(Long id) {
         User user;
+
+
         try {
              user = userRepository.findById(id).get();
         } catch (Exception e) {

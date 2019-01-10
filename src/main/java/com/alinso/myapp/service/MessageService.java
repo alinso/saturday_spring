@@ -5,6 +5,7 @@ import com.alinso.myapp.dto.message.MessageDto;
 import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Message;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.MessageRepository;
 import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.util.DateUtil;
@@ -31,20 +32,23 @@ public class MessageService {
     @Autowired
     UserEventService userEventService;
 
+    @Autowired
+    BlockService blockService;
+
     public MessageDto send(MessageDto messageDto) {
         Message message = modelMapper.map(messageDto, Message.class);
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User reader = userRepository.findById(messageDto.getReader().getId()).get();
 
+
+        if(blockService.isBlockedByIt(reader.getId()) || blockService.isBlockedIt(reader.getId()))
+            throw new UserWarningException("Engellendiniz");
+
+
         message.setWriter(writer);
         message.setReader(reader);
 
        messageRepository.save(message);
-
-//        MessageDto newMessageDto =new MessageDto();
-//        newMessageDto.setMessage(message.getMessage());
-//        newMessageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(),"DD/MM HH:mm"));
-//        newMessageDto.setReader(modelMapper.map(message.getReader(),ProfileDto.class));
 
         userEventService.newMessage(message.getReader());
         messageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(),"DD/MM HH:mm"));
@@ -58,6 +62,7 @@ public class MessageService {
         User reader = userRepository.findById(readerId).get();
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Message> messages = messageRepository.getByReaderWriter(reader, writer);
+
 
         List<MessageDto> messageDtos = new ArrayList<>();
         for (Message message : messages) {
@@ -97,6 +102,7 @@ public class MessageService {
         List<ConversationDto> myConversationDtos = new ArrayList<>();
         for (Message message : latestMessageFromEachConversation) {
 
+
             //define the opposite id for every conversation
             Long oppositeId = getOppositeId(message,me);
 
@@ -105,6 +111,10 @@ public class MessageService {
                 oppositeIds.add(oppositeId);
             else
                 continue;
+
+            if(blockService.isBlockedByIt(oppositeId) || blockService.isBlockedIt(oppositeId))
+                continue;
+
 
             User oppositeUser  =userRepository.findById(oppositeId).get();
             ProfileDto oppositeDto = modelMapper.map(oppositeUser,ProfileDto.class);
