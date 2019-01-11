@@ -48,7 +48,7 @@ public class BlockService {
         return isBlocked;
     }
 
-    public Boolean isBlockedByIt(Long blockerId) {
+    private Boolean isBlockedByIt(Long blockerId) {
 
         User blocked  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User blocker =userRepository.findById(blockerId).get();
@@ -61,7 +61,7 @@ public class BlockService {
     }
 
 
-    public Boolean isBlockedIt(Long blockedId) {
+    private Boolean isBlockedIt(Long blockedId) {
 
         User blocker  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User blocked =userRepository.findById(blockedId).get();
@@ -71,6 +71,10 @@ public class BlockService {
             return false;
         else
             return true;
+    }
+
+    public Boolean isThereABlock(Long oppositId){
+        return (isBlockedIt(oppositId) || isBlockedByIt(oppositId));
     }
 
 

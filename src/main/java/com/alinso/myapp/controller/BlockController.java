@@ -28,7 +28,7 @@ public class BlockController {
 
     @GetMapping("isBlocked/{oppositId}")
     public ResponseEntity<?> isFollowing(@PathVariable("oppositId") Long oppositId){
-        Boolean result = (blockService.isBlockedByIt(oppositId) || blockService.isBlockedByIt(oppositId));
+        Boolean result = blockService.isThereABlock(oppositId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

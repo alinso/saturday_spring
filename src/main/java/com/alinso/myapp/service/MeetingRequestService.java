@@ -43,8 +43,8 @@ public class MeetingRequestService {
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(blockService.isBlockedByIt(meeting.getCreator().getId()))
-            throw new UserWarningException("Engellendiniz");
+        if(blockService.isThereABlock(meeting.getCreator().getId()))
+            throw new UserWarningException("Erişim Yok");
 
 
         Boolean isThisUserJoined = isThisUserJoined(meeting.getId());
@@ -74,8 +74,8 @@ public class MeetingRequestService {
         UserUtil.checkUserOwner(meetingRequest.getMeeting().getCreator().getId());
 
 
-        if(blockService.isBlockedByIt(meetingRequest.getMeeting().getCreator().getId()))
-            throw new UserWarningException("Engellendiniz");
+        if(blockService.isThereABlock(meetingRequest.getMeeting().getCreator().getId()))
+            throw new UserWarningException("Erişim  yok");
 
 
         if(meetingRequest.getMeetingRequestStatus()==MeetingRequestStatus.WAITING){

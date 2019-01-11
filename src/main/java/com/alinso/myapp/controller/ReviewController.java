@@ -45,4 +45,10 @@ public class ReviewController {
         return new ResponseEntity<>(reviews,HttpStatus.OK);
     }
 
+    @GetMapping("findById/{reviewId}")
+    public ResponseEntity<?> findById(@PathVariable("reviewId") Long reviewId){
+        ReviewDto reviewDto = reviewService.findById(reviewId);
+        return new ResponseEntity<>(reviewDto, HttpStatus.OK);
+    }
+
 }

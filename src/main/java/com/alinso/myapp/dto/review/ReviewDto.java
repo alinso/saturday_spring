@@ -1,5 +1,6 @@
 package com.alinso.myapp.dto.review;
 
+import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.ReviewType;
 
@@ -12,16 +13,31 @@ public class ReviewDto {
     private String review;
 
     @NotNull
-    private User reader;
+    private ProfileDto reader;
 
 
-    private User writer;
+    private ProfileDto writer;
 
     private ReviewType reviewType;
 
     @NotNull
     private Boolean isPositive;
 
+    public ProfileDto getReader() {
+        return reader;
+    }
+
+    public void setReader(ProfileDto reader) {
+        this.reader = reader;
+    }
+
+    public ProfileDto getWriter() {
+        return writer;
+    }
+
+    public void setWriter(ProfileDto writer) {
+        this.writer = writer;
+    }
 
     public String getReview() {
         return review;
@@ -29,22 +45,6 @@ public class ReviewDto {
 
     public void setReview(String review) {
         this.review = review;
-    }
-
-    public User getReader() {
-        return reader;
-    }
-
-    public void setReader(User reader) {
-        this.reader = reader;
-    }
-
-    public User getWriter() {
-        return writer;
-    }
-
-    public void setWriter(User writer) {
-        this.writer = writer;
     }
 
     public ReviewType getReviewType() {

@@ -41,8 +41,8 @@ public class MessageService {
         User reader = userRepository.findById(messageDto.getReader().getId()).get();
 
 
-        if(blockService.isBlockedByIt(reader.getId()) || blockService.isBlockedIt(reader.getId()))
-            throw new UserWarningException("Engellendiniz");
+        if(blockService.isThereABlock(reader.getId()))
+            throw new UserWarningException("Erişim Yok");
 
 
         message.setWriter(writer);
@@ -112,7 +112,7 @@ public class MessageService {
             else
                 continue;
 
-            if(blockService.isBlockedByIt(oppositeId) || blockService.isBlockedIt(oppositeId))
+            if(blockService.isThereABlock(oppositeId))
                 continue;
 
 

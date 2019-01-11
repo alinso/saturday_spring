@@ -119,7 +119,7 @@ public class MeetingService {
 
         for (Meeting meeting : meetings) {
 
-            if(blockService.isBlockedByIt(meeting.getCreator().getId()))
+            if(blockService.isThereABlock(meeting.getCreator().getId()))
                 continue;
 
             ProfileDto profileDto = modelMapper.map(meeting.getCreator(), ProfileDto.class);
@@ -158,8 +158,8 @@ public class MeetingService {
         User user = userRepository.findById(id).get();
 
 
-        if(blockService.isBlockedByIt(id))
-            throw  new UserWarningException("Engellendiniz");
+        if(blockService.isThereABlock(id))
+            throw  new UserWarningException("Erişim Yok");
 
         List<Meeting> meetingsCreatedByUser = meetingRepository.findByCreatorOrderByIdDesc(user);
         List <Meeting> meetingsAttendedByUser  =meetingRequesRepository.meetingsAttendedByUser(user,MeetingRequestStatus.APPROVED);
@@ -194,7 +194,7 @@ public class MeetingService {
         List<MeetingRequest> meetingRequests  =meetingRequesRepository.findByMeetingId(id);
         Meeting meeting  =meetingRepository.findById(id).get();
 
-        UserUtil.checkUserOwner(id);
+        UserUtil.checkUserOwner(meeting.getCreator().getId());
 
         List<MeetingRequestDto> meetingRequestDtos =  new ArrayList<>();
         for(MeetingRequest meetingRequest :meetingRequests){

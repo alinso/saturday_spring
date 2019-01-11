@@ -67,8 +67,8 @@ public class PhotoService {
     }
 
     public List<Photo> findByUserId(Long id){
-        if(blockService.isBlockedByIt(id) || blockService.isBlockedIt(id))
-            throw new UserWarningException("Engellendiniz");
+        if(blockService.isThereABlock(id))
+            throw new UserWarningException("Erişim Yok");
 
         User user  =userRepository.findById(id).get();
         return photoRepository.findByUser(user);

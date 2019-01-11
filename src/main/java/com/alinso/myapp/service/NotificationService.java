@@ -34,8 +34,8 @@ public class NotificationService {
     private void createNotification(User target,User trigger,NotificationType notificationType,String message){
 
 
-        if(blockService.isBlockedByIt(target.getId()) || blockService.isBlockedIt(target.getId()))
-            throw new UserWarningException("Engellendiniz");
+        if(blockService.isThereABlock(target.getId()))
+            throw new UserWarningException("Erişim Yok");
 
 
         Notification notification = new Notification();

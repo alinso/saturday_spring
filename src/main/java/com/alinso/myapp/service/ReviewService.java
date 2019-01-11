@@ -1,6 +1,7 @@
 package com.alinso.myapp.service;
 
 import com.alinso.myapp.dto.review.ReviewDto;
+import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Meeting;
 import com.alinso.myapp.entity.MeetingRequest;
 import com.alinso.myapp.entity.Review;
@@ -50,7 +51,7 @@ public class ReviewService {
     private final Integer HOURS_TO_WRITE_REVIEW = -1;
 
 
-    public Boolean haveUserAttendMeeting(Meeting meeting, User user){
+    public Boolean haveUserAttendMeeting(Meeting meeting, User user) {
         Boolean result = false;
         MeetingRequest myRequest = new MeetingRequest();
         try {
@@ -87,7 +88,7 @@ public class ReviewService {
 
         //have I attend his meeting?
         for (Meeting meeting : recentMeetingsCreatedByOther) {
-            if(haveUserAttendMeeting(meeting,me)) {
+            if (haveUserAttendMeeting(meeting, me)) {
                 result = true;
                 break;
             }
@@ -95,13 +96,13 @@ public class ReviewService {
 
         //has he attend my meeting
         //if I already attend one of him no need to check this
-        if(!result)
-        for (Meeting meeting : recentMeetingsCreatedByMe) {
-            if(haveUserAttendMeeting(meeting,other)) {
-                result = true;
-                break;
+        if (!result)
+            for (Meeting meeting : recentMeetingsCreatedByMe) {
+                if (haveUserAttendMeeting(meeting, other)) {
+                    result = true;
+                    break;
+                }
             }
-        }
         return result;
     }
 
@@ -109,15 +110,14 @@ public class ReviewService {
         User reader = userRepository.findById(reviewDto.getReader().getId()).get();
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(blockService.isBlockedByIt(reader.getId()) || blockService.isBlockedIt(reader.getId()))
-            throw new UserWarningException("Engellendiniz");
+        if (blockService.isThereABlock(reader.getId()))
+            throw new UserWarningException("Erişim Yok");
 
-        if(reviewDto.getReviewType()==ReviewType.MEETING && !haveUsersMeetRecently(writer, reader))
+        if (reviewDto.getReviewType() == ReviewType.MEETING && !haveUsersMeetRecently(writer, reader))
             throw new UserWarningException("Daha önce bir aktiviteye katılmadınız!");
 
-        if(isReviewedBefore(reviewDto.getReader().getId()))
+        if (isReviewedBefore(reviewDto.getReader().getId()))
             throw new UserWarningException("Bir kişi için daha önce referans yazdınız");
-
 
 
         Review review = modelMapper.map(reviewDto, Review.class);
@@ -137,26 +137,38 @@ public class ReviewService {
 
         Boolean isReviewedBefore = true;
         Review myPreviousReview = reviewRepository.myPreviousReview(me, other);
-        if(myPreviousReview==null)
-            isReviewedBefore=false;
+        if (myPreviousReview == null)
+            isReviewedBefore = false;
 
         return isReviewedBefore;
     }
 
     public List<ReviewDto> reviewsOfUser(Long id) {
-        User user  =userRepository.findById(id).get();
+        User user = userRepository.findById(id).get();
 
-        if(blockService.isBlockedByIt(id) || blockService.isBlockedIt(id))
-            throw new UserWarningException("Engellendiniz");
+        if (blockService.isThereABlock(id))
+            throw new UserWarningException("Erişim Yok");
 
 
         List<Review> reviews = reviewRepository.findByReader(user);
 
         List<ReviewDto> reviewDtos = new ArrayList<>();
-        for(Review review : reviews){
-            ReviewDto reviewDto  = modelMapper.map(review,ReviewDto.class);
+        for (Review review : reviews) {
+            ReviewDto reviewDto = modelMapper.map(review, ReviewDto.class);
+            reviewDto.setWriter(modelMapper.map(review.getWriter(), ProfileDto.class));
+            reviewDto.setReader(modelMapper.map(review.getReader(), ProfileDto.class));
             reviewDtos.add(reviewDto);
         }
-        return  reviewDtos;
+        return reviewDtos;
+    }
+
+
+    public ReviewDto findById(Long id) {
+        Review review = reviewRepository.findById(id).get();
+        ReviewDto reviewDto = modelMapper.map(review, ReviewDto.class);
+        reviewDto.setWriter(modelMapper.map(review.getWriter(), ProfileDto.class));
+        reviewDto.setReader(modelMapper.map(review.getReader(), ProfileDto.class));
+
+        return reviewDto;
     }
 }
