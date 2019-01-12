@@ -39,7 +39,7 @@ public class ProfileDto {
     private Integer reviewCount;
     private Integer photoCount;
     private Integer point;
-
+    private String interests;
 
 
 
@@ -153,4 +153,11 @@ public class ProfileDto {
         this.bDateString = bDateString;
     }
 
+    public String getInterests() {
+        return interests;
+    }
+
+    public void setInterests(String interests) {
+        this.interests = interests;
+    }
 }

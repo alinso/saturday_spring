@@ -3,13 +3,13 @@ package com.alinso.myapp.security.payload;
 public class JWTLoginSucessReponse {
     private boolean success;
     private String token;
-    private String userFullName;
+    private String profilePicName;
     private Long cityId;
 
-    public JWTLoginSucessReponse(boolean success, String token, String userFullName, Long city_id) {
+    public JWTLoginSucessReponse(boolean success, String token, String profilePicName, Long city_id) {
         this.success = success;
         this.token = token;
-        this.userFullName = userFullName;
+        this.profilePicName = profilePicName;
         this.cityId =city_id;
     }
 
@@ -42,16 +42,16 @@ public class JWTLoginSucessReponse {
         return "JWTLoginSucessReponse{" +
                 "success=" + success +
                 ", token='" + token + '\'' +
-                ", userFullName='" + userFullName + '\'' +
+                ", profilePicName='" + profilePicName + '\'' +
                 ", cityId='" + cityId + '\'' +
                 '}';
     }
 
-    public String getUserFullName() {
-        return userFullName;
+    public String getProfilePicName() {
+        return profilePicName;
     }
 
-    public void setUserFullName(String userFullName) {
-        this.userFullName = userFullName;
+    public void setProfilePicName(String profilePicName) {
+        this.profilePicName = profilePicName;
     }
 }

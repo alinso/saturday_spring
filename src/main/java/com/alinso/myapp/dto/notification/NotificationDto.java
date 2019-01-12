@@ -12,6 +12,8 @@ public class NotificationDto {
 
     private ProfileDto target;
 
+    private String createdAtString;
+
     @Enumerated(EnumType.ORDINAL)
     private NotificationType notificationType;
 
@@ -57,5 +59,13 @@ public class NotificationDto {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getCreatedAtString() {
+        return createdAtString;
+    }
+
+    public void setCreatedAtString(String createdAtString) {
+        this.createdAtString = createdAtString;
     }
 }

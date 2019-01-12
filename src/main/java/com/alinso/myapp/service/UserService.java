@@ -122,6 +122,7 @@ public class UserService {
         loggedUser.setMotivation(profileInfoForUpdateDto.getMotivation());
         loggedUser.setAbout(profileInfoForUpdateDto.getAbout());
         loggedUser.setGender(profileInfoForUpdateDto.getGender());
+        loggedUser.setInterests(profileInfoForUpdateDto.getInterests());
         loggedUser.setReferenceCode(profileInfoForUpdateDto.getReferenceCode());
 
         userRepository.save(loggedUser);

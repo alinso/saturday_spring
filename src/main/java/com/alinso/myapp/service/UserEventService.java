@@ -1,8 +1,11 @@
 package com.alinso.myapp.service;
 
+import com.alinso.myapp.entity.Block;
+import com.alinso.myapp.entity.Meeting;
 import com.alinso.myapp.entity.Review;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.ReviewType;
+import com.alinso.myapp.repository.FollowRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,8 +16,8 @@ public class UserEventService {
 
 
     private final Integer NEW_MEETING_POINT = 1;
-    private final Integer FRIIEND_REVİEW_POINT = 3;
-    private final Integer MEETING_REVİEW_POINT = 5;
+    private final Integer FRIEND_REVIEW_POINT = 3;
+    private final Integer MEETING_REVIEW_POINT = 5;
 
     @Autowired
     UserRepository userRepository;
@@ -22,9 +25,19 @@ public class UserEventService {
     @Autowired
     NotificationService notificationService;
 
-    public void newMeeting(User user) {
+    @Autowired
+    BlockService blockService;
+
+    @Autowired
+    FollowRepository followRepository;
+
+    public void newMeeting(User user, Meeting meeting) {
         user.setPoint((user.getPoint() + NEW_MEETING_POINT));
         user.setMeetingCount((user.getMeetingCount() + 1));
+        for(User follower:followRepository.findFollowersOfUser(user)){
+            if(!blockService.isThereABlock(follower.getId()))
+            notificationService.newMeeting(follower,meeting.getId());
+        }
         userRepository.save(user);
     }
 
@@ -50,9 +63,9 @@ public class UserEventService {
     public void referenceWritten(User reader, Review review){
         Integer point = 0;
         if (review.getReviewType() == ReviewType.FRIEND)
-            point = FRIIEND_REVİEW_POINT;
+            point = FRIEND_REVIEW_POINT;
         if (review.getReviewType() == ReviewType.MEETING)
-            point = MEETING_REVİEW_POINT;
+            point = MEETING_REVIEW_POINT;
 
         if (review.getPositive())
             reader.setPoint(reader.getPoint() + point);

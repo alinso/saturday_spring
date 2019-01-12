@@ -35,6 +35,7 @@ public class ProfileInfoForUpdateDto {
 
     private String bDateString;
 
+    private String interests;
 
     @NotNull(message = "Cinsiyet Seçiniz")
     @Enumerated(EnumType.ORDINAL)
@@ -144,5 +145,13 @@ public class ProfileInfoForUpdateDto {
 
     public void setCityId(Long cityId) {
         this.cityId = cityId;
+    }
+
+    public String getInterests() {
+        return interests;
+    }
+
+    public void setInterests(String interests) {
+        this.interests = interests;
     }
 }

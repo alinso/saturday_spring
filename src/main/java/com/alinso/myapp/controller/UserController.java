@@ -75,7 +75,7 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = SecurityConstants.TOKEN_PREFIX + tokenProvider.generateToken(authentication);
 
-        return ResponseEntity.ok(new JWTLoginSucessReponse(true, jwt, user.getName()+" "+user.getSurname(),user.getCityId()));
+        return ResponseEntity.ok(new JWTLoginSucessReponse(true, jwt, user.getProfilePicName(),user.getCityId()));
     }
 
     @GetMapping("/verifyMail/{token}")

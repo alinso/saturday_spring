@@ -7,6 +7,7 @@ import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.NotificationType;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.NotificationRepository;
+import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.UserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class NotificationService {
     }
     public void newMeeting(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        createNotification(target,trigger,NotificationType.NEW_MEETING,itemId.toString());
+        createNotification(target,trigger,NotificationType.FOLLOWING,itemId.toString());
     }
     public void newGeneral(String message,User target){
         createNotification(target,null,NotificationType.GENERAL,message);
@@ -131,6 +132,7 @@ public class NotificationService {
 
             notificationDto.setTrigger(triggerDto);
             notificationDto.setTarget(targetDto);
+            notificationDto.setCreatedAtString(DateUtil.dateToString(notification.getCreatedAt(),"DD/MM/YYYY HH:mm"));
             notificationDtos.add(notificationDto);
         }
 

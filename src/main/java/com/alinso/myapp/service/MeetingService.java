@@ -85,9 +85,11 @@ public class MeetingService {
         meeting.setCreator(loggedUser);
         meeting.setDeadLine(DateUtil.stringToDate(meetingDto.getDeadLineString(),"dd/MM/yyyy HH:mm"));
         meeting.setPhotoName(fileStorageUtil.saveFileAndReturnName(meetingDto.getFile(),fileUploadPath));
-        userEventService.newMeeting(loggedUser);
 
-        return meetingRepository.save(meeting);
+        meetingRepository.save(meeting);
+        userEventService.newMeeting(loggedUser,meeting);
+
+        return meeting;
     }
 
     public Meeting update(MeetingDto meetingDto) {

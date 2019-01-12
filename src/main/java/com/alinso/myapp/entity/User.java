@@ -78,6 +78,8 @@ public class User extends BaseEntity implements UserDetails {
     @ManyToOne
     private City city;
 
+    @Column
+    private String interests;
 
     public Integer getPhotoCount() {
         return photoCount;
@@ -255,5 +257,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public String getInterests() {
+        return interests;
+    }
+
+    public void setInterests(String interests) {
+        this.interests = interests;
     }
 }
