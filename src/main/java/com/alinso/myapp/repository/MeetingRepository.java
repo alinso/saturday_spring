@@ -14,10 +14,10 @@ import java.util.List;
 @Repository
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
-    @Query("select meeting from Meeting meeting where meeting.deadLine > :now and meeting.city= :city")
-    public List<Meeting> findAllNonExpiredByCityId(@Param("now") Date now, @Param("city")City city);
+    @Query("select meeting from Meeting meeting where meeting.deadLine > :now and meeting.city= :city order by meeting.deadLine asc ")
+    public List<Meeting> findAllNonExpiredByCityIdOrderByDeadLine(@Param("now") Date now, @Param("city")City city);
 
-    public List<Meeting> findByCreatorOrderByIdDesc(User creator);
+    public List<Meeting> findByCreatorOrderByDeadLineDesc(User creator);
 
     @Query("select meeting from Meeting meeting where meeting.deadLine > :start and meeting.deadLine < :finish and meeting.creator=:user")
     List<Meeting> recentMeetingsOfCreator(@Param("start")Date start, @Param("finish")Date finish, @Param("user")User user);

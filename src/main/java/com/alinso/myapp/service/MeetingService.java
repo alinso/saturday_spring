@@ -114,7 +114,7 @@ public class MeetingService {
 
     public List<MeetingDto> findAllNonExpiredByCityId(Long cityId) {
 
-        List<Meeting> meetings = meetingRepository.findAllNonExpiredByCityId(new Date(),cityService.findById(cityId));
+        List<Meeting> meetings = meetingRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(),cityService.findById(cityId));
         List<MeetingDto> meetingDtos = new ArrayList<>();
 
         for (Meeting meeting : meetings) {
@@ -161,7 +161,7 @@ public class MeetingService {
         if(blockService.isThereABlock(id))
             throw  new UserWarningException("Erişim Yok");
 
-        List<Meeting> meetingsCreatedByUser = meetingRepository.findByCreatorOrderByIdDesc(user);
+        List<Meeting> meetingsCreatedByUser = meetingRepository.findByCreatorOrderByDeadLineDesc(user);
         List <Meeting> meetingsAttendedByUser  =meetingRequesRepository.meetingsAttendedByUser(user,MeetingRequestStatus.APPROVED);
 
         List<Meeting> meetings = new ArrayList<>();
