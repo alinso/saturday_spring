@@ -70,6 +70,11 @@ public class MeetingService {
         meetingDto.setThisUserJoined(meetingRequestService.isThisUserJoined(meeting.getId()));
         meetingDto.setAttendants(meetingRequestService.findAttendants(meeting));
 
+        if(meeting.getDeadLine().compareTo(new Date()) < 0)
+            meetingDto.setExpired(true);
+        else
+            meetingDto.setExpired(false);
+
         return meetingDto;
 
     }
@@ -81,6 +86,7 @@ public class MeetingService {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         City city = cityService.findById(meetingDto.getCityId());
 
+        meeting.setCommentNotificationSent(false);
         meeting.setCity(city);
         meeting.setCreator(loggedUser);
         meeting.setDeadLine(DateUtil.stringToDate(meetingDto.getDeadLineString(),"dd/MM/yyyy HH:mm"));

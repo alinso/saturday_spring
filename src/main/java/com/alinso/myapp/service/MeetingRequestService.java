@@ -108,7 +108,7 @@ public class MeetingRequestService {
     }
 
     public void checkMaxApproveCountExceeded(Meeting meeting){
-        Integer c= meetingRequesRepository.countOfAprrovedForThisMeetingId(meeting, MeetingRequestStatus.APPROVED);
+        Integer c= meetingRequesRepository.countOfAprrovedForThisMeeting(meeting, MeetingRequestStatus.APPROVED);
         if(c==2){
             throw  new UserWarningException("Her aktivite için en fazla 2 kişi onaylayabilirsiniz");
         }
@@ -125,7 +125,9 @@ public class MeetingRequestService {
 
         List<ProfileDto> profileDtos = new ArrayList<>();
         for(User user: attendantUsers){
-            profileDtos.add(modelMapper.map(user,ProfileDto.class));
+            ProfileDto profileDto  =modelMapper.map(user,ProfileDto.class);
+            profileDto.setAge(UserUtil.calculateAge(user));
+            profileDtos.add(profileDto);
         }
         profileDtos.add(modelMapper.map(meeting.getCreator(), ProfileDto.class));
         return profileDtos;

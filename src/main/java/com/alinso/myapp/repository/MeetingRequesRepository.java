@@ -23,10 +23,15 @@ public interface MeetingRequesRepository extends JpaRepository<MeetingRequest, L
 
     @Query("select count(meetingRequest) from MeetingRequest meetingRequest " +
             "where  meetingRequest.meetingRequestStatus=:status and meetingRequest.meeting=:meeting")
-    Integer countOfAprrovedForThisMeetingId(@Param("meeting") Meeting meeting, @Param("status")MeetingRequestStatus status);
+    Integer countOfAprrovedForThisMeeting(@Param("meeting") Meeting meeting, @Param("status")MeetingRequestStatus status);
 
     @Query("select meetingRequest.meeting from MeetingRequest meetingRequest " +
             "where  meetingRequest.meetingRequestStatus=:status and meetingRequest.applicant=:user")
 
     List<Meeting> meetingsAttendedByUser(@Param("user") User user,@Param("status") MeetingRequestStatus status);
+
+    @Query("select meetingRequest.applicant from MeetingRequest meetingRequest where meetingRequest.meeting=:meeting and meetingRequest.meetingRequestStatus=:status")
+    List<User> attendantsOfMeeting(@Param("meeting") Meeting meeting,@Param("status") MeetingRequestStatus status);
+
+
 }

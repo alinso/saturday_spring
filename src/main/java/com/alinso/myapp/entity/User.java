@@ -63,19 +63,19 @@ public class User extends BaseEntity implements UserDetails {
     @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
 
-    @Column( columnDefinition = "int default 0")
+    @Column( nullable = false, columnDefinition = "int default 0")
     private Integer point ;
 
-    @Column( columnDefinition = "int default 0")
+    @Column(  nullable = false, columnDefinition = "int default 0")
     private Integer meetingCount;
 
-    @Column( columnDefinition = "int default 0")
+    @Column( nullable = false,  columnDefinition = "int default 0")
     private Integer photoCount;
 
-    @Column( columnDefinition = "int default 0")
+    @Column( nullable = false,  columnDefinition = "int default 0")
     private Integer reviewCount;
 
-    @ManyToOne
+    @ManyToOnedele
     private City city;
 
     @Column

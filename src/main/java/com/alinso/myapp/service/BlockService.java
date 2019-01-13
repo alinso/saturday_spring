@@ -74,6 +74,9 @@ public class BlockService {
     }
 
     public Boolean isThereABlock(Long oppositId){
+        if(SecurityContextHolder.getContext().getAuthentication()==null){ //it means that there is a process triggered by system, not by a triggered user
+            return false;
+        }
         return (isBlockedIt(oppositId) || isBlockedByIt(oppositId));
     }
 

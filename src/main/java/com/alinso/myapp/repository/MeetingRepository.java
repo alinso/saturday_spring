@@ -22,4 +22,7 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
     @Query("select meeting from Meeting meeting where meeting.deadLine > :start and meeting.deadLine < :finish and meeting.creator=:user")
     List<Meeting> recentMeetingsOfCreator(@Param("start")Date start, @Param("finish")Date finish, @Param("user")User user);
 
+    @Query("select meeting from Meeting meeting where meeting.deadLine > :start and meeting.deadLine < :finish and meeting.isCommentNotificationSent=false")
+    List<Meeting> recentUncommentedMeetings(@Param("start")Date start, @Param("finish")Date finish);
+
 }

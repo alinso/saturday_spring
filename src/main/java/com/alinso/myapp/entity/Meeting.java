@@ -39,6 +39,9 @@ public class Meeting extends BaseEntity {
     @Column
     private String photoName;
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isCommentNotificationSent;
+
     public String getDetail() {
         return detail;
     }
@@ -77,5 +80,13 @@ public class Meeting extends BaseEntity {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public Boolean getCommentNotificationSent() {
+        return isCommentNotificationSent;
+    }
+
+    public void setCommentNotificationSent(Boolean commentNotificationSent) {
+        isCommentNotificationSent = commentNotificationSent;
     }
 }
