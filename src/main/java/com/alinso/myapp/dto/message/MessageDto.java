@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 public class MessageDto {
 
-    @NotBlank
+    @NotBlank(message = "Mesaj boş olamaz")
     private String message;
 
     @NotNull

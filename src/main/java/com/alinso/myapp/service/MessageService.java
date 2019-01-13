@@ -132,6 +132,21 @@ public class MessageService {
         userEventService.messaesRead();
         return myConversationDtos;
     }
+
+
+    public void greetingMessageForNewUser(User reader){
+        User ali = userRepository.findByEmail("soyaslanaliinsan@gmail.com").get();
+            Message message =  new Message();
+            message.setReader(reader);
+            message.setWriter(ali);
+            message.setMessage("Aramıza Hoşgeldin, <br/> Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen " +
+                    "bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, sinemaya gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
+                    " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin.<br/><br/>" +
+                    " Activiy Friend kadın-erkek sayısı dengeli, tüm kullanıcıların referansla üye olabildiği bir sistemdir. Herhangi biriyle birşey yapmadan önce o kişi " +
+                    " hakkında yazılanları okuyabilir, katıldığı aktivieleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
+                    "<br/><br/>Sormak istediğin herhangi birşey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarız.<br/><br/>İyi eğlenceler, dileriz");
+            messageRepository.save(message);
+    }
 }
 
 

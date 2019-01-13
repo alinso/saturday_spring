@@ -37,7 +37,10 @@ public class UserUpdateValidator implements Validator {
         }
 
         if(profileInfoForUpdateDto.getGender()== Gender.UNSELECTED){
-            errors.rejectValue("gender","Match", "Cinsiyet Seçiniz");
+            errors.rejectValue("gender","Match", "Cinsiyet Seçmelisin");
+        }
+        if(profileInfoForUpdateDto.getCityId()==null){
+            errors.rejectValue("cityId","Match", "Şehir Seçmelisin");
         }
 
 

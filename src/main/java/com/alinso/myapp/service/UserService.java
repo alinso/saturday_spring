@@ -56,6 +56,9 @@ public class UserService {
     CityService cityService;
 
     @Autowired
+    UserEventService userEventService;
+
+    @Autowired
     BlockService blockService;
 
     @Value("${upload.profile.path}")
@@ -65,6 +68,11 @@ public class UserService {
 
         newUser.setConfirmPassword("");
         newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
+        newUser.setPhotoCount(0);
+        newUser.setReviewCount(0);
+        newUser.setPoint(0);
+        newUser.setMeetingCount(0);
+
         User user = userRepository.save(newUser);
         String token = mailVerificationTokenService.saveToken(user);
         mailVerificationTokenService.sendMail(token, user.getEmail());
@@ -90,10 +98,11 @@ public class UserService {
         if (token == null) {
             throw new RecordNotFound404Exception("Geçersiz link");
         }
-
         User user = userRepository.findById(token.getUser().getId()).get();
         user.setEnabled(true);
         userRepository.save(user);
+        userEventService.newUserRegistered(user);
+
     }
 
     public void resetPassword(ResetPasswordDto resetPasswordDto) {

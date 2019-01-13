@@ -1,6 +1,7 @@
 package com.alinso.myapp.entity;
 
 import com.alinso.myapp.entity.enums.Gender;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -63,19 +64,24 @@ public class User extends BaseEntity implements UserDetails {
     @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
 
-    @Column( nullable = false, columnDefinition = "int default 0")
+    @Column
+    @ColumnDefault("0")
     private Integer point ;
 
-    @Column(  nullable = false, columnDefinition = "int default 0")
+    @Column
+    @ColumnDefault("0")
     private Integer meetingCount;
 
-    @Column( nullable = false,  columnDefinition = "int default 0")
+    @Column
+    @ColumnDefault("0")
     private Integer photoCount;
 
-    @Column( nullable = false,  columnDefinition = "int default 0")
+    @Column
+    @ColumnDefault("0")
     private Integer reviewCount;
 
-    @ManyToOnedele
+    @ManyToOne
+    @ColumnDefault("0")
     private City city;
 
     @Column

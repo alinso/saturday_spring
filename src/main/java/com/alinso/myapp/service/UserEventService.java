@@ -31,6 +31,9 @@ public class UserEventService {
     @Autowired
     FollowRepository followRepository;
 
+    @Autowired
+    MessageService messageService;
+
     public void newMeeting(User user, Meeting meeting) {
         user.setPoint((user.getPoint() + NEW_MEETING_POINT));
         user.setMeetingCount((user.getMeetingCount() + 1));
@@ -93,5 +96,10 @@ public class UserEventService {
 
     public void messaesRead() {
         //TODO: all messages will be readed
+    }
+
+    public void newUserRegistered(User user) {
+    messageService.greetingMessageForNewUser(user);
+    notificationService.newMessage(user);
     }
 }
