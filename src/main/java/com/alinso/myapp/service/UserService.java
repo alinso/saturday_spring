@@ -10,6 +10,7 @@ import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
+import com.alinso.myapp.mail.service.MailService;
 import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.service.security.ForgottenPasswordTokenService;
 import com.alinso.myapp.service.security.MailVerificationTokenService;
@@ -59,6 +60,9 @@ public class UserService {
     UserEventService userEventService;
 
     @Autowired
+    MailService mailService;
+
+    @Autowired
     BlockService blockService;
 
     @Value("${upload.profile.path}")
@@ -75,7 +79,7 @@ public class UserService {
 
         User user = userRepository.save(newUser);
         String token = mailVerificationTokenService.saveToken(user);
-        mailVerificationTokenService.sendMail(token, user.getEmail());
+        mailService.sendMailVerificationMail(user,token);
         referenceService.useReferenceCode(newUser);
         referenceService.createNewReferenceCodes(user);
         return user;
@@ -89,7 +93,7 @@ public class UserService {
             throw new UserWarningException("Bu E-Posta ile kayıtlı kullanıcı bulunamadı");
         }
         String token = forgottenPasswordTokenService.saveToken(user);
-        forgottenPasswordTokenService.sendMail(token, user.getEmail());
+        mailService.sendForgottenPasswordMail(user,token);
     }
 
     public void verifyMail(String tokenString) {

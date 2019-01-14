@@ -3,7 +3,7 @@ package com.alinso.myapp.service.security;
 import com.alinso.myapp.entity.ForgottenPasswordToken;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.mail.SMTPEmail;
+import com.alinso.myapp.mail.util.SMTPMailUtil;
 import com.alinso.myapp.repository.ForgottenPasswordTokenRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +44,16 @@ public class ForgottenPasswordTokenService {
     }
 
 
-    public void sendMail(String token,String recipientAddress){
-        String subject = "Night Out Şifremi Unuttum!";
-        String confirmationUrl = applicationUrl+ "/resetPassword/" + token;
-
-        SMTPEmail email = new SMTPEmail();
-        email.setRecipient(recipientAddress);
-        email.setSubject(subject);
-        email.setMessage(" rn" + "http://localhost:8080" + confirmationUrl);
-        email.sendMail();
-    }
+//    public void sendMail(String token,String recipientAddress){
+//        String subject = "Night Out Şifremi Unuttum!";
+//        String confirmationUrl = applicationUrl+ "/resetPassword/" + token;
+//
+//        SMTPMailUtil email = new SMTPMailUtil();
+//        email.setRecipient(recipientAddress);
+//        email.setSubject(subject);
+//        email.setMessage(" rn" + "http://localhost:8080" + confirmationUrl);
+//        email.sendMail();
+//    }
 
 
 

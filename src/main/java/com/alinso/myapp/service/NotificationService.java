@@ -8,6 +8,8 @@ import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.MeetingRequestStatus;
 import com.alinso.myapp.entity.enums.NotificationType;
 import com.alinso.myapp.exception.UserWarningException;
+import com.alinso.myapp.mail.service.MailService;
+import com.alinso.myapp.mail.util.SMTPMailUtil;
 import com.alinso.myapp.repository.MeetingRepository;
 import com.alinso.myapp.repository.MeetingRequesRepository;
 import com.alinso.myapp.repository.NotificationRepository;
@@ -34,6 +36,9 @@ public class NotificationService {
 
     @Autowired
     NotificationRepository notificationRepository;
+
+    @Autowired
+    MailService  mailService;
 
     @Autowired
     ModelMapper modelMapper;
@@ -63,7 +68,6 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-
     @Scheduled(fixedRate = 60*60*1000, initialDelay = 60*1000)
     public void newMeetingCommentAvailable(){
 
@@ -84,11 +88,12 @@ public class NotificationService {
             if(meetingRequesRepository.countOfAprrovedForThisMeeting(meeting, MeetingRequestStatus.APPROVED)>1){
                 //send notification to creator
                 createNotification(meeting.getCreator(),null,NotificationType.MEETING_COMMENT_AVAILABLE, meetingId.toString());
-
+                mailService.newReviewAvailableMail(meeting.getCreator(),meetingId);
                 //send notification to attendants
                 List<User> attendants  = meetingRequesRepository.attendantsOfMeeting(meeting,MeetingRequestStatus.APPROVED);
                 for(User attendant :attendants){
                     createNotification(attendant,null,NotificationType.MEETING_COMMENT_AVAILABLE,meetingId.toString());
+                    mailService.newReviewAvailableMail(attendant,meetingId);
                 }
             }
             meeting.setCommentNotificationSent(true);
@@ -99,25 +104,30 @@ public class NotificationService {
     public void newMessage(User target){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.MESSAGE,null);
+        mailService.sendNewMessageMail(target,trigger);
     }
 
     public void newRequest(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REQUEST,itemId.toString());
+        mailService.sendNewRequestMail(target,trigger,itemId);
     }
 
     public void newRequestApproval(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REQUEST_APPROVAL,itemId.toString());
+        mailService.sendNewRequestApprovalMail(target,trigger,itemId);
     }
 
     public void newReview(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REVIEW,itemId.toString());
+        mailService.newReviewMail(target,trigger,itemId);
     }
     public void newMeeting(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.FOLLOWING,itemId.toString());
+        mailService.sendNewActivityMail(target,trigger,itemId);
     }
     public void newGeneral(String message,User target){
         createNotification(target,null,NotificationType.GENERAL,message);

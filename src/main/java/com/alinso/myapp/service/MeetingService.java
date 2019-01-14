@@ -8,6 +8,7 @@ import com.alinso.myapp.entity.Meeting;
 import com.alinso.myapp.entity.MeetingRequest;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.MeetingRequestStatus;
+import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.MeetingRepository;
 import com.alinso.myapp.repository.MeetingRequesRepository;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class MeetingService {
@@ -200,8 +202,12 @@ public class MeetingService {
     public MeetingDto getMeetingWithRequests(Long id) {
 
         List<MeetingRequest> meetingRequests  =meetingRequesRepository.findByMeetingId(id);
-        Meeting meeting  =meetingRepository.findById(id).get();
-
+        Meeting meeting= new Meeting();
+        try {
+            meeting = meetingRepository.findById(id).get();
+        }catch (NoSuchElementException e){
+            throw new RecordNotFound404Exception("Sayfa Bulunamadı");
+        }
         UserUtil.checkUserOwner(meeting.getCreator().getId());
 
         List<MeetingRequestDto> meetingRequestDtos =  new ArrayList<>();

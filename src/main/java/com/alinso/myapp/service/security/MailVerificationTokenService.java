@@ -3,7 +3,7 @@ package com.alinso.myapp.service.security;
 import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.mail.SMTPEmail;
+import com.alinso.myapp.mail.util.SMTPMailUtil;
 import com.alinso.myapp.repository.MailVerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +37,7 @@ public class MailVerificationTokenService {
         String subject = "Night Out E-Posta Doğrulama";
         String confirmationUrl = applicationUrl+ "/verifyMail/" + token;
 
-        SMTPEmail email = new SMTPEmail();
+        SMTPMailUtil email = new SMTPMailUtil();
         email.setRecipient(recipientAddress);
         email.setSubject(subject);
         email.setMessage(" rn" + "http://localhost:8080" + confirmationUrl);

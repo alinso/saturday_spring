@@ -1,11 +1,11 @@
-package com.alinso.myapp.mail;
+package com.alinso.myapp.mail.util;
 
-import java.util.Properties;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import java.util.Properties;
 
-public class SMTPEmail {
+public class SMTPMailUtil {
 
     /**
      Outgoing Mail (SMTP) Server
@@ -41,7 +41,7 @@ public class SMTPEmail {
 
         Session session = Session.getDefaultInstance(props, auth);
         System.out.println("Session created");
-        EmailUtils.sendEmail(session, recipient,subject, message);
+        AbstractMailUtil.sendEmail(session, recipient,subject, message);
 
     }
 

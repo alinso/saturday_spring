@@ -1,4 +1,4 @@
-package com.alinso.myapp.mail;
+package com.alinso.myapp.mail.util;
 
 
 import javax.mail.Message;
@@ -9,7 +9,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.Date;
 
 
-public class EmailUtils {
+public class AbstractMailUtil {
 
     /**
      * Utility method to send simple HTML email
@@ -27,21 +27,18 @@ public class EmailUtils {
             msg.addHeader("format", "flowed");
             msg.addHeader("Content-Transfer-Encoding", "8bit");
 
-            msg.setFrom(new InternetAddress("no_reply@example.com", "NoReply-JD"));
+            msg.setFrom(new InternetAddress("ankaratangoclub@gmail.com", "Activity Friend"));
 
-            msg.setReplyTo(InternetAddress.parse("no_reply@example.com", false));
+            msg.setReplyTo(InternetAddress.parse("ankaratangoclub@gmail.com", false));
 
             msg.setSubject(subject, "UTF-8");
 
-            msg.setText(body, "UTF-8");
-
+            msg.setContent(body,"text/html; charset=UTF-8");
             msg.setSentDate(new Date());
 
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-            System.out.println("Message is ready");
             Transport.send(msg);
 
-            System.out.println("EMail Sent Successfully!!");
         }
         catch (Exception e) {
             e.printStackTrace();
