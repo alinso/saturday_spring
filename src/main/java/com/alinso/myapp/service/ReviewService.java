@@ -86,7 +86,7 @@ public class ReviewService {
         //let say users havent meet initially
         Boolean result = false;
 
-        //have I attend his meeting?
+        //have I attend his activity?
         for (Activity activity : recentMeetingsCreatedByOther) {
             if (haveUserAttendMeeting(activity, me)) {
                 result = true;
@@ -94,7 +94,7 @@ public class ReviewService {
             }
         }
 
-        //has he attend my meeting
+        //has he attend my activity
         //if I already attend one of him no need to check this
         if (!result)
             for (Activity activity : recentMeetingsCreatedByMe) {
@@ -170,5 +170,12 @@ public class ReviewService {
         reviewDto.setReader(modelMapper.map(review.getReader(), ProfileDto.class));
 
         return reviewDto;
+    }
+
+    public Boolean haveIMeetThisUserRecently(Long otherUserId) {
+        User me  = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User other  =userRepository.findById(otherUserId).get();
+
+        return  haveUsersMeetRecently(me,other);
     }
 }

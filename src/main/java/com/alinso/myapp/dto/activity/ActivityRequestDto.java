@@ -1,4 +1,4 @@
-package com.alinso.myapp.dto.meeting;
+package com.alinso.myapp.dto.activity;
 
 import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;

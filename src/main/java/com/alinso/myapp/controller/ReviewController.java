@@ -1,11 +1,13 @@
 package com.alinso.myapp.controller;
 
 import com.alinso.myapp.dto.review.ReviewDto;
+import com.alinso.myapp.entity.User;
 import com.alinso.myapp.service.ReviewService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +51,12 @@ public class ReviewController {
     public ResponseEntity<?> findById(@PathVariable("reviewId") Long reviewId){
         ReviewDto reviewDto = reviewService.findById(reviewId);
         return new ResponseEntity<>(reviewDto, HttpStatus.OK);
+    }
+
+    @GetMapping("haveIMeetThisUserRecently/{otherUserId}")
+    public ResponseEntity<?> haveIMeetThisUserRecently(@PathVariable("otherUserId") Long otherUserId){
+        Boolean result  =reviewService.haveIMeetThisUserRecently(otherUserId);
+        return new ResponseEntity<Boolean>(result,HttpStatus.OK);
     }
 
 }

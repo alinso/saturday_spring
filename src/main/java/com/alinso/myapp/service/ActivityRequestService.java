@@ -88,7 +88,6 @@ public class ActivityRequestService {
             activityRequest.setActivityRequestStatus(ActivityRequestStatus.WAITING);
             activityRequesRepository.save(activityRequest);
             userEventService.cancelApproval(activityRequest.getApplicant(),activityRequest.getActivity());
-
         }
 
         return activityRequest.getActivityRequestStatus();

@@ -1,10 +1,10 @@
 package com.alinso.myapp.controller;
 
 
-import com.alinso.myapp.dto.meeting.ActivityDto;
+import com.alinso.myapp.dto.activity.ActivityDto;
 import com.alinso.myapp.service.ActivityService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
-import com.alinso.myapp.validator.MeetingValidator;
+import com.alinso.myapp.validator.ActivityValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +26,13 @@ public class ActivityController {
     MapValidationErrorUtil mapValidationErrorUtil;
 
     @Autowired
-    MeetingValidator  meetingValidator;
+    ActivityValidator activityValidator;
 
 
     @PostMapping("/create")
     public ResponseEntity<?> save(@Valid ActivityDto activityDto, BindingResult result){
 
-        meetingValidator.validate(activityDto,result);
+        activityValidator.validate(activityDto,result);
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
@@ -73,7 +73,7 @@ public class ActivityController {
     @PostMapping("update")
     public ResponseEntity<?> update(@Valid ActivityDto activityDto, BindingResult result){
 
-        meetingValidator.validate(activityDto,result);
+        activityValidator.validate(activityDto,result);
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 

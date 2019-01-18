@@ -1,6 +1,6 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.dto.meeting.ActivityDto;
+import com.alinso.myapp.dto.activity.ActivityDto;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @Component
-public class MeetingValidator implements Validator {
+public class ActivityValidator implements Validator {
     @Override
     public boolean supports(Class<?> clazz) {
         return ActivityDto.class.isAssignableFrom(clazz);

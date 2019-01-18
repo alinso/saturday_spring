@@ -1,6 +1,5 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.Review;
 import com.alinso.myapp.entity.User;
@@ -19,10 +18,10 @@ import java.util.List;
 public class UserEventService {
 
 
-    private final Integer NEW_MEETING_POINT = 1;
+    private final Integer NEW_ACTIVITY_POINT = 1;
     private final Integer NEW_APPROVAL_POINT = 3;
     private final Integer FRIEND_REVIEW_POINT = 3;
-    private final Integer MEETING_REVIEW_POINT = 5;
+    private final Integer ACTIVITY_REVIEW_POINT = 5;
 
     @Autowired
     UserRepository userRepository;
@@ -47,7 +46,7 @@ public class UserEventService {
 
 
     public void newMeeting(User user, Activity activity) {
-        user.setPoint((user.getPoint() + NEW_MEETING_POINT));
+        user.setPoint((user.getPoint() + NEW_ACTIVITY_POINT));
         user.setActivityCount((user.getActivityCount() + 1));
         for(User follower:followRepository.findFollowersOfUser(user)){
             if(!blockService.isThereABlock(follower.getId()))
@@ -64,6 +63,16 @@ public class UserEventService {
             user.setActivityCount((user.getActivityCount() - 1));
             userRepository.save(user);
         }
+
+        User creator  = activity.getCreator();
+        //this means  that creator user approved someone and get extra 3 points,we should delete them too
+        if(attendants.size()>0){
+            creator.setPoint(creator.getPoint()- NEW_APPROVAL_POINT);
+        }
+
+        creator.setPoint(creator.getPoint()- NEW_ACTIVITY_POINT);
+        creator.setActivityCount(creator.getActivityCount()-1);
+        userRepository.save(creator);
     }
 
     public void newMessage(User reader){
@@ -84,7 +93,7 @@ public class UserEventService {
 
         //if this is the first approval give creator user his points
         List<User> attendants  = activityRequesRepository.attendantsOfActivity(activity,ActivityRequestStatus.APPROVED);
-        if(attendants.size()==2){
+        if(attendants.size()==1){
             User creator  =activity.getCreator();
             creator.setPoint(creator.getPoint()+NEW_APPROVAL_POINT);
             userRepository.save(creator);
@@ -99,7 +108,7 @@ public class UserEventService {
 
         //if this is the first approval REMOVE creator user points
         List<User> attendants  = activityRequesRepository.attendantsOfActivity(activity,ActivityRequestStatus.APPROVED);
-        if(attendants.size()==1){
+        if(attendants.size()==0){
             User creator  =activity.getCreator();
             creator.setPoint(creator.getPoint()-NEW_APPROVAL_POINT);
             userRepository.save(creator);
@@ -111,7 +120,7 @@ public class UserEventService {
         if (review.getReviewType() == ReviewType.FRIEND)
             point = FRIEND_REVIEW_POINT;
         if (review.getReviewType() == ReviewType.MEETING)
-            point = MEETING_REVIEW_POINT;
+            point = ACTIVITY_REVIEW_POINT;
 
         if (review.getPositive())
             reader.setPoint(reader.getPoint() + point);

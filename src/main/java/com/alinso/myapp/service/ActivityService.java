@@ -1,7 +1,7 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.meeting.ActivityDto;
-import com.alinso.myapp.dto.meeting.ActivityRequestDto;
+import com.alinso.myapp.dto.activity.ActivityDto;
+import com.alinso.myapp.dto.activity.ActivityRequestDto;
 import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.City;

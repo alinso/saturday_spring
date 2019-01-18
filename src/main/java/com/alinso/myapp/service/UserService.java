@@ -187,7 +187,7 @@ public class UserService {
             User user = userRepository.findByEmail(email).get();
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             return profileInfoForUpdateDto;
-        } catch (Exception e) {
+        }catch (NoSuchElementException e){
             return null;
         }
     }
