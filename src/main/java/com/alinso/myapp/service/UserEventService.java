@@ -1,21 +1,26 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.entity.Block;
-import com.alinso.myapp.entity.Meeting;
+import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.Review;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.ReviewType;
+import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.repository.FollowRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserEventService {
 
 
     private final Integer NEW_MEETING_POINT = 1;
+    private final Integer NEW_APPROVAL_POINT = 3;
     private final Integer FRIEND_REVIEW_POINT = 3;
     private final Integer MEETING_REVIEW_POINT = 5;
 
@@ -34,21 +39,31 @@ public class UserEventService {
     @Autowired
     MessageService messageService;
 
-    public void newMeeting(User user, Meeting meeting) {
+    @Autowired
+    ReferenceService referenceService;
+
+    @Autowired
+    ActivityRequesRepository activityRequesRepository;
+
+
+    public void newMeeting(User user, Activity activity) {
         user.setPoint((user.getPoint() + NEW_MEETING_POINT));
-        user.setMeetingCount((user.getMeetingCount() + 1));
+        user.setActivityCount((user.getActivityCount() + 1));
         for(User follower:followRepository.findFollowersOfUser(user)){
             if(!blockService.isThereABlock(follower.getId()))
-            notificationService.newMeeting(follower,meeting.getId());
+            notificationService.newMeeting(follower, activity.getId());
         }
         userRepository.save(user);
     }
 
 
-    public void removeMeeting(User user) {
-        user.setPoint((user.getPoint() - NEW_MEETING_POINT));
-        user.setMeetingCount((user.getMeetingCount() - 1));
-        userRepository.save(user);
+    public void removeMeeting(Activity activity) {
+        List<User> attendants = activityRequesRepository.attendantsOfActivity(activity, ActivityRequestStatus.APPROVED);
+        for(User user: attendants){
+            user.setPoint((user.getPoint() - NEW_APPROVAL_POINT));
+            user.setActivityCount((user.getActivityCount() - 1));
+            userRepository.save(user);
+        }
     }
 
     public void newMessage(User reader){
@@ -59,11 +74,39 @@ public class UserEventService {
         notificationService.newRequest(target,itemId);
     }
 
-    public void newApproval(User target,Long itemId) {
-        notificationService.newRequestApproval(target,itemId);
+    public void newApproval(User target,Activity activity) {
+        notificationService.newRequestApproval(target,activity.getId());
+
+        //give APPROVED user his points
+        target.setPoint((target.getPoint()+ NEW_APPROVAL_POINT));
+        target.setActivityCount((target.getActivityCount()+1));
+        userRepository.save(target);
+
+        //if this is the first approval give creator user his points
+        List<User> attendants  = activityRequesRepository.attendantsOfActivity(activity,ActivityRequestStatus.APPROVED);
+        if(attendants.size()==2){
+            User creator  =activity.getCreator();
+            creator.setPoint(creator.getPoint()+NEW_APPROVAL_POINT);
+            userRepository.save(creator);
+        }
     }
 
-    public void referenceWritten(User reader, Review review){
+    public void cancelApproval(User target, Activity activity){
+        //REMOVE APPROVED user points
+        target.setPoint((target.getPoint()- NEW_APPROVAL_POINT));
+        target.setActivityCount((target.getActivityCount()-1));
+        userRepository.save(target);
+
+        //if this is the first approval REMOVE creator user points
+        List<User> attendants  = activityRequesRepository.attendantsOfActivity(activity,ActivityRequestStatus.APPROVED);
+        if(attendants.size()==1){
+            User creator  =activity.getCreator();
+            creator.setPoint(creator.getPoint()-NEW_APPROVAL_POINT);
+            userRepository.save(creator);
+        }
+    }
+
+    public void reviewWritten(User reader, Review review){
         Integer point = 0;
         if (review.getReviewType() == ReviewType.FRIEND)
             point = FRIEND_REVIEW_POINT;
@@ -100,6 +143,12 @@ public class UserEventService {
 
     public void newUserRegistered(User user) {
     messageService.greetingMessageForNewUser(user);
-    notificationService.newMessage(user);
+    notificationService.newGreetingMessage(user);
+
+    //give points to the referencer
+        referenceService.createNewReferenceCodes(user);
+        User parent= referenceService.useReferenceCodeAndReturnParent(user);
+        parent.setPoint((parent.getPoint()+5));
+        userRepository.save(parent);
     }
 }

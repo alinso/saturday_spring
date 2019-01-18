@@ -1,6 +1,6 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.dto.meeting.MeetingDto;
+import com.alinso.myapp.dto.meeting.ActivityDto;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -11,15 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class MeetingValidator implements Validator {
     @Override
     public boolean supports(Class<?> clazz) {
-        return MeetingDto.class.isAssignableFrom(clazz);
+        return ActivityDto.class.isAssignableFrom(clazz);
     }
 
     @Override
     public void validate(Object o, Errors errors) {
-        MeetingDto meetingDto = (MeetingDto) o;
+        ActivityDto activityDto = (ActivityDto) o;
 
 
-        MultipartFile file = meetingDto.getFile();
+        MultipartFile file = activityDto.getFile();
 
         if( file!=null &&  !(file.getContentType().toLowerCase().equals("image/jpg")
                 || file.getContentType().toLowerCase().equals("image/jpeg")
@@ -32,7 +32,7 @@ public class MeetingValidator implements Validator {
             errors.rejectValue("file","","Max dosya boyutu 2 MB olabilir");
         }
 
-        if(meetingDto.getDetail().length()>340){
+        if(activityDto.getDetail().length()>340){
             errors.rejectValue("detail","","Maksimum 340 karakter girebilirsiniz");
 
         }

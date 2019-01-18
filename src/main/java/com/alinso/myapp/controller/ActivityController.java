@@ -1,9 +1,8 @@
 package com.alinso.myapp.controller;
 
 
-import com.alinso.myapp.dto.meeting.MeetingDto;
-import com.alinso.myapp.entity.enums.MeetingRequestStatus;
-import com.alinso.myapp.service.MeetingService;
+import com.alinso.myapp.dto.meeting.ActivityDto;
+import com.alinso.myapp.service.ActivityService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.validator.MeetingValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +15,12 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/meeting")
-public class MeetingController {
+@RequestMapping("/activity")
+public class ActivityController {
 
 
     @Autowired
-    MeetingService meetingService;
+    ActivityService activityService;
 
     @Autowired
     MapValidationErrorUtil mapValidationErrorUtil;
@@ -31,33 +30,33 @@ public class MeetingController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<?> save(@Valid  MeetingDto meetingDto,BindingResult result){
+    public ResponseEntity<?> save(@Valid ActivityDto activityDto, BindingResult result){
 
-        meetingValidator.validate(meetingDto,result);
+        meetingValidator.validate(activityDto,result);
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
-        meetingService.save(meetingDto);
-        return new ResponseEntity<>(meetingDto,HttpStatus.ACCEPTED);
+        activityService.save(activityDto);
+        return new ResponseEntity<>(activityDto,HttpStatus.ACCEPTED);
     }
 
     @GetMapping("findAllByCityId/{cityId}")
     public ResponseEntity<?> findAll(@PathVariable("cityId") Long cityId){
-        List<MeetingDto>  meetings = meetingService.findAllNonExpiredByCityId(cityId);
+        List<ActivityDto>  meetings = activityService.findAllNonExpiredByCityId(cityId);
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }
 
-    @GetMapping("meetingWithRequests/{id}")
+    @GetMapping("activityWithRequests/{id}")
     public ResponseEntity<?> meetingWithRequests(@PathVariable("id") Long id){
-        MeetingDto meetingDto  =meetingService.getMeetingWithRequests(id);
-        return new ResponseEntity<>(meetingDto,HttpStatus.OK);
+        ActivityDto activityDto = activityService.getActivityWithRequests(id);
+        return new ResponseEntity<>(activityDto,HttpStatus.OK);
     }
 
 
     @GetMapping("findByUserId/{id}")
     public ResponseEntity<?> findByUserId(@PathVariable("id") Long id){
-        List<MeetingDto>  meetings = meetingService.meetingsOfUser(id);
+        List<ActivityDto>  meetings = activityService.activitiesOfUser(id);
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }
@@ -66,31 +65,31 @@ public class MeetingController {
     @GetMapping("delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
 
-        meetingService.deleteById(id);
+        activityService.deleteById(id);
 
         return new ResponseEntity<>("deleted",HttpStatus.OK);
     }
 
     @PostMapping("update")
-    public ResponseEntity<?> update(@Valid  MeetingDto meetingDto,BindingResult result){
+    public ResponseEntity<?> update(@Valid ActivityDto activityDto, BindingResult result){
 
-        meetingValidator.validate(meetingDto,result);
+        meetingValidator.validate(activityDto,result);
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
 
-        meetingService.update(meetingDto);
+        activityService.update(activityDto);
 
-        return new ResponseEntity<>(meetingDto,HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(activityDto,HttpStatus.ACCEPTED);
 
     }
 
     @GetMapping("findById/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id){
 
-        MeetingDto meetingDto = meetingService.findById(id);
+        ActivityDto activityDto = activityService.findById(id);
 
-        return new ResponseEntity<>(meetingDto,HttpStatus.OK);
+        return new ResponseEntity<>(activityDto,HttpStatus.OK);
     }
 
 

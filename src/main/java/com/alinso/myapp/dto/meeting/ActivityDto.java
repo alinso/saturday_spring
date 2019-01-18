@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
-public class MeetingDto {
+public class ActivityDto {
     private Long id;
     private ProfileDto profileDto;
 
@@ -16,7 +16,7 @@ public class MeetingDto {
     private String photoName;
     private MultipartFile file;
     private List<ProfileDto> attendants;
-    private List<MeetingRequestDto> requests;
+    private List<ActivityRequestDto> requests;
     private Boolean isThisUserJoined;
     private Boolean isExpired;
     private City city;
@@ -82,11 +82,11 @@ public class MeetingDto {
         isThisUserJoined = thisUserJoins;
     }
 
-    public List<MeetingRequestDto> getRequests() {
+    public List<ActivityRequestDto> getRequests() {
         return requests;
     }
 
-    public void setRequests(List<MeetingRequestDto> requests) {
+    public void setRequests(List<ActivityRequestDto> requests) {
         this.requests = requests;
     }
 

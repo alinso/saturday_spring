@@ -74,7 +74,7 @@ public class BlockService {
     }
 
     public Boolean isThereABlock(Long oppositId){
-        if(SecurityContextHolder.getContext().getAuthentication()==null){ //it means that there is a process triggered by system, not by a triggered user
+        if(SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")){ //if user not logged in cannot control the blockage status
             return false;
         }
         return (isBlockedIt(oppositId) || isBlockedByIt(oppositId));

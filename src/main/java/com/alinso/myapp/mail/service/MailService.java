@@ -67,10 +67,10 @@ public class MailService {
         sendMail(target,message,systemMessage.getMailSubject());
     }
 
-    public void sendNewActivityMail(User target,User trigger,Long meetingId){
+    public void sendNewActivityMail(User target,User trigger,Long activityID){
         SystemMessage systemMessage  = systemMessageRepository.findByMessageCode("NEW_ACTIVITY_MAIL");
         String personLink  = applicationUrl+"profile/"+trigger.getId();
-        String activityLink = applicationUrl+"meetingDetail/"+meetingId;
+        String activityLink = applicationUrl+"activityDetail/"+activityID;
         String message = systemMessage.getMessageText()
                 .replace("{activityLink}",activityLink)
                 .replace("{personName}",trigger.getName()+" "+trigger.getSurname())
@@ -78,10 +78,10 @@ public class MailService {
         sendMail(target,message,systemMessage.getMailSubject());
     }
 
-    public void sendNewRequestMail(User target,User trigger,Long meetingId){
+    public void sendNewRequestMail(User target,User trigger,Long activityID){
         SystemMessage systemMessage  = systemMessageRepository.findByMessageCode("NEW_REQUEST_MAIL");
         String personLink  = applicationUrl+"profile/"+trigger.getId();
-        String activityLink = applicationUrl+"meetingDetail/"+meetingId;
+        String activityLink = applicationUrl+"activityDetail/"+activityID;
         String message = systemMessage.getMessageText()
                 .replace("{activityLink}",activityLink)
                 .replace("{personName}",trigger.getName()+" "+trigger.getSurname())
@@ -89,10 +89,10 @@ public class MailService {
         sendMail(target,message,systemMessage.getMailSubject());
     }
 
-    public void sendNewRequestApprovalMail(User target,User trigger,Long meetingId) {
+    public void sendNewRequestApprovalMail(User target,User trigger,Long activityID) {
         SystemMessage systemMessage = systemMessageRepository.findByMessageCode("NEW_REQUEST_APPROVAL_MAIL");
         String personLink = applicationUrl + "profile/" + trigger.getId();
-        String activityLink = applicationUrl + "meetingDetail/" + meetingId;
+        String activityLink = applicationUrl + "activityDetail/" + activityID;
         String message = systemMessage.getMessageText()
                 .replace("{activityLink}", activityLink)
                 .replace("{personName}", trigger.getName() + " " + trigger.getSurname())
@@ -111,9 +111,9 @@ public class MailService {
         sendMail(target, message, systemMessage.getMailSubject());
     }
 
-    public void newReviewAvailableMail(User target, Long meetingId){
+    public void newReviewAvailableMail(User target, Long activityID){
         SystemMessage systemMessage = systemMessageRepository.findByMessageCode("NEW_REVIEW_AVAILABLE_MAIL");
-        String activityLink = applicationUrl + "meetingDetail/" + meetingId;
+        String activityLink = applicationUrl + "activityDetail/" + activityID;
         String message = systemMessage.getMessageText()
                 .replace("{activityLink}", activityLink);
         sendMail(target, message, systemMessage.getMailSubject());

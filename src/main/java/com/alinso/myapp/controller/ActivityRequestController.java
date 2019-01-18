@@ -1,7 +1,7 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.entity.enums.MeetingRequestStatus;
-import com.alinso.myapp.service.MeetingRequestService;
+import com.alinso.myapp.entity.enums.ActivityRequestStatus;
+import com.alinso.myapp.service.ActivityRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("request")
-public class MeetingRequestController {
+public class ActivityRequestController {
 
     @Autowired
-    MeetingRequestService meetingRequestService;
+    ActivityRequestService activityRequestService;
 
     @GetMapping("sendRequest/{id}")
     public ResponseEntity<?> join(@PathVariable("id") Long id){
 
-        Boolean isThisUserJoins = meetingRequestService.sendRequest(id);
+        Boolean isThisUserJoins = activityRequestService.sendRequest(id);
 
         return new ResponseEntity<>(isThisUserJoins, HttpStatus.OK);
     }
@@ -28,7 +28,7 @@ public class MeetingRequestController {
     @GetMapping("approveRequest/{id}")
     public ResponseEntity<?> approveRequest(@PathVariable("id") Long id){
 
-        MeetingRequestStatus status = meetingRequestService.approveRequest(id);
+        ActivityRequestStatus status = activityRequestService.approveRequest(id);
         return new ResponseEntity<>(status,HttpStatus.OK);
     }
 

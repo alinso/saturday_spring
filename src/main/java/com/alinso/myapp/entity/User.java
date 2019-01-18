@@ -70,7 +70,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column
     @ColumnDefault("0")
-    private Integer meetingCount;
+    private Integer activityCount;
 
     @Column
     @ColumnDefault("0")
@@ -151,12 +151,12 @@ public class User extends BaseEntity implements UserDetails {
         this.referenceCode = referenceCode;
     }
 
-    public Integer getMeetingCount() {
-        return meetingCount;
+    public Integer getActivityCount() {
+        return activityCount;
     }
 
-    public void setMeetingCount(Integer meetingCount) {
-        this.meetingCount = meetingCount;
+    public void setActivityCount(Integer activityCount) {
+        this.activityCount = activityCount;
     }
 
     public String getEmail() {

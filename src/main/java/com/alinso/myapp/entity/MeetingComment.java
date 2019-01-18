@@ -18,7 +18,7 @@ public class MeetingComment extends BaseEntity {
 
     @ManyToOne
     @NotNull
-    private Meeting meeting;
+    private Activity activity;
 
     @Column
     @Min(0)
@@ -42,12 +42,12 @@ public class MeetingComment extends BaseEntity {
         this.comment = comment;
     }
 
-    public Meeting getMeeting() {
-        return meeting;
+    public Activity getActivity() {
+        return activity;
     }
 
-    public void setMeeting(Meeting meeting) {
-        this.meeting = meeting;
+    public void setActivity(Activity activity) {
+        this.activity = activity;
     }
 
     public Integer getRate() {

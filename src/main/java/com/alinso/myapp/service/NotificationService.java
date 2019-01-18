@@ -2,17 +2,17 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.dto.notification.NotificationDto;
 import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.entity.Meeting;
+import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.Notification;
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.entity.enums.MeetingRequestStatus;
+import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.NotificationType;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
-import com.alinso.myapp.mail.util.SMTPMailUtil;
-import com.alinso.myapp.repository.MeetingRepository;
-import com.alinso.myapp.repository.MeetingRequesRepository;
+import com.alinso.myapp.repository.ActivityRepository;
+import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.repository.NotificationRepository;
+import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.UserUtil;
 import org.modelmapper.ModelMapper;
@@ -47,10 +47,13 @@ public class NotificationService {
     BlockService blockService;
 
     @Autowired
-    MeetingRepository meetingRepository;
+    ActivityRepository activityRepository;
 
     @Autowired
-    MeetingRequesRepository meetingRequesRepository;
+    ActivityRequesRepository activityRequesRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     private void createNotification(User target,User trigger,NotificationType notificationType,String message){
 
@@ -80,24 +83,24 @@ public class NotificationService {
         finish.setTime(new Date());
         finish.add(Calendar.HOUR, HOURS_TO_WRITE_REVIEW);
 
-        List<Meeting> meetingList=meetingRepository.recentUncommentedMeetings(start.getTime(),finish.getTime());
+        List<Activity> activityList = activityRepository.recentUncommentedActivities(start.getTime(),finish.getTime());
 
-        for(Meeting meeting:meetingList){
+        for(Activity activity : activityList){
             //check if attendants are more than one
-            Long meetingId  =meeting.getId();
-            if(meetingRequesRepository.countOfAprrovedForThisMeeting(meeting, MeetingRequestStatus.APPROVED)>1){
+            Long meetingId  = activity.getId();
+            if(activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED)>1){
                 //send notification to creator
-                createNotification(meeting.getCreator(),null,NotificationType.MEETING_COMMENT_AVAILABLE, meetingId.toString());
-                mailService.newReviewAvailableMail(meeting.getCreator(),meetingId);
+                createNotification(activity.getCreator(),null,NotificationType.MEETING_COMMENT_AVAILABLE, meetingId.toString());
+                mailService.newReviewAvailableMail(activity.getCreator(),meetingId);
                 //send notification to attendants
-                List<User> attendants  = meetingRequesRepository.attendantsOfMeeting(meeting,MeetingRequestStatus.APPROVED);
+                List<User> attendants  = activityRequesRepository.attendantsOfActivity(activity, ActivityRequestStatus.APPROVED);
                 for(User attendant :attendants){
                     createNotification(attendant,null,NotificationType.MEETING_COMMENT_AVAILABLE,meetingId.toString());
                     mailService.newReviewAvailableMail(attendant,meetingId);
                 }
             }
-            meeting.setCommentNotificationSent(true);
-            meetingRepository.save(meeting);
+            activity.setCommentNotificationSent(true);
+            activityRepository.save(activity);
         }
     }
 
@@ -209,6 +212,12 @@ public class NotificationService {
                 notificationRepository.save(notification);
             }
         }
+    }
+
+    public void newGreetingMessage(User target) {
+        User trigger  =userRepository.findById(Long.valueOf(1)).get();
+        createNotification(target,trigger,NotificationType.MESSAGE,null);
+        mailService.sendNewMessageMail(target,trigger);
     }
 }
 

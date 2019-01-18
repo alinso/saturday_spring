@@ -1,6 +1,5 @@
 package com.alinso.myapp.dto.user;
 
-import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.enums.Gender;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +34,7 @@ public class ProfileDto {
 
     private String motivation = "";
 
-    private Integer meetingCount;
+    private Integer activityCount;
     private Integer reviewCount;
     private Integer photoCount;
     private Integer point;
@@ -127,12 +126,12 @@ public class ProfileDto {
     }
 
 
-    public Integer getMeetingCount() {
-        return meetingCount;
+    public Integer getActivityCount() {
+        return activityCount;
     }
 
-    public void setMeetingCount(Integer meetingCount) {
-        this.meetingCount = meetingCount;
+    public void setActivityCount(Integer activityCount) {
+        this.activityCount = activityCount;
     }
 
 

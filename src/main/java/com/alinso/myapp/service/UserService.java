@@ -75,13 +75,11 @@ public class UserService {
         newUser.setPhotoCount(0);
         newUser.setReviewCount(0);
         newUser.setPoint(0);
-        newUser.setMeetingCount(0);
+        newUser.setActivityCount(0);
 
         User user = userRepository.save(newUser);
         String token = mailVerificationTokenService.saveToken(user);
         mailService.sendMailVerificationMail(user,token);
-        referenceService.useReferenceCode(newUser);
-        referenceService.createNewReferenceCodes(user);
         return user;
     }
 
@@ -106,6 +104,7 @@ public class UserService {
         user.setEnabled(true);
         userRepository.save(user);
         userEventService.newUserRegistered(user);
+
 
     }
 

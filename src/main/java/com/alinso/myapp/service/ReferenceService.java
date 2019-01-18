@@ -23,6 +23,8 @@ public class ReferenceService {
     @Autowired
     ModelMapper modelMapper;
 
+
+
     public void createNewReferenceCodes(User parent){
         for(int i=0;i<5;i++){
             Reference reference =  new Reference();
@@ -77,10 +79,13 @@ public class ReferenceService {
         return referenceDto;
     }
 
-    public void useReferenceCode(User child) {
+    public User useReferenceCodeAndReturnParent(User child) {
         Reference reference= referenceRepository.findByCode(child.getReferenceCode());
         reference.setChild(child);
         referenceRepository.save(reference);
+
+        User parent = reference.getParent();
+        return parent;
     }
 }
 

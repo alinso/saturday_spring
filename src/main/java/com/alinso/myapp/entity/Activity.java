@@ -7,24 +7,24 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-public class Meeting extends BaseEntity {
+public class Activity extends BaseEntity {
 
     @Column(columnDefinition = "TEXT")
     @NotBlank(message = "Bu kısmı boş bırakamazsınız")
     private String detail;
 
 
-    public Meeting(@NotBlank(message = "Bu kısmı boş bırakamazsınız") String detail) {
+    public Activity(@NotBlank(message = "Bu kısmı boş bırakamazsınız") String detail) {
         this.detail = detail;
     }
 
-    public Meeting(@NotBlank(message = "Bu kısmı boş bırakamazsınız") String detail, User creator, List<User> attendants, String photoName) {
+    public Activity(@NotBlank(message = "Bu kısmı boş bırakamazsınız") String detail, User creator, List<User> attendants, String photoName) {
         this.detail = detail;
         this.creator = creator;
         this.photoName = photoName;
     }
 
-    public Meeting(){}
+    public Activity(){}
 
     @Column
     @NotNull

@@ -1,20 +1,20 @@
 package com.alinso.myapp.dto.meeting;
 
 import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.entity.enums.MeetingRequestStatus;
+import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 
-public class MeetingRequestDto {
+public class ActivityRequestDto {
 
     private Long id;
-    private MeetingRequestStatus meetingRequestStatus;
+    private ActivityRequestStatus activityRequestStatus;
     private ProfileDto profileDto;
 
-    public MeetingRequestStatus getMeetingRequestStatus() {
-        return meetingRequestStatus;
+    public ActivityRequestStatus getActivityRequestStatus() {
+        return activityRequestStatus;
     }
 
-    public void setMeetingRequestStatus(MeetingRequestStatus meetingRequestStatus) {
-        this.meetingRequestStatus = meetingRequestStatus;
+    public void setActivityRequestStatus(ActivityRequestStatus activityRequestStatus) {
+        this.activityRequestStatus = activityRequestStatus;
     }
 
     public ProfileDto getProfileDto() {

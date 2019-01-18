@@ -2,15 +2,15 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.dto.review.ReviewDto;
 import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.entity.Meeting;
-import com.alinso.myapp.entity.MeetingRequest;
+import com.alinso.myapp.entity.Activity;
+import com.alinso.myapp.entity.ActivityRequest;
 import com.alinso.myapp.entity.Review;
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.entity.enums.MeetingRequestStatus;
+import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.ReviewType;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.repository.MeetingRepository;
-import com.alinso.myapp.repository.MeetingRequesRepository;
+import com.alinso.myapp.repository.ActivityRepository;
+import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.repository.ReviewRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -33,10 +33,10 @@ public class ReviewService {
     ReviewRepository reviewRepository;
 
     @Autowired
-    MeetingRepository meetingRepository;
+    ActivityRepository activityRepository;
 
     @Autowired
-    MeetingRequesRepository meetingRequesRepository;
+    ActivityRequesRepository activityRequesRepository;
 
     @Autowired
     ModelMapper modelMapper;
@@ -51,14 +51,14 @@ public class ReviewService {
     private final Integer HOURS_TO_WRITE_REVIEW = -1;
 
 
-    public Boolean haveUserAttendMeeting(Meeting meeting, User user) {
+    public Boolean haveUserAttendMeeting(Activity activity, User user) {
         Boolean result = false;
-        MeetingRequest myRequest = new MeetingRequest();
+        ActivityRequest myRequest = new ActivityRequest();
         try {
-            myRequest = meetingRequesRepository.findByMeetingaAndApplicant(user, meeting);
+            myRequest = activityRequesRepository.findByActivityAndApplicant(user, activity);
 
             //I have attend one of his meetings
-            if (myRequest.getMeetingRequestStatus() == MeetingRequestStatus.APPROVED) {
+            if (myRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
                 result = true;
             }
         } catch (Exception e) {
@@ -79,16 +79,16 @@ public class ReviewService {
         finish.add(Calendar.HOUR, HOURS_TO_WRITE_REVIEW);
 
 
-        List<Meeting> recentMeetingsCreatedByMe = meetingRepository.recentMeetingsOfCreator(start.getTime(), finish.getTime(), me);
-        List<Meeting> recentMeetingsCreatedByOther = meetingRepository.recentMeetingsOfCreator(start.getTime(), finish.getTime(), other);
+        List<Activity> recentMeetingsCreatedByMe = activityRepository.recentActivitiesOfCreator(start.getTime(), finish.getTime(), me);
+        List<Activity> recentMeetingsCreatedByOther = activityRepository.recentActivitiesOfCreator(start.getTime(), finish.getTime(), other);
 
 
         //let say users havent meet initially
         Boolean result = false;
 
         //have I attend his meeting?
-        for (Meeting meeting : recentMeetingsCreatedByOther) {
-            if (haveUserAttendMeeting(meeting, me)) {
+        for (Activity activity : recentMeetingsCreatedByOther) {
+            if (haveUserAttendMeeting(activity, me)) {
                 result = true;
                 break;
             }
@@ -97,8 +97,8 @@ public class ReviewService {
         //has he attend my meeting
         //if I already attend one of him no need to check this
         if (!result)
-            for (Meeting meeting : recentMeetingsCreatedByMe) {
-                if (haveUserAttendMeeting(meeting, other)) {
+            for (Activity activity : recentMeetingsCreatedByMe) {
+                if (haveUserAttendMeeting(activity, other)) {
                     result = true;
                     break;
                 }
@@ -126,7 +126,7 @@ public class ReviewService {
         review.setReviewType(ReviewType.FRIEND);
 
         reviewRepository.save(review);
-        userEventService.referenceWritten(reader, review);
+        userEventService.reviewWritten(reader, review);
 
     }
 
