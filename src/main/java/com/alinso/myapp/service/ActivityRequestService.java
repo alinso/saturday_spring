@@ -124,11 +124,15 @@ public class ActivityRequestService {
 
         List<ProfileDto> profileDtos = new ArrayList<>();
         for(User user: attendantUsers){
-            ProfileDto profileDto  =modelMapper.map(user,ProfileDto.class);
+                ProfileDto profileDto  =modelMapper.map(user,ProfileDto.class);
             profileDto.setAge(UserUtil.calculateAge(user));
             profileDtos.add(profileDto);
         }
-        profileDtos.add(modelMapper.map(activity.getCreator(), ProfileDto.class));
+        ProfileDto creator = modelMapper.map(activity.getCreator(), ProfileDto.class);
+        creator.setAge(UserUtil.calculateAge(activity.getCreator()));
+
+        profileDtos.add(creator);
+
         return profileDtos;
     }
 
