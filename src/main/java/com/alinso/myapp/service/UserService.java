@@ -95,7 +95,7 @@ public class UserService {
     }
 
     public void verifyMail(String tokenString) {
-        MailVerificationToken token = mailVerificationTokenService.findByToken(tokenString);
+        MailVerificationToken token = mailVerificationTokenService.findByActiveToken(tokenString);
 
         if (token == null) {
             throw new RecordNotFound404Exception("Geçersiz link");
@@ -105,6 +105,8 @@ public class UserService {
         userRepository.save(user);
         userEventService.newUserRegistered(user);
 
+        //if we dont delete token every time user clicks the link, same process above duplicates
+         mailVerificationTokenService.delete(token);
 
     }
 

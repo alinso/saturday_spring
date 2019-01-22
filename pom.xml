@@ -9,13 +9,14 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.alinso</groupId>
-    <artifactId>myapp</artifactId>
+    <artifactId>af</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>my dream app</description>
 
     <properties>
         <java.version>1.8</java.version>
+        <start-class>com.alinso.myapp.MyappApplication</start-class>
     </properties>
 
     <dependencies>

@@ -12,6 +12,7 @@ public class MailVerificationToken extends BaseEntity  {
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
+
     public String getToken() {
         return token;
     }

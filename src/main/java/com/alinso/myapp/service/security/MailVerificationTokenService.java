@@ -46,7 +46,7 @@ public class MailVerificationTokenService {
 
 
 
-    public MailVerificationToken findByToken(String token){
+    public MailVerificationToken findByActiveToken(String token){
         try {
             return mailVerificationTokenRepository.findByToken(token).get();
         }catch (NoSuchElementException e){
@@ -55,4 +55,7 @@ public class MailVerificationTokenService {
     }
 
 
+    public void delete(MailVerificationToken token) {
+    mailVerificationTokenRepository.delete(token);
+    }
 }
