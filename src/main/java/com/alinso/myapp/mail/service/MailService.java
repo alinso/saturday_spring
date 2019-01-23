@@ -38,7 +38,7 @@ public class MailService {
     public void sendForgottenPasswordMail(User target, String token){
         SystemMessage systemMessage  = systemMessageRepository.findByMessageCode("FORGOTTEN_PASSWORD_MAIL");
 
-        String link = applicationUrl+"resetPassword/"+token;
+        String link = "<a href='"+applicationUrl+"resetPassword/"+token+"'><strong>[Şifre Yenilemek İçin Tıklayın]</strong></a>";
         String message  =systemMessage.getMessageText().replace("{link}",link);
 
         sendMail(target,message,systemMessage.getMailSubject());
@@ -46,8 +46,7 @@ public class MailService {
 
     public void sendMailVerificationMail(User target, String token){
         SystemMessage systemMessage  = systemMessageRepository.findByMessageCode("MAIL_VERIFICATION_MAIL");
-
-        String link = applicationUrl+"verifyMail/"+token;
+        String link = "<a href='"+applicationUrl+"verifyMail/"+token+"'><strong>[Hesabınızı Aktifleştirmek için Tıklayın]</strong></a>";
         String message  =systemMessage.getMessageText().replace("{link}",link);
 
         sendMail(target,message,systemMessage.getMailSubject());

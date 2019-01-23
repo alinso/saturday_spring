@@ -21,7 +21,8 @@ public class MyappApplication extends SpringBootServletInitializer implements We
 
 
     @Value("${cors.url}")
-    private String applicationUrl;
+    private String allowedOrigins;
+
 
 
     public static void main(String[] args) {
@@ -37,7 +38,7 @@ public class MyappApplication extends SpringBootServletInitializer implements We
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedMethods("POST","GET")
-        .allowedOrigins(applicationUrl);
+        .allowedOrigins(allowedOrigins.split(","));
     }
 
 
