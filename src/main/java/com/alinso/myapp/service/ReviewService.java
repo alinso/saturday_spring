@@ -110,10 +110,12 @@ public class ReviewService {
         User reader = userRepository.findById(reviewDto.getReader().getId()).get();
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        Boolean haveUsersMeetRecently = haveUsersMeetRecently(writer, reader);
+
         if (blockService.isThereABlock(reader.getId()))
             throw new UserWarningException("Erişim Yok");
 
-        if (reviewDto.getReviewType() == ReviewType.MEETING && !haveUsersMeetRecently(writer, reader))
+        if (reviewDto.getReviewType() == ReviewType.MEETING && !haveUsersMeetRecently)
             throw new UserWarningException("Daha önce bir aktiviteye katılmadınız!");
 
         if (isReviewedBefore(reviewDto.getReader().getId()))
@@ -123,7 +125,10 @@ public class ReviewService {
         Review review = modelMapper.map(reviewDto, Review.class);
         review.setWriter(writer);
         review.setReader(reader);
-        review.setReviewType(ReviewType.FRIEND);
+        if(haveUsersMeetRecently)
+            review.setReviewType(ReviewType.MEETING);
+        if(!haveUsersMeetRecently)
+            review.setReviewType(ReviewType.FRIEND);
 
         reviewRepository.save(review);
         userEventService.reviewWritten(reader, review);

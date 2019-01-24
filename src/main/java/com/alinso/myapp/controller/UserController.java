@@ -58,7 +58,10 @@ public class UserController {
     @Autowired
     private ResetPasswordValidator resetPasswordValidator;
 
-
+    @GetMapping("ok")
+    public ResponseEntity<?> ok(){
+        return new ResponseEntity<>("okkey",HttpStatus.OK);
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result) {

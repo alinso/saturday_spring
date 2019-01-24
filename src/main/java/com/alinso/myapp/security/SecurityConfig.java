@@ -2,6 +2,7 @@ package com.alinso.myapp.security;
 
 import com.alinso.myapp.service.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         prePostEnabled = true
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+
+    @Value("${ssl.require_ssl}")
+    private boolean requireHttps;
 
     @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
@@ -69,6 +74,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        http.addFilterBefore(encodingFilter,CsrfFilter.class);
 
 
+        if(this.requireHttps) {
+            http
+                    .requiresChannel()
+                    .anyRequest().requiresSecure();
+        }
+
 
 
         http.cors().and().csrf().disable()
@@ -98,6 +109,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/forgottenPassword/**").permitAll()
                 .antMatchers("/user/resetPassword/**").permitAll()
                 .antMatchers("/user/profile/**").permitAll()
+                .antMatchers("/user/ok/**").permitAll()
 
                 .antMatchers(SecurityConstants.H2_URL).permitAll()
                 .anyRequest().authenticated();
