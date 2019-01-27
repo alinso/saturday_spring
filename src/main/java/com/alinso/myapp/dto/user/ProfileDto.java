@@ -39,6 +39,7 @@ public class ProfileDto {
     private Integer photoCount;
     private Integer point;
     private String interests;
+    private String referenceCode;
 
 
 
@@ -158,5 +159,13 @@ public class ProfileDto {
 
     public void setInterests(String interests) {
         this.interests = interests;
+    }
+
+    public String getReferenceCode() {
+        return referenceCode;
+    }
+
+    public void setReferenceCode(String referenceCode) {
+        this.referenceCode = referenceCode;
     }
 }

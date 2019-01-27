@@ -33,6 +33,9 @@ import java.util.NoSuchElementException;
 public class UserService {
 
     @Autowired
+    HashtagService hashtagService;
+
+    @Autowired
     ModelMapper modelMapper;
 
     @Autowired
@@ -79,7 +82,7 @@ public class UserService {
 
         User user = userRepository.save(newUser);
         String token = mailVerificationTokenService.saveToken(user);
-        mailService.sendMailVerificationMail(user,token);
+        mailService.sendMailVerificationMail(user, token);
         return user;
     }
 
@@ -91,7 +94,7 @@ public class UserService {
             throw new UserWarningException("Bu E-Posta ile kayıtlı kullanıcı bulunamadı");
         }
         String token = forgottenPasswordTokenService.saveToken(user);
-        mailService.sendForgottenPasswordMail(user,token);
+        mailService.sendForgottenPasswordMail(user, token);
     }
 
     public void verifyMail(String tokenString) {
@@ -102,11 +105,13 @@ public class UserService {
         }
         User user = userRepository.findById(token.getUser().getId()).get();
         user.setEnabled(true);
+
+        userEventService.setReferenceChain(user);
         userRepository.save(user);
         userEventService.newUserRegistered(user);
 
         //if we dont delete token every time user clicks the link, same process above duplicates
-         mailVerificationTokenService.delete(token);
+        mailVerificationTokenService.delete(token);
 
     }
 
@@ -125,19 +130,20 @@ public class UserService {
 
 
     public ProfileInfoForUpdateDto update(ProfileInfoForUpdateDto profileInfoForUpdateDto) {
-        User loggedUser  =(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         loggedUser.setName(profileInfoForUpdateDto.getName());
         loggedUser.setCity(cityService.findById(profileInfoForUpdateDto.getCityId()));
         loggedUser.setSurname(profileInfoForUpdateDto.getSurname());
         loggedUser.setEmail(profileInfoForUpdateDto.getEmail());
         loggedUser.setPhone(profileInfoForUpdateDto.getPhone());
-        loggedUser.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(),"dd/MM/yyyy"));
+        loggedUser.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(), "dd/MM/yyyy"));
         loggedUser.setMotivation(profileInfoForUpdateDto.getMotivation());
         loggedUser.setAbout(profileInfoForUpdateDto.getAbout());
         loggedUser.setGender(profileInfoForUpdateDto.getGender());
-        loggedUser.setInterests(profileInfoForUpdateDto.getInterests());
-        loggedUser.setReferenceCode(profileInfoForUpdateDto.getReferenceCode());
+        //loggedUser.setInterests(profileInfoForUpdateDto.getInterests());
+        //loggedUser.setReferenceCode(profileInfoForUpdateDto.getReferenceCode());
+        hashtagService.saveUserHashtag(loggedUser,profileInfoForUpdateDto.getInterests());
 
         userRepository.save(loggedUser);
         return profileInfoForUpdateDto;
@@ -148,16 +154,18 @@ public class UserService {
 
 
         try {
-             user = userRepository.findById(id).get();
+            user = userRepository.findById(id).get();
         } catch (Exception e) {
             throw new RecordNotFound404Exception("Kullanıcı Bulunamadı: " + id);
         }
-            ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
+        ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
 
-            if (user.getBirthDate() != null) {
-                profileDto.setAge(UserUtil.calculateAge(user));
-            }
-            return profileDto;
+        if (user.getBirthDate() != null) {
+            profileDto.setAge(UserUtil.calculateAge(user));
+        }
+
+        profileDto.setInterests(hashtagService.findByUserStr(user));
+        return profileDto;
     }
 
 
@@ -166,11 +174,11 @@ public class UserService {
 
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
-            profileInfoForUpdateDto.setbDateString(DateUtil.dateToString(user.getBirthDate(),"dd/MM/yyyy"));
-
+            profileInfoForUpdateDto.setbDateString(DateUtil.dateToString(user.getBirthDate(), "dd/MM/yyyy"));
+            profileInfoForUpdateDto.setInterests(hashtagService.findByUserStr(user));
             return profileInfoForUpdateDto;
         } catch (Exception e) {
-            throw new UserWarningException("Hata oluştu" );
+            throw new UserWarningException("Hata oluştu");
         }
     }
 
@@ -189,7 +197,7 @@ public class UserService {
             User user = userRepository.findByEmail(email).get();
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             return profileInfoForUpdateDto;
-        }catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             return null;
         }
     }
@@ -211,8 +219,8 @@ public class UserService {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //save new file and remove old one
-        if(!loggedUser.getProfilePicName().equals(""))
-        fileStorageService.deleteFile(profilPicUploadPath + loggedUser.getProfilePicName());
+        if (!loggedUser.getProfilePicName().equals(""))
+            fileStorageService.deleteFile(profilPicUploadPath + loggedUser.getProfilePicName());
         fileStorageService.storeFile(singlePhotoUploadDto.getFile(), profilPicUploadPath, newName);
 
         //update database

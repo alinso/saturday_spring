@@ -17,7 +17,6 @@ public class ProfileInfoForUpdateDto {
     @NotBlank(message = "Telefon boş olamaz")
     private String phone;
 
-
     private String profilePicName;
 
     @NotBlank(message = "İsim boş olamaz")

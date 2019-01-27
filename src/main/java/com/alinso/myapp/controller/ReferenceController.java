@@ -1,6 +1,7 @@
 package com.alinso.myapp.controller;
 
 import com.alinso.myapp.dto.reference.ReferenceDto;
+import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.service.ReferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,8 +21,8 @@ public class ReferenceController {
 
     @GetMapping("/myReferences")
     public ResponseEntity<?> myReferences(){
-        List<ReferenceDto> referenceDtos =  referenceService.getMyReferences();
-        return new ResponseEntity<>(referenceDtos, HttpStatus.OK);
+        List<ProfileDto> profileDtos =  referenceService.getMyReferences();
+        return new ResponseEntity<>(profileDtos, HttpStatus.OK);
     }
 
 }

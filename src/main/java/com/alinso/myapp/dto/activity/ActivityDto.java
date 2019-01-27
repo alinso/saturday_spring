@@ -21,6 +21,7 @@ public class ActivityDto {
     private Boolean isExpired;
     private City city;
     private Long cityId;
+    private String hashtagListString;
 
     @NotBlank(message="İleri bir zaman seçmelisiniz(10 dk sonra, 1 saat sonra...)")
     private String deadLineString;
@@ -120,5 +121,13 @@ public class ActivityDto {
 
     public void setCityId(Long cityId) {
         this.cityId = cityId;
+    }
+
+    public String getHashtagListString() {
+        return hashtagListString;
+    }
+
+    public void setHashtagListString(String hashtagListString) {
+        this.hashtagListString = hashtagListString;
     }
 }

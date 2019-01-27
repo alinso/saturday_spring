@@ -1,8 +1,6 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.dto.reference.ReferenceDto;
 import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
-import com.alinso.myapp.entity.Reference;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.service.ReferenceService;
@@ -56,8 +54,8 @@ public class UserValidator implements Validator {
             errors.rejectValue("gender","Match", "Cinsiyet Seçiniz");
         }
 
-        ReferenceDto referenceDto  = referenceService.findByCode(user.getReferenceCode());
-        if(referenceDto==null || referenceDto.getChild()!=null){
+        User parent  = referenceService.findByCode(user.getReferenceCode());
+        if(parent==null && !user.getReferenceCode().equals("")){
             errors.rejectValue("referenceCode","Match", "Geçersiz Referans Kodu");
         }
 

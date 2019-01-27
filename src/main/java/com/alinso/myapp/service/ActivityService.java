@@ -3,10 +3,7 @@ package com.alinso.myapp.service;
 import com.alinso.myapp.dto.activity.ActivityDto;
 import com.alinso.myapp.dto.activity.ActivityRequestDto;
 import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.entity.Activity;
-import com.alinso.myapp.entity.City;
-import com.alinso.myapp.entity.ActivityRequest;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.*;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
@@ -29,6 +26,9 @@ import java.util.NoSuchElementException;
 
 @Service
 public class ActivityService {
+
+   @Autowired
+   HashtagService hashtagService;
 
     @Autowired
     ActivityRepository activityRepository;
@@ -72,6 +72,8 @@ public class ActivityService {
         activityDto.setThisUserJoined(activityRequestService.isThisUserJoined(activity.getId()));
         activityDto.setAttendants(activityRequestService.findAttendants(activity));
 
+        activityDto.setHashtagListString(hashtagService.findByActivityStr(activity));
+
         if(activity.getDeadLine().compareTo(new Date()) < 0)
             activityDto.setExpired(true);
         else
@@ -96,6 +98,7 @@ public class ActivityService {
 
         activityRepository.save(activity);
         userEventService.newMeeting(loggedUser, activity);
+        hashtagService.saveActivityHashtag(activity,activityDto.getHashtagListString());
 
         return activity;
     }
@@ -119,7 +122,14 @@ public class ActivityService {
 
         activityInDb.setDeadLine(DateUtil.stringToDate(activityDto.getDeadLineString(),"dd/MM/yyyy HH:mm"));
         activityInDb.setDetail(activityDto.getDetail());
+
+        hashtagService.saveActivityHashtag(activityInDb,activityDto.getHashtagListString());
+
+
         return activityRepository.save(activityInDb);
+
+
+
     }
 
     public List<ActivityDto> findAllNonExpiredByCityId(Long cityId) {
@@ -139,6 +149,7 @@ public class ActivityService {
             activityDto.setThisUserJoined(activityRequestService.isThisUserJoined(activity.getId()));
             activityDto.setDeadLineString(DateUtil.dateToString(activity.getDeadLine(),"dd/MM/yyyy HH:mm"));
             activityDto.setProfileDto(profileDto);
+            activityDto.setHashtagListString(hashtagService.findByActivityStr(activity));
             activityDtos.add(activityDto);
         }
         return activityDtos;
@@ -160,6 +171,9 @@ public class ActivityService {
 
         //delete requests
        activityRequestService.deleteByActivityId(id);
+
+       //delete hashtags
+        hashtagService.deleteByActivity(activityInDb);
 
         activityRepository.deleteById(id);
     }
@@ -194,6 +208,7 @@ public class ActivityService {
             activityDto.setAttendants(activityRequestService.findAttendants(activity));
             activityDto.setThisUserJoined(activityRequestService.isThisUserJoined(activity.getId()));
             activityDto.setProfileDto(profileDto);
+            activityDto.setHashtagListString(hashtagService.findByActivityStr(activity));
             activityDtos.add(activityDto);
         }
         return activityDtos;
@@ -224,6 +239,7 @@ public class ActivityService {
 
         ActivityDto activityDto = modelMapper.map(activity, ActivityDto.class);
         activityDto.setDeadLineString(DateUtil.dateToString(activity.getDeadLine(),"dd/MM/yyyy hh:mm"));
+        activityDto.setHashtagListString(hashtagService.findByActivityStr(activity));
         activityDto.setRequests(activityRequestDtos);
 
         return activityDto;

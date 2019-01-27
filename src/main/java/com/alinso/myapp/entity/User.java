@@ -61,8 +61,11 @@ public class User extends BaseEntity implements UserDetails {
     private String motivation = "";
 
     @Column
-    @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
+
+    //reference parent
+    @ManyToOne
+    private User parent;
 
     @Column
     @ColumnDefault("0")
@@ -83,9 +86,9 @@ public class User extends BaseEntity implements UserDetails {
     @ManyToOne
     @ColumnDefault("0")
     private City city;
-
-    @Column
-    private String interests;
+//
+//    @Column
+//    private String interests;
 
     public Integer getPhotoCount() {
         return photoCount;
@@ -265,11 +268,13 @@ public class User extends BaseEntity implements UserDetails {
         this.city = city;
     }
 
-    public String getInterests() {
-        return interests;
+
+
+    public User getParent() {
+        return parent;
     }
 
-    public void setInterests(String interests) {
-        this.interests = interests;
+    public void setParent(User parent) {
+        this.parent = parent;
     }
 }

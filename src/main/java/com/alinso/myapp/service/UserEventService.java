@@ -150,14 +150,32 @@ public class UserEventService {
         //TODO: all messages will be readed
     }
 
-    public void newUserRegistered(User user) {
-    messageService.greetingMessageForNewUser(user);
-    notificationService.newGreetingMessage(user);
 
-    //give points to the referencer
-        referenceService.createNewReferenceCodes(user);
-        User parent= referenceService.useReferenceCodeAndReturnParent(user);
-        parent.setPoint((parent.getPoint()+5));
-        userRepository.save(parent);
+    public void setReferenceChain(User child){
+
+        //when registering reference code of parent inserted as reference code of this(child) user
+        //we will get that code from db and set a new-real ref-code from child
+        String parentRefCode = child.getReferenceCode();
+        referenceService.createNewReferenceCode(child);
+
+        if (!parentRefCode.equals("") && parentRefCode!=null) {
+            //give points to the referencer
+            User parent = userRepository.findByReferenceCode(parentRefCode).get();
+            parent.setPoint((parent.getPoint() + 5));
+            userRepository.save(parent);
+            //set parent of user
+            child.setParent(parent);
+            userRepository.save(child);
+        }
+
+
+
+    }
+
+    public void newUserRegistered(User child) {
+    messageService.greetingMessageForNewUser(child);
+    notificationService.newGreetingMessage(child);
+
+
     }
 }

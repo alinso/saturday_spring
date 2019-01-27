@@ -20,12 +20,12 @@ public class SMTPMailUtil {
     private String message;
 
     public void sendMail() {
-        final String fromEmail = "ankaratangoclub@gmail.com"; //requires valid gmail id
+        final String fromEmail = "mail@activityfriend.net"; //requires valid gmail id
         final String password = "1876Edison"; // correct password for gmail id
 
         System.out.println("SSLEmail Start");
         Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.gmail.com"); //SMTP Host
+        props.put("mail.smtp.host", "smtp.yandex.com"); //SMTP Host
         props.put("mail.smtp.socketFactory.port", "465"); //SSL Port
         props.put("mail.smtp.socketFactory.class",
                 "javax.net.ssl.SSLSocketFactory"); //SSL Factory Class

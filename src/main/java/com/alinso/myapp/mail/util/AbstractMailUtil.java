@@ -27,9 +27,9 @@ public class AbstractMailUtil {
             msg.addHeader("format", "flowed");
             msg.addHeader("Content-Transfer-Encoding", "8bit");
 
-            msg.setFrom(new InternetAddress("ankaratangoclub@gmail.com", "Activity Friend"));
+            msg.setFrom(new InternetAddress("mail@activityfriend.net", "Activity Friend"));
 
-            msg.setReplyTo(InternetAddress.parse("ankaratangoclub@gmail.com", false));
+            msg.setReplyTo(InternetAddress.parse("mail@activityfriend.net", false));
 
             msg.setSubject(subject, "UTF-8");
 

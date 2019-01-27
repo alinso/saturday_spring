@@ -1,10 +1,8 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.reference.ReferenceDto;
 import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.entity.Reference;
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.repository.ReferenceRepository;
+import com.alinso.myapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,32 +10,28 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 @Service
 public class ReferenceService {
 
     @Autowired
-    ReferenceRepository referenceRepository;
-
-    @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    UserRepository userRepository;
 
 
-    public void createNewReferenceCodes(User parent){
-        for(int i=0;i<5;i++){
-            Reference reference =  new Reference();
-            reference.setParent(parent);
-            reference.setReferenceCode(makeReferenceCode());
-            referenceRepository.save(reference);
-        }
+    public void createNewReferenceCode(User parent) {
+        parent.setReferenceCode(makeReferenceCode());
+        userRepository.save(parent);
     }
 
 
     public String makeReferenceCode() {
         Character[] characterArray = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'y', 'z',
-                 '1', '2', '3', '4', '5', '6', '8', '9', '0'};
+                '1', '2', '3', '4', '5', '6', '8', '9', '0'};
 
         Random rnd = new Random();
         Character c1 = characterArray[rnd.nextInt(31)];
@@ -52,41 +46,29 @@ public class ReferenceService {
     }
 
 
-    public List<ReferenceDto> getMyReferences() {
-        User loggedUser  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Reference> references = referenceRepository.findByParent(loggedUser);
-        List<ReferenceDto> referenceDtos =new ArrayList<>();
+    public List<ProfileDto> getMyReferences() {
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<User> references = userRepository.findByParent(loggedUser);
+        List<ProfileDto> profileDtos = new ArrayList<>();
 
-        for (Reference reference:references){
-            ReferenceDto referenceDto =  new ReferenceDto();
-            if(reference.getChild()!=null) {
-                ProfileDto profileDto = modelMapper.map(reference.getChild(), ProfileDto.class);
-                referenceDto.setChild(profileDto);
-            }
-            referenceDto.setReferenceCode(reference.getReferenceCode());
-            referenceDtos.add(referenceDto);
+        for (User reference : references) {
+            ProfileDto profileDto = modelMapper.map(reference,ProfileDto.class);
+
+            profileDtos.add(profileDto);
+        }
+        return profileDtos;
+    }
+
+    public User findByCode(String referenceCode) {
+        User user= null;
+        try {
+            user = userRepository.findByReferenceCode(referenceCode).get();
+        }catch (NoSuchElementException e){
         }
 
-        return referenceDtos;
-
+        return user;
     }
 
-    public ReferenceDto findByCode(String referenceCode) {
-        ReferenceDto referenceDto= null;
-        Reference reference= referenceRepository.findByCode(referenceCode);
-        if(reference!=null)
-        referenceDto = modelMapper.map(reference, ReferenceDto.class);
-        return referenceDto;
-    }
-
-    public User useReferenceCodeAndReturnParent(User child) {
-        Reference reference= referenceRepository.findByCode(child.getReferenceCode());
-        reference.setChild(child);
-        referenceRepository.save(reference);
-
-        User parent = reference.getParent();
-        return parent;
-    }
 }
 
 

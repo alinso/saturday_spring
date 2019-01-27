@@ -18,4 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select user from User user where  CONCAT( user.name,  ' ', user.surname )  like (:search) ")
     List<User> searchUser(@Param("search") String search);
+
+    @Query("select user from User  user where user.parent=:parent")
+    List<User> findByParent(@Param("parent") User parent);
+
+   Optional<User> findByReferenceCode(String referenceCode);
 }
