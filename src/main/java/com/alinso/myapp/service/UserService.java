@@ -1,13 +1,13 @@
 package com.alinso.myapp.service;
 
+import com.alinso.myapp.entity.ForgottenPasswordToken;
+import com.alinso.myapp.entity.MailVerificationToken;
+import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
 import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
-import com.alinso.myapp.entity.ForgottenPasswordToken;
-import com.alinso.myapp.entity.MailVerificationToken;
-import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
@@ -67,6 +67,9 @@ public class UserService {
 
     @Autowired
     BlockService blockService;
+
+    @Autowired
+    PremiumService premiumService;
 
     @Value("${upload.profile.path}")
     private String profilPicUploadPath;
@@ -249,6 +252,7 @@ public class UserService {
         ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
         profileDto.setAge(UserUtil.calculateAge(user));
         profileDto.setInterests(hashtagService.findByUserStr(user));
+        profileDto.setUserPremium(premiumService.isUserPremium(user));
         return profileDto;
     }
 

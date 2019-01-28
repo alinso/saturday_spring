@@ -106,6 +106,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(SecurityConstants.LOGIN_URL).permitAll()
                 .antMatchers("/user/verifyMail/**").permitAll()
                 .antMatchers("/user/search/**").permitAll()
+                .antMatchers("/hashtag/findUsers/**").permitAll()
                 .antMatchers("/user/forgottenPassword/**").permitAll()
                 .antMatchers("/user/resetPassword/**").permitAll()
                 .antMatchers("/user/profile/**").permitAll()

@@ -1,7 +1,7 @@
 package com.alinso.myapp.entity.dto.activity;
 
-import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.City;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;

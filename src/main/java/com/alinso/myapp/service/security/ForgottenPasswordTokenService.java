@@ -3,7 +3,6 @@ package com.alinso.myapp.service.security;
 import com.alinso.myapp.entity.ForgottenPasswordToken;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.mail.util.SMTPMailUtil;
 import com.alinso.myapp.repository.ForgottenPasswordTokenRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

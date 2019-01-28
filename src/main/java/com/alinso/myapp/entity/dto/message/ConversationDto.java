@@ -1,7 +1,7 @@
 package com.alinso.myapp.entity.dto.message;
 
-import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 
 public class ConversationDto {
 

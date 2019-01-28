@@ -1,7 +1,7 @@
 package com.alinso.myapp.repository;
 
-import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.Activity;
+import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

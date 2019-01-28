@@ -1,7 +1,7 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.service.ReferenceService;
 import com.alinso.myapp.service.UserService;

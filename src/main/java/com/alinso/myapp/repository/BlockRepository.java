@@ -1,7 +1,6 @@
 package com.alinso.myapp.repository;
 
 import com.alinso.myapp.entity.Block;
-import com.alinso.myapp.entity.Follow;
 import com.alinso.myapp.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

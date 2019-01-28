@@ -38,7 +38,11 @@ public class ActivityRequestService {
     @Autowired
     BlockService blockService;
 
+    @Autowired
+    DayActionService dayActionService;
+
     public Boolean sendRequest(Long id) {
+
         Activity activity = activityService.findEntityById(id);
         if(activity.getDeadLine().compareTo(new Date())<0)
             throw new UserWarningException("Geçmiş tarihli bir aktivitede düzenleme yapamazsınız");
@@ -51,16 +55,23 @@ public class ActivityRequestService {
 
         Boolean isThisUserJoined = isThisUserJoined(activity.getId());
         if(!isThisUserJoined){
+
+            //check if user reached the limit
+            dayActionService.checkRequestLimit();
+
+
             ActivityRequest newActivityRequest =new ActivityRequest();
             newActivityRequest.setApplicant(loggedUser);
             newActivityRequest.setActivity(activity);
             newActivityRequest.setActivityRequestStatus(ActivityRequestStatus.WAITING);
             activityRequesRepository.save(newActivityRequest);
             userEventService.newRequest(activity.getCreator(), activity.getId());
+            dayActionService.addRequest();
         }
         else{
             ActivityRequest activityRequest = activityRequesRepository.findByActivityAndApplicant(loggedUser, activity);
             activityRequesRepository.delete(activityRequest);
+            dayActionService.removeRequest();
         }
 
         //we have changed the status in above if-else condition

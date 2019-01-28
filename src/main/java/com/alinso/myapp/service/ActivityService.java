@@ -58,12 +58,15 @@ public class ActivityService {
     @Autowired
     BlockService blockService;
 
+    @Autowired
+    DayActionService dayActionService;
+
     @Value("${upload.path}")
     private String fileUploadPath;
 
 
     public ActivityDto findById(Long id) {
-        Activity activity=null;
+        Activity activity = null;
         try {
             activity = activityRepository.findById(id).get();
         } catch (NoSuchElementException e) {
@@ -74,9 +77,9 @@ public class ActivityService {
 
 
     public Activity findEntityById(Long id) {
-        Activity activity=null;
+        Activity activity = null;
         try {
-            activityRepository.findById(id).get();
+          activity=  activityRepository.findById(id).get();
         } catch (NoSuchElementException e) {
             throw new UserWarningException("Aktivite Bulunamadı");
         }
@@ -85,6 +88,10 @@ public class ActivityService {
 
 
     public Activity save(ActivityDto activityDto) {
+
+        //check if user reached the limit
+        dayActionService.checkActivityLimit();
+
         Activity activity = new Activity(activityDto.getDetail());
         City city = cityService.findById(activityDto.getCityId());
 
@@ -99,7 +106,7 @@ public class ActivityService {
         activityRepository.save(activity);
         userEventService.newActivity(loggedUser, activity);
         hashtagService.saveActivityHashtag(activity, activityDto.getHashtagListString());
-
+        dayActionService.addActivity();
         return activity;
     }
 
@@ -159,6 +166,9 @@ public class ActivityService {
 
         //delete hashtags
         hashtagService.deleteByActivity(activityInDb);
+
+        //delete dayAction
+        dayActionService.removeActivity();
 
         activityRepository.deleteById(id);
     }
@@ -224,6 +234,14 @@ public class ActivityService {
             activityDto.setExpired(false);
 
         return activityDto;
+    }
+
+    public List<ActivityDto> toDtoList(List<Activity> activities) {
+        List<ActivityDto> activityDtos = new ArrayList<>();
+        for (Activity a : activities) {
+        activityDtos.add(toDto(a));
+        }
+        return  activityDtos;
     }
 }
 

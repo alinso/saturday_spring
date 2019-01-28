@@ -277,4 +277,5 @@ public class User extends BaseEntity implements UserDetails {
     public void setParent(User parent) {
         this.parent = parent;
     }
+
 }

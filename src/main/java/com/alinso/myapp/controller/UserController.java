@@ -1,17 +1,17 @@
 package com.alinso.myapp.controller;
 
+import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
 import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
-import com.alinso.myapp.entity.User;
 import com.alinso.myapp.security.JwtTokenProvider;
 import com.alinso.myapp.security.SecurityConstants;
 import com.alinso.myapp.security.payload.JWTLoginSucessReponse;
 import com.alinso.myapp.security.payload.LoginRequest;
-import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.service.UserService;
+import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.validator.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")

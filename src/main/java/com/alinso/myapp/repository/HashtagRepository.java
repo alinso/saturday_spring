@@ -30,10 +30,10 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
 
     List<Hashtag> findByUser(User user);
 
-    @Query("select h from Hashtag h where h.name=:clearHashtag and h.activity!=null")
-    List<Activity> findActivitiesByHashtag(String clearHashtag);
+    @Query("select h.activity from Hashtag h where h.name=:clearHashtag and h.activity!=null")
+    List<Activity> findActivitiesByHashtag(@Param("clearHashtag") String clearHashtag);
 
 
-    @Query("select h from Hashtag h where h.name=:clearHashtag and h.user!=null")
-    List<Activity> findUsersByHashtag(String clearHashtag);
+    @Query("select h.user    from Hashtag h where h.name=:clearHashtag and h.user!=null")
+    List<User> findUsersByHashtag(@Param("clearHashtag") String clearHashtag);
 }
