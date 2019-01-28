@@ -1,10 +1,9 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Follow;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.repository.FollowRepository;
-import com.alinso.myapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +19,7 @@ public class FollowService {
     FollowRepository followRepository;
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     @Autowired
     ModelMapper modelMapper;
@@ -28,7 +27,7 @@ public class FollowService {
     public Boolean follow(Long leaderId){
 
         User follower  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User leader =userRepository.findById(leaderId).get();
+        User leader =userService.findEntityById(leaderId);
         Follow follow = followRepository.findFollowingByLeaderAndFollower(leader,follower);
 
         Boolean isFollowing;
@@ -48,7 +47,7 @@ public class FollowService {
     public Boolean isFollowing(Long leaderId) {
 
         User follower  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User leader =userRepository.findById(leaderId).get();
+        User leader =userService.findEntityById(leaderId);
 
         Follow follow = followRepository.findFollowingByLeaderAndFollower(leader,follower);
         if(follow==null)
@@ -63,8 +62,7 @@ public class FollowService {
 
         List<ProfileDto> profileDtos  = new ArrayList<>();
         for(User user: followingUsers){
-            ProfileDto profileDto = modelMapper.map(user,ProfileDto.class);
-            profileDtos.add(profileDto);
+            profileDtos.add(userService.toProfileDto(user));
         }
 
         return profileDtos;

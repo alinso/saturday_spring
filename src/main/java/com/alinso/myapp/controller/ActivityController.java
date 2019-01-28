@@ -1,7 +1,7 @@
 package com.alinso.myapp.controller;
 
 
-import com.alinso.myapp.dto.activity.ActivityDto;
+import com.alinso.myapp.entity.dto.activity.ActivityDto;
 import com.alinso.myapp.service.ActivityService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.validator.ActivityValidator;

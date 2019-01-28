@@ -1,12 +1,11 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.ActivityRequest;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.repository.ActivityRepository;
 import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.util.UserUtil;
 import org.modelmapper.ModelMapper;
@@ -22,7 +21,7 @@ import java.util.List;
 public class ActivityRequestService {
 
     @Autowired
-    ActivityRepository activityRepository;
+    ActivityService activityService;
 
     @Autowired
     ModelMapper modelMapper;
@@ -31,13 +30,16 @@ public class ActivityRequestService {
     UserEventService userEventService;
 
     @Autowired
+    UserService userService;
+
+    @Autowired
     ActivityRequesRepository activityRequesRepository;
 
     @Autowired
     BlockService blockService;
 
     public Boolean sendRequest(Long id) {
-        Activity activity = activityRepository.findById(id).get();
+        Activity activity = activityService.findEntityById(id);
         if(activity.getDeadLine().compareTo(new Date())<0)
             throw new UserWarningException("Geçmiş tarihli bir aktivitede düzenleme yapamazsınız");
 
@@ -123,15 +125,8 @@ public class ActivityRequestService {
         }
 
         List<ProfileDto> profileDtos = new ArrayList<>();
-        for(User user: attendantUsers){
-                ProfileDto profileDto  =modelMapper.map(user,ProfileDto.class);
-            profileDto.setAge(UserUtil.calculateAge(user));
-            profileDtos.add(profileDto);
-        }
-        ProfileDto creator = modelMapper.map(activity.getCreator(), ProfileDto.class);
-        creator.setAge(UserUtil.calculateAge(activity.getCreator()));
-
-        profileDtos.add(creator);
+        profileDtos.addAll(userService.toProfileDtoList(attendantUsers));
+        profileDtos.add(userService.toProfileDto(activity.getCreator()));
 
         return profileDtos;
     }

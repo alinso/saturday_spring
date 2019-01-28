@@ -1,4 +1,4 @@
-package com.alinso.myapp.dto.photo;
+package com.alinso.myapp.entity.dto.photo;
 import org.springframework.web.multipart.MultipartFile;
 
 public class SinglePhotoUploadDto {

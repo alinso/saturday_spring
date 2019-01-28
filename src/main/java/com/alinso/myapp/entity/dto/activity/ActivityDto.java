@@ -1,6 +1,6 @@
-package com.alinso.myapp.dto.activity;
+package com.alinso.myapp.entity.dto.activity;
 
-import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.City;
 import org.springframework.web.multipart.MultipartFile;
 

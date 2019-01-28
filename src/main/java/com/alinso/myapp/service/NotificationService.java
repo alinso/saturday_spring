@@ -1,10 +1,10 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.notification.NotificationDto;
-import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.Notification;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.notification.NotificationDto;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.NotificationType;
 import com.alinso.myapp.exception.UserWarningException;
@@ -12,7 +12,6 @@ import com.alinso.myapp.mail.service.MailService;
 import com.alinso.myapp.repository.ActivityRepository;
 import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.repository.NotificationRepository;
-import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.UserUtil;
 import org.modelmapper.ModelMapper;
@@ -52,8 +51,9 @@ public class NotificationService {
     @Autowired
     ActivityRequesRepository activityRequesRepository;
 
+
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     private void createNotification(User target,User trigger,NotificationType notificationType,String message){
 
@@ -185,11 +185,11 @@ public class NotificationService {
         for(Notification notification  :notifications){
             NotificationDto notificationDto = modelMapper.map(notification, NotificationDto.class);
 
-            ProfileDto targetDto= modelMapper.map(notification.getTarget(),ProfileDto.class);
+            ProfileDto targetDto= userService.toProfileDto(notification.getTarget());
 
             ProfileDto triggerDto = null;
             if(notification.getTrigger()!=null)
-                triggerDto  =modelMapper.map(notification.getTrigger(), ProfileDto.class);
+                triggerDto  =userService.toProfileDto(notification.getTrigger());
 
             notificationDto.setTrigger(triggerDto);
             notificationDto.setTarget(targetDto);
@@ -215,7 +215,7 @@ public class NotificationService {
     }
 
     public void newGreetingMessage(User target) {
-        User trigger  =userRepository.findById(Long.valueOf(1)).get();
+        User trigger  =userService.findEntityById(Long.valueOf(1));
         createNotification(target,trigger,NotificationType.MESSAGE,null);
         mailService.sendNewMessageMail(target,trigger);
     }

@@ -1,6 +1,6 @@
-package com.alinso.myapp.dto.notification;
+package com.alinso.myapp.entity.dto.notification;
 
-import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.NotificationType;
 
 import javax.persistence.EnumType;

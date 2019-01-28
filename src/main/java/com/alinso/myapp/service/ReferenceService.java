@@ -1,14 +1,13 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -21,6 +20,9 @@ public class ReferenceService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    UserService userService;
 
 
     public void createNewReferenceCode(User parent) {
@@ -49,14 +51,7 @@ public class ReferenceService {
     public List<ProfileDto> getMyReferences() {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<User> references = userRepository.findByParent(loggedUser);
-        List<ProfileDto> profileDtos = new ArrayList<>();
-
-        for (User reference : references) {
-            ProfileDto profileDto = modelMapper.map(reference,ProfileDto.class);
-
-            profileDtos.add(profileDto);
-        }
-        return profileDtos;
+        return userService.toProfileDtoList(references);
     }
 
     public User findByCode(String referenceCode) {

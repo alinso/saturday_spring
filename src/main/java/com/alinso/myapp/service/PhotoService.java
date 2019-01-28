@@ -3,9 +3,8 @@ package com.alinso.myapp.service;
 import com.alinso.myapp.entity.Photo;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.repository.PhotoRepository;
-import com.alinso.myapp.repository.UserRepository;
+import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.util.UserUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ public class PhotoService {
     FileStorageUtil fileStorageService;
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     @Value("${upload.path}")
     private String fileUploadPath;
@@ -70,7 +69,7 @@ public class PhotoService {
         if(blockService.isThereABlock(id))
             throw new UserWarningException("Erişim Yok");
 
-        User user  =userRepository.findById(id).get();
+        User user  =userService.findEntityById(id);
         return photoRepository.findByUser(user);
     }
 

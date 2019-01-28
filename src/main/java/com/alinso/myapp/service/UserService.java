@@ -1,10 +1,10 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
-import com.alinso.myapp.dto.security.ChangePasswordDto;
-import com.alinso.myapp.dto.security.ResetPasswordDto;
-import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
+import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
+import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
+import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
+import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.ForgottenPasswordToken;
 import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
@@ -128,6 +128,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public User findEntityById(Long id) {
+        try {
+            return userRepository.findById(id).get();
+        }catch (NoSuchElementException e){
+            throw new UserWarningException("Kullanıcı Bulunamadı");
+        }
+    }
 
     public ProfileInfoForUpdateDto update(ProfileInfoForUpdateDto profileInfoForUpdateDto) {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -143,7 +150,7 @@ public class UserService {
         loggedUser.setGender(profileInfoForUpdateDto.getGender());
         //loggedUser.setInterests(profileInfoForUpdateDto.getInterests());
         //loggedUser.setReferenceCode(profileInfoForUpdateDto.getReferenceCode());
-        hashtagService.saveUserHashtag(loggedUser,profileInfoForUpdateDto.getInterests());
+        hashtagService.saveUserHashtag(loggedUser, profileInfoForUpdateDto.getInterests());
 
         userRepository.save(loggedUser);
         return profileInfoForUpdateDto;
@@ -152,22 +159,13 @@ public class UserService {
     public ProfileDto getProfileById(Long id) {
         User user;
 
-
         try {
             user = userRepository.findById(id).get();
         } catch (Exception e) {
             throw new RecordNotFound404Exception("Kullanıcı Bulunamadı: " + id);
         }
-        ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
-
-        if (user.getBirthDate() != null) {
-            profileDto.setAge(UserUtil.calculateAge(user));
-        }
-
-        profileDto.setInterests(hashtagService.findByUserStr(user));
-        return profileDto;
+        return toProfileDto(user);
     }
-
 
     public ProfileInfoForUpdateDto getMyProfileInfoForUpdate() {
         try {
@@ -229,7 +227,6 @@ public class UserService {
         return newName;
     }
 
-
     public Boolean changePassword(ChangePasswordDto changePasswordDto) {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         loggedUser.setPassword(bCryptPasswordEncoder.encode(changePasswordDto.getNewPassword()));
@@ -243,10 +240,23 @@ public class UserService {
         List<User> users = userRepository.searchUser("%" + searchText + "%");
         List<ProfileDto> profileDtos = new ArrayList<>();
         for (User user : users) {
-            ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
-            profileDto.setAge(UserUtil.calculateAge(user));
-            profileDtos.add(profileDto);
+            profileDtos.add(toProfileDto(user));
         }
         return profileDtos;
+    }
+
+    public ProfileDto toProfileDto(User user) {
+        ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
+        profileDto.setAge(UserUtil.calculateAge(user));
+        profileDto.setInterests(hashtagService.findByUserStr(user));
+        return profileDto;
+    }
+
+    public List<ProfileDto> toProfileDtoList(List<User> users) {
+        List<ProfileDto> dtos = new ArrayList<>();
+        for (User u : users) {
+            dtos.add(toProfileDto(u));
+        }
+        return dtos;
     }
 }

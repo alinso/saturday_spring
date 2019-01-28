@@ -1,10 +1,10 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
-import com.alinso.myapp.dto.security.ChangePasswordDto;
-import com.alinso.myapp.dto.security.ResetPasswordDto;
-import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
+import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
+import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
+import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
+import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.security.JwtTokenProvider;
 import com.alinso.myapp.security.SecurityConstants;

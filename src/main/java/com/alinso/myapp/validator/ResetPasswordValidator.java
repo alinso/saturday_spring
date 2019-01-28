@@ -1,6 +1,6 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.dto.security.ResetPasswordDto;
+import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
 import com.alinso.myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

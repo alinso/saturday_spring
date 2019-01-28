@@ -1,10 +1,9 @@
 package com.alinso.myapp.controller;
 
 
-import com.alinso.myapp.dto.photo.AlbumDto;
-import com.alinso.myapp.dto.photo.MultiPhotoUploadDto;
-import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
+import com.alinso.myapp.entity.dto.photo.AlbumDto;
+import com.alinso.myapp.entity.dto.photo.MultiPhotoUploadDto;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Photo;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.service.PhotoService;

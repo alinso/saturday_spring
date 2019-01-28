@@ -1,18 +1,16 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.review.ReviewDto;
-import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.ActivityRequest;
 import com.alinso.myapp.entity.Review;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.review.ReviewDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.ReviewType;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.ActivityRepository;
 import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.repository.ReviewRepository;
-import com.alinso.myapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,9 +23,6 @@ import java.util.List;
 
 @Service
 public class ReviewService {
-
-    @Autowired
-    UserRepository userRepository;
 
     @Autowired
     ReviewRepository reviewRepository;
@@ -43,6 +38,9 @@ public class ReviewService {
 
     @Autowired
     UserEventService userEventService;
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     BlockService blockService;
@@ -107,7 +105,7 @@ public class ReviewService {
     }
 
     public void writeReview(ReviewDto reviewDto) {
-        User reader = userRepository.findById(reviewDto.getReader().getId()).get();
+        User reader = userService.findEntityById(reviewDto.getReader().getId());
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Boolean haveUsersMeetRecently = haveUsersMeetRecently(writer, reader);
@@ -138,7 +136,7 @@ public class ReviewService {
 
     public Boolean isReviewedBefore(Long id) {
         User me = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User other = userRepository.findById(id).get();
+        User other = userService.findEntityById(id);
 
         Boolean isReviewedBefore = true;
         Review myPreviousReview = reviewRepository.myPreviousReview(me, other);
@@ -149,7 +147,7 @@ public class ReviewService {
     }
 
     public List<ReviewDto> reviewsOfUser(Long id) {
-        User user = userRepository.findById(id).get();
+        User user = userService.findEntityById(id);
 
         if (blockService.isThereABlock(id))
             throw new UserWarningException("Erişim Yok");
@@ -160,8 +158,8 @@ public class ReviewService {
         List<ReviewDto> reviewDtos = new ArrayList<>();
         for (Review review : reviews) {
             ReviewDto reviewDto = modelMapper.map(review, ReviewDto.class);
-            reviewDto.setWriter(modelMapper.map(review.getWriter(), ProfileDto.class));
-            reviewDto.setReader(modelMapper.map(review.getReader(), ProfileDto.class));
+            reviewDto.setWriter(userService.toProfileDto(review.getWriter()));
+            reviewDto.setReader(userService.toProfileDto(review.getReader()));
             reviewDtos.add(reviewDto);
         }
         return reviewDtos;
@@ -171,15 +169,15 @@ public class ReviewService {
     public ReviewDto findById(Long id) {
         Review review = reviewRepository.findById(id).get();
         ReviewDto reviewDto = modelMapper.map(review, ReviewDto.class);
-        reviewDto.setWriter(modelMapper.map(review.getWriter(), ProfileDto.class));
-        reviewDto.setReader(modelMapper.map(review.getReader(), ProfileDto.class));
+        reviewDto.setWriter(userService.toProfileDto(review.getWriter()));
+        reviewDto.setReader(userService.toProfileDto(review.getReader()));
 
         return reviewDto;
     }
 
     public Boolean haveIMeetThisUserRecently(Long otherUserId) {
         User me  = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User other  =userRepository.findById(otherUserId).get();
+        User other  =userService.findEntityById(otherUserId);
 
         return  haveUsersMeetRecently(me,other);
     }

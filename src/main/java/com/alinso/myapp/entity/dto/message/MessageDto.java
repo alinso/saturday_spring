@@ -1,7 +1,6 @@
-package com.alinso.myapp.dto.message;
+package com.alinso.myapp.entity.dto.message;
 
-import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

@@ -1,6 +1,5 @@
-package com.alinso.myapp.dto.user;
+package com.alinso.myapp.entity.dto.user;
 
-import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.enums.Gender;
 import org.springframework.stereotype.Component;
 

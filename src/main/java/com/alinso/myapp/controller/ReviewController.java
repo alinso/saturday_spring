@@ -1,13 +1,11 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.dto.review.ReviewDto;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.review.ReviewDto;
 import com.alinso.myapp.service.ReviewService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 

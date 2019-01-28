@@ -1,7 +1,6 @@
-package com.alinso.myapp.dto.review;
+package com.alinso.myapp.entity.dto.review;
 
-import com.alinso.myapp.dto.user.ProfileDto;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.ReviewType;
 
 import javax.validation.constraints.NotBlank;

@@ -1,6 +1,6 @@
 package com.alinso.myapp.validator;
 
-import com.alinso.myapp.dto.user.ProfileInfoForUpdateDto;
+import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

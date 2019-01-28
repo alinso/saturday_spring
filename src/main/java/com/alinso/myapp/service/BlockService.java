@@ -1,12 +1,9 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.dto.user.ProfileDto;
 import com.alinso.myapp.entity.Block;
-import com.alinso.myapp.entity.Follow;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.repository.BlockRepository;
-import com.alinso.myapp.repository.FollowRepository;
-import com.alinso.myapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +20,7 @@ public class BlockService {
     BlockRepository blockRepository;
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     @Autowired
     ModelMapper modelMapper;
@@ -31,7 +28,7 @@ public class BlockService {
     public Boolean block(Long blockedId){
 
         User blocker  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User blocked =userRepository.findById(blockedId).get();
+        User blocked =userService.findEntityById(blockedId);
         Block block = blockRepository.findBlockByBlockedAndBlocker(blocked,blocker);
 
         Boolean isBlocked;
@@ -51,7 +48,7 @@ public class BlockService {
     private Boolean isBlockedByIt(Long blockerId) {
 
         User blocked  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User blocker =userRepository.findById(blockerId).get();
+        User blocker =userService.findEntityById(blockerId);
 
         Block block = blockRepository.findBlockByBlockedAndBlocker(blocked,blocker);
         if(block==null)
@@ -64,7 +61,7 @@ public class BlockService {
     private Boolean isBlockedIt(Long blockedId) {
 
         User blocker  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User blocked =userRepository.findById(blockedId).get();
+        User blocked =userService.findEntityById(blockedId);
 
         Block block = blockRepository.findBlockByBlockedAndBlocker(blocked,blocker);
         if(block==null)
@@ -89,8 +86,7 @@ public class BlockService {
 
         List<ProfileDto> profileDtos  = new ArrayList<>();
         for(User user: blockeds){
-            ProfileDto profileDto = modelMapper.map(user,ProfileDto.class);
-            profileDtos.add(profileDto);
+            profileDtos.add(userService.toProfileDto(user));
         }
 
         return profileDtos;

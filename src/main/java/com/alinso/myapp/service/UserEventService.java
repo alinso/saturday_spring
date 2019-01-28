@@ -45,7 +45,7 @@ public class UserEventService {
     ActivityRequesRepository activityRequesRepository;
 
 
-    public void newMeeting(User user, Activity activity) {
+    public void newActivity(User user, Activity activity) {
         user.setPoint((user.getPoint() + NEW_ACTIVITY_POINT));
         user.setActivityCount((user.getActivityCount() + 1));
         for(User follower:followRepository.findFollowersOfUser(user)){

@@ -1,4 +1,4 @@
-package com.alinso.myapp.dto.security;
+package com.alinso.myapp.entity.dto.security;
 
 import javax.validation.constraints.NotBlank;
 

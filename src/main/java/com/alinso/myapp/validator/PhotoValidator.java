@@ -1,7 +1,7 @@
 package com.alinso.myapp.validator;
 
 
-import com.alinso.myapp.dto.photo.SinglePhotoUploadDto;
+import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;

@@ -1,7 +1,7 @@
-package com.alinso.myapp.dto.hashtag;
+package com.alinso.myapp.entity.dto.hashtag;
 
-import com.alinso.myapp.dto.activity.ActivityDto;
-import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.entity.dto.activity.ActivityDto;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 
 public class HashtagDto {
     private String name;

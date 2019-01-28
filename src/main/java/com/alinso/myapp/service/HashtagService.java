@@ -87,4 +87,11 @@ public class HashtagService {
         List<Hashtag> hashtagList  = hashtagRepository.findByUser(user);
         return  hashtagList;
     }
+
+
+    private List findActivitiesByHashtag(String hashtag){
+        String clearHashtag=hashtag.trim().replace("#","");
+        List<Activity> activities  =hashtagRepository.findActivitiesByHashtag(clearHashtag);
+        return null;
+    }
 }

@@ -1,7 +1,7 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.dto.message.ConversationDto;
-import com.alinso.myapp.dto.message.MessageDto;
+import com.alinso.myapp.entity.dto.message.ConversationDto;
+import com.alinso.myapp.entity.dto.message.MessageDto;
 import com.alinso.myapp.service.MessageService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

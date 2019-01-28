@@ -1,6 +1,6 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.dto.notification.NotificationDto;
+import com.alinso.myapp.entity.dto.notification.NotificationDto;
 import com.alinso.myapp.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

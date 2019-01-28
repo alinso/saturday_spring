@@ -1,6 +1,6 @@
-package com.alinso.myapp.dto.reference;
+package com.alinso.myapp.entity.dto.reference;
 
-import com.alinso.myapp.dto.user.ProfileDto;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 
 public class ReferenceDto {
 

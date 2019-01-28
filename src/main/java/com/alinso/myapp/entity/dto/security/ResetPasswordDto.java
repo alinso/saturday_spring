@@ -1,4 +1,4 @@
-package com.alinso.myapp.dto.security;
+package com.alinso.myapp.entity.dto.security;
 
 public class ResetPasswordDto {
     private String password;
