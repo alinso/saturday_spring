@@ -5,6 +5,7 @@ import com.alinso.myapp.entity.enums.PremiumType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 @Entity
 public class Premium extends BaseEntity {
@@ -20,6 +21,10 @@ public class Premium extends BaseEntity {
     @Enumerated(EnumType.ORDINAL)
     @NotNull
     private PremiumType type;
+
+    @Column
+    private Date startDate;
+
 
     public User getUser() {
         return user;
@@ -43,5 +48,13 @@ public class Premium extends BaseEntity {
 
     public void setType(PremiumType type) {
         this.type = type;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 }

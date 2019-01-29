@@ -64,6 +64,10 @@ public class ReferenceService {
         return user;
     }
 
+    public List<ProfileDto> getChildrenOfParent(User parent) {
+        List<User> references = userRepository.findByParent(parent);
+        return userService.toProfileDtoList(references);
+    }
 }
 
 

@@ -1,10 +1,15 @@
 package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.Activity;
+import com.alinso.myapp.entity.Premium;
 import com.alinso.myapp.entity.Review;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
+import com.alinso.myapp.entity.enums.PremiumDuration;
+import com.alinso.myapp.entity.enums.PremiumType;
 import com.alinso.myapp.entity.enums.ReviewType;
+import com.alinso.myapp.mail.service.MailService;
 import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.repository.FollowRepository;
 import com.alinso.myapp.repository.UserRepository;
@@ -43,6 +48,12 @@ public class UserEventService {
 
     @Autowired
     ActivityRequesRepository activityRequesRepository;
+
+    @Autowired
+    PremiumService premiumService;
+
+    @Autowired
+    MailService mailService;
 
 
     public void newActivity(User user, Activity activity) {
@@ -166,11 +177,16 @@ public class UserEventService {
             //set parent of user
             child.setParent(parent);
             userRepository.save(child);
+
+            //check the number of child for this parent
+            List<ProfileDto> children = referenceService.getChildrenOfParent(parent);
+            if(children.size()==5){
+                premiumService.saveGift(parent, PremiumDuration.ONE_MONTH);
+                mailService.newPremiumFor5ReferenceMail(parent);
+            }
         }
-
-
-
     }
+
 
     public void newUserRegistered(User child) {
     messageService.greetingMessageForNewUser(child);
