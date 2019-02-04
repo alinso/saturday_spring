@@ -86,6 +86,10 @@ public class User extends BaseEntity implements UserDetails {
     @ManyToOne
     @ColumnDefault("0")
     private City city;
+
+    @Column(columnDefinition = "TEXT")
+    private  String firebaseId;
+
 //
 //    @Column
 //    private String interests;
@@ -278,4 +282,11 @@ public class User extends BaseEntity implements UserDetails {
         this.parent = parent;
     }
 
+    public String getFirebaseId() {
+        return firebaseId;
+    }
+
+    public void setFirebaseId(String firebaseId) {
+        this.firebaseId = firebaseId;
+    }
 }

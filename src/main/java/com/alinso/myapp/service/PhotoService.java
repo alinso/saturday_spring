@@ -28,9 +28,6 @@ public class PhotoService {
     @Autowired
     UserService userService;
 
-    @Value("${upload.path}")
-    private String fileUploadPath;
-
     @Autowired
     UserEventService userEventService;
 
@@ -47,10 +44,10 @@ public class PhotoService {
         for (MultipartFile file : multipartPhotos) {
 
             //store photo file
-            String extension =  FilenameUtils.getExtension(file.getOriginalFilename());
-            String newName = fileStorageService.makeFileName()+"."+extension;
+            //String extension =  FilenameUtils.getExtension(file.getOriginalFilename());
+            String newName = fileStorageService.makeFileName()+".jpg";
 
-            fileStorageService.storeFile(file, fileUploadPath, newName);
+            fileStorageService.storeFile(file, newName,false);
             photoNames.add(newName);
 
             //save to the database
@@ -79,7 +76,7 @@ public class PhotoService {
         UserUtil.checkUserOwner(photo.getUser().getId());
 
         if(photo!=null){
-            fileStorageService.deleteFile(fileUploadPath+photoName);
+            fileStorageService.deleteFile(photoName);
             photoRepository.delete(photo);
             userEventService.photoDeleted();
         }

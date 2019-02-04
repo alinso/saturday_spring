@@ -35,7 +35,7 @@ public class MyappApplication extends SpringBootServletInitializer implements We
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedMethods("POST","GET")
-        .allowedOrigins(allowedOrigins.split(","));
+                .allowedOrigins(allowedOrigins.split(","));
     }
 
 

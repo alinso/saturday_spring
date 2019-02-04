@@ -111,6 +111,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/resetPassword/**").permitAll()
                 .antMatchers("/user/profile/**").permitAll()
                 .antMatchers("/user/ok/**").permitAll()
+                .antMatchers("/m/a/**").permitAll()
 
                 .antMatchers(SecurityConstants.H2_URL).permitAll()
                 .anyRequest().authenticated();

@@ -138,7 +138,7 @@ public class MessageService {
         Message message = new Message();
         message.setReader(reader);
         message.setWriter(userService.findEntityById(ali.getId()));
-        message.setMessage("Aramıza Hoşgeldin, \n" +
+        message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz:) \n" +
                 " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, sinemaya gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
                 " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
                 "\n" +

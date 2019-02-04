@@ -3,9 +3,13 @@ package com.alinso.myapp.util;
 import com.alinso.myapp.exception.UserWarningException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +21,12 @@ import java.util.Random;
 @Service
 public class FileStorageUtil {
 
-    private Path fileStorageLocation;
+    private Path fileUploadDir;
+    private Path tmpFileUploadDir;
+
+    @Value("${upload.path}")
+    private String fileUploadDirString;
+
 
     @Autowired
     public FileStorageUtil() {
@@ -43,29 +52,75 @@ public class FileStorageUtil {
         return newName;
     }
 
-    public void storeFile(MultipartFile file, String profilePicPath, String newName) {
-        fileStorageLocation = Paths.get(profilePicPath);
+    public void storeFile(MultipartFile file, String newName,Boolean isProfile) {
+        fileUploadDir = Paths.get(fileUploadDirString);
+        tmpFileUploadDir = Paths.get(fileUploadDirString+"/tmp");
 
         try {
-            Path targetLocation = this.fileStorageLocation.resolve(newName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            Path tmpFilePath = this.tmpFileUploadDir.resolve(newName);
+            Files.copy(file.getInputStream(), tmpFilePath, StandardCopyOption.REPLACE_EXISTING);
+            saveResizedImage(newName,isProfile);
+            deleteTmpFile(tmpFilePath.toString());
 
         } catch (IOException ex) {
             throw new UserWarningException("Could not store util " + newName + ". Please try again!. IO message: " + ex.getMessage());
         }
     }
 
-    public void deleteFile(String path) {
-        File file = new File(path);
+    private void saveResizedImage(String name, Boolean isProfile){
+
+
+        int targetWidth = 700;
+        if(isProfile)
+            targetWidth=250;
+
+
+        try {
+            File input = new File(fileUploadDirString+"/tmp/"+name);
+            BufferedImage image = ImageIO.read(input);
+
+            Integer width = image.getWidth();
+            Integer height = image.getHeight();
+
+            //1000 * 3000 -> 500*150
+            Double rate  =Double.parseDouble( width.toString()) / targetWidth;
+            Double targetHeightDouble = Double.parseDouble(height.toString()) / rate;
+
+
+
+            BufferedImage resized = resize(image, targetHeightDouble.intValue(), targetWidth);
+            File output = new File(fileUploadDirString+"/"+name);
+            ImageIO.write(resized, "jpg", output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static BufferedImage resize(BufferedImage img, int height, int width) {
+        Image tmp = img.getScaledInstance(width, height, Image.SCALE_DEFAULT);
+        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D g2d = resized.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+        return resized;
+    }
+
+    private void deleteTmpFile(String tmpFilePath) {
+        File file = new File(tmpFilePath);
         file.delete();
     }
 
-    public String saveFileAndReturnName(MultipartFile file, String fileUploadPath) {
+    public void deleteFile(String name) {
+        File file = new File(fileUploadDirString+"/"+name);
+        file.delete();
+    }
+
+    public String saveFileAndReturnName(MultipartFile file) {
         String newName = null;
         if (file != null) {
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             newName = makeFileName() + "." + extension;
-            storeFile(file, fileUploadPath, newName);
+            storeFile(file, newName,false);
         }
         return newName;
     }

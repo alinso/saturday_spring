@@ -61,8 +61,6 @@ public class ActivityService {
     @Autowired
     DayActionService dayActionService;
 
-    @Value("${upload.path}")
-    private String fileUploadPath;
 
 
     public ActivityDto findById(Long id) {
@@ -97,7 +95,7 @@ public class ActivityService {
 
         activity.setCity(city);
         activity.setDeadLine(DateUtil.stringToDate(activityDto.getDeadLineString(), "dd/MM/yyyy HH:mm"));
-        activity.setPhotoName(fileStorageUtil.saveFileAndReturnName(activityDto.getFile(), fileUploadPath));
+        activity.setPhotoName(fileStorageUtil.saveFileAndReturnName(activityDto.getFile()));
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         activity.setCreator(loggedUser);
@@ -121,8 +119,8 @@ public class ActivityService {
 
         //save new photo and remove old one
         if (activityDto.getFile() != null) {
-            fileStorageUtil.deleteFile(fileUploadPath + activityInDb.getPhotoName());
-            activityInDb.setPhotoName(fileStorageUtil.saveFileAndReturnName(activityDto.getFile(), fileUploadPath));
+            fileStorageUtil.deleteFile(activityInDb.getPhotoName());
+            activityInDb.setPhotoName(fileStorageUtil.saveFileAndReturnName(activityDto.getFile()));
         }
         activityInDb.setDeadLine(DateUtil.stringToDate(activityDto.getDeadLineString(), "dd/MM/yyyy HH:mm"));
         activityInDb.setDetail(activityDto.getDetail());
@@ -159,7 +157,7 @@ public class ActivityService {
         userEventService.removeMeeting(activityInDb);
 
         //delete file
-        fileStorageUtil.deleteFile(fileUploadPath + activityInDb.getPhotoName());
+        fileStorageUtil.deleteFile(activityInDb.getPhotoName());
 
         //delete requests
         activityRequestService.deleteByActivityId(id);

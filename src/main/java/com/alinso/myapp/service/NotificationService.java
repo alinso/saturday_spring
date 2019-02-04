@@ -9,6 +9,7 @@ import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.NotificationType;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
+import com.alinso.myapp.pushNotification.AndroidPushNotificationsService;
 import com.alinso.myapp.repository.ActivityRepository;
 import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.repository.NotificationRepository;
@@ -35,6 +36,9 @@ public class NotificationService {
 
     @Autowired
     NotificationRepository notificationRepository;
+
+    @Autowired
+    AndroidPushNotificationsService androidPushNotificationsService;
 
     @Autowired
     MailService  mailService;
@@ -108,29 +112,34 @@ public class NotificationService {
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.MESSAGE,null);
         mailService.sendNewMessageMail(target,trigger);
+        androidPushNotificationsService.newMessage(trigger,target);
     }
 
     public void newRequest(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REQUEST,itemId.toString());
         mailService.sendNewRequestMail(target,trigger,itemId);
+        androidPushNotificationsService.newRequest(trigger,target);
     }
 
     public void newRequestApproval(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REQUEST_APPROVAL,itemId.toString());
         mailService.sendNewRequestApprovalMail(target,trigger,itemId);
+        androidPushNotificationsService.newRequestApproval(trigger,target);
     }
 
     public void newReview(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REVIEW,itemId.toString());
         mailService.newReviewMail(target,trigger,itemId);
+        androidPushNotificationsService.newReview(trigger,target);
     }
     public void newMeeting(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.FOLLOWING,itemId.toString());
         mailService.sendNewActivityMail(target,trigger,itemId);
+        androidPushNotificationsService.newMeeting(trigger,target);
     }
     public void newGeneral(String message,User target){
         createNotification(target,null,NotificationType.GENERAL,message);

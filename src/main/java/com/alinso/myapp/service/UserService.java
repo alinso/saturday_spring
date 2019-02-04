@@ -20,7 +20,6 @@ import com.alinso.myapp.util.UserUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,7 +44,7 @@ public class UserService {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    FileStorageUtil fileStorageService;
+    FileStorageUtil fileStorageUtil;
 
     @Autowired
     ReferenceService referenceService;
@@ -70,9 +69,6 @@ public class UserService {
 
     @Autowired
     PremiumService premiumService;
-
-    @Value("${upload.profile.path}")
-    private String profilPicUploadPath;
 
     public User register(User newUser) {
 
@@ -134,7 +130,7 @@ public class UserService {
     public User findEntityById(Long id) {
         try {
             return userRepository.findById(id).get();
-        }catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             throw new UserWarningException("Kullanıcı Bulunamadı");
         }
     }
@@ -215,14 +211,14 @@ public class UserService {
     public String updateProfilePic(SinglePhotoUploadDto singlePhotoUploadDto) {
 
         String extension = FilenameUtils.getExtension(singlePhotoUploadDto.getFile().getOriginalFilename());
-        String newName = fileStorageService.makeFileName() + "." + extension;
+        String newName = fileStorageUtil.makeFileName() + "." + extension;
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         //save new file and remove old one
         if (!loggedUser.getProfilePicName().equals(""))
-            fileStorageService.deleteFile(profilPicUploadPath + loggedUser.getProfilePicName());
-        fileStorageService.storeFile(singlePhotoUploadDto.getFile(), profilPicUploadPath, newName);
+            fileStorageUtil.deleteFile(loggedUser.getProfilePicName());
+        fileStorageUtil.storeFile(singlePhotoUploadDto.getFile(), newName, true);
 
         //update database
         loggedUser.setProfilePicName(newName);

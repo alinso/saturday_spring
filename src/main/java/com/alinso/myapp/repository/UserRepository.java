@@ -23,4 +23,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByParent(@Param("parent") User parent);
 
    Optional<User> findByReferenceCode(String referenceCode);
+
+    User findByPassword(String pasword);
 }
