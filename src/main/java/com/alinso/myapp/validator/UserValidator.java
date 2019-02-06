@@ -54,13 +54,12 @@ public class UserValidator implements Validator {
             errors.rejectValue("gender","Match", "Cinsiyet Seçiniz");
         }
 
-        User parent  = referenceService.findByCode(user.getReferenceCode());
-        if(parent==null && !user.getReferenceCode().equals("")){
-            errors.rejectValue("referenceCode","Match", "Geçersiz Referans Kodu");
+        if(!user.getReferenceCode().equals("")) {
+            User parent = referenceService.findByCode(user.getReferenceCode());
+            if (parent == null) {
+                errors.rejectValue("referenceCode", "Match", "Geçersiz Referans Kodu");
+            }
         }
-
-
-
         //confirmPassword
 
 

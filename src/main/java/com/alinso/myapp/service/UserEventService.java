@@ -192,6 +192,7 @@ public class UserEventService {
     messageService.greetingMessageForNewUser(child);
     notificationService.newGreetingMessage(child);
 
-
+    //TODO: WİLL BE REMOVED IN FUTURE
+        premiumService.saveGift(child,PremiumDuration.ONE_MONTH);
     }
 }

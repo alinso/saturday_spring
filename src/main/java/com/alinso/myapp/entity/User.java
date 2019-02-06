@@ -13,6 +13,13 @@ import java.util.Collection;
 import java.util.Date;
 
 @Entity
+@NamedStoredProcedureQuery(
+        name = "delete_user_sp",
+        procedureName = "delete_user",
+        parameters = {
+                @StoredProcedureParameter(name = "userId", mode = ParameterMode.IN, type = Long.class),
+        }
+)
 public class User extends BaseEntity implements UserDetails {
 
 

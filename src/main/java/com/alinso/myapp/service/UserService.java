@@ -20,10 +20,13 @@ import com.alinso.myapp.util.UserUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,6 +36,9 @@ public class UserService {
 
     @Autowired
     HashtagService hashtagService;
+
+    @Autowired
+    EntityManager entityManager;
 
     @Autowired
     ModelMapper modelMapper;
@@ -258,5 +264,26 @@ public class UserService {
             dtos.add(toProfileDto(u));
         }
         return dtos;
+    }
+
+    @Scheduled(fixedRate = 60*60 * 1000, initialDelay = 60 * 1000)
+    public void deleteTestUser() {
+        try {
+            User test = userRepository.findByEmail("ankaratangoclub@gmail.com").get();
+            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
+            delete_user_sp.setParameter("userId", test.getId());
+            delete_user_sp.execute();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            User test2 = userRepository.findByEmail("cincihocam@hotmail.com").get();
+            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
+            delete_user_sp.setParameter("userId", test2.getId());
+            delete_user_sp.execute();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

@@ -32,8 +32,8 @@ public class PhotoValidator implements Validator {
             errors.rejectValue("file", "","Yalnızca jpeg/jpg/png türündeki dosyaları yükleyebilirsiniz");
         }
 
-        if(file.getSize()>2097152){ //2 MB
-            errors.rejectValue("file","","Max dosya boyutu 2 MB olabilir");
+        if(file.getSize()>1037152){ //2 MB
+            errors.rejectValue("file","","Max dosya boyutu 1 MB olabilir");
         }
 
     }
