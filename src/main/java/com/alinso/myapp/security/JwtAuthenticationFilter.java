@@ -4,6 +4,7 @@ import com.alinso.myapp.entity.User;
 import com.alinso.myapp.service.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
@@ -14,7 +15,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static com.alinso.myapp.security.SecurityConstants.HEADER_STRING;
 import static com.alinso.myapp.security.SecurityConstants.TOKEN_PREFIX;
@@ -43,6 +46,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails, null, Collections.emptyList());
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+
+
+                //set roles-----------------------------------------------------------------------------
+                List<SimpleGrantedAuthority> updatedAuthorities = new ArrayList<SimpleGrantedAuthority>();
+
+                SimpleGrantedAuthority user = new SimpleGrantedAuthority("ROLE_USER");
+                updatedAuthorities.add(user);
+
+                //if it is admin//
+                if(userDetails.getRole().equals("ROLE_ADMIN")){
+                    SimpleGrantedAuthority admin = new SimpleGrantedAuthority("ROLE_ADMIN");
+                    updatedAuthorities.add(admin);
+                }
+
+
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(
+                                SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
+                                SecurityContextHolder.getContext().getAuthentication().getCredentials(),
+                                updatedAuthorities)
+                );
+                // roles are set------------------------------------------------------------------------
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             }

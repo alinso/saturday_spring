@@ -97,6 +97,11 @@ public class User extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private  String firebaseId;
 
+
+    @Column
+    private String role;
+
+
 //
 //    @Column
 //    private String interests;
@@ -295,5 +300,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setFirebaseId(String firebaseId) {
         this.firebaseId = firebaseId;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
