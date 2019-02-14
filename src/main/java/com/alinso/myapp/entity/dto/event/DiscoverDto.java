@@ -2,7 +2,7 @@ package com.alinso.myapp.entity.dto.event;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class EventDto {
+public class DiscoverDto {
 
     private Long id;
 

@@ -1,7 +1,7 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.entity.dto.event.EventDto;
-import com.alinso.myapp.service.EventService;
+import com.alinso.myapp.entity.dto.event.DiscoverDto;
+import com.alinso.myapp.service.DiscoverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,17 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("event")
-public class EventController {
+@RequestMapping("discover")
+public class DiscoverController {
 
     @Autowired
-    EventService eventService;
+    DiscoverService discoverService;
 
 
-    @GetMapping("findNonExpiredEvents")
-    public ResponseEntity<?> findNonExpiredEvents(){
-        List<EventDto> eventDtoList  = eventService.findNonExpiredEvents();
-        return new ResponseEntity<List<EventDto>>(eventDtoList, HttpStatus.OK);
+    @GetMapping("findNonExpiredDiscovers")
+    public ResponseEntity findNonExpiredEvents(){
+        List<DiscoverDto> discoverDtoList = discoverService.findNonExpiredEvents();
+        return new ResponseEntity(discoverDtoList, HttpStatus.OK);
     }
 
 }

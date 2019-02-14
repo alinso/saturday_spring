@@ -2,10 +2,11 @@ package com.alinso.myapp.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import java.util.Date;
 
 @Entity
-public class Event extends BaseEntity {
+public class Discover extends BaseEntity {
 
     @Column
     private String detail;
@@ -13,8 +14,8 @@ public class Event extends BaseEntity {
     @Column
     private String title;
 
-    @Column
-    private Date date;
+    @ManyToOne
+    private City city;
 
     @Column
     private String photoName;
@@ -49,5 +50,9 @@ public class Event extends BaseEntity {
 
     public void setPhotoName(String photoName) {
         this.photoName = photoName;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 }

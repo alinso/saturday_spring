@@ -70,6 +70,8 @@ public class ActivityRequestService {
         }
         else{
             ActivityRequest activityRequest = activityRequesRepository.findByActivityAndApplicant(loggedUser, activity);
+            //delete points if this activity request was approved
+            userEventService.removeApprovedRequestPoints(activityRequest);
             activityRequesRepository.delete(activityRequest);
             dayActionService.removeRequest();
         }

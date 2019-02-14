@@ -1,9 +1,6 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.entity.Activity;
-import com.alinso.myapp.entity.Premium;
-import com.alinso.myapp.entity.Review;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.*;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.PremiumDuration;
@@ -123,6 +120,15 @@ public class UserEventService {
             User creator  =activity.getCreator();
             creator.setPoint(creator.getPoint()-NEW_APPROVAL_POINT);
             userRepository.save(creator);
+        }
+    }
+
+    //if the request is approved and request-owner user takes back the request we need to take back the points
+    public void removeApprovedRequestPoints(ActivityRequest activityRequest){
+        if(activityRequest.getActivityRequestStatus()==ActivityRequestStatus.APPROVED){
+            User user = activityRequest.getApplicant();
+            user.setPoint(user.getPoint()-NEW_ACTIVITY_POINT);
+            userRepository.save(user);
         }
     }
 

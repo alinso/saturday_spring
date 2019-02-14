@@ -1,7 +1,7 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.entity.dto.event.EventDto;
-import com.alinso.myapp.service.EventService;
+import com.alinso.myapp.entity.dto.event.DiscoverDto;
+import com.alinso.myapp.service.DiscoverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import javax.validation.Valid;
 public class AdminController {
 
     @Autowired
-    EventService eventService;
+    DiscoverService discoverService;
 
 
     @GetMapping("dashboard")
@@ -26,9 +26,9 @@ public class AdminController {
     }
 
 
-    @PostMapping("saveEvent")
-    public ResponseEntity<?> saveEvent(@Valid EventDto eventDto){
-        eventService.save(eventDto);
+    @PostMapping("saveDiscover")
+    public ResponseEntity<?> saveEvent(@Valid DiscoverDto discoverDto){
+        discoverService.save(discoverDto);
         return new ResponseEntity<>("okk",HttpStatus.OK);
     }
 }
