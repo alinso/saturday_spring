@@ -48,28 +48,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
 
 
-                //set roles-----------------------------------------------------------------------------
-                List<SimpleGrantedAuthority> updatedAuthorities = new ArrayList<SimpleGrantedAuthority>();
-
-                SimpleGrantedAuthority user = new SimpleGrantedAuthority("ROLE_USER");
-                updatedAuthorities.add(user);
-
-                //if it is admin//
-                if(userDetails.getRole().equals("ROLE_ADMIN")){
-                    SimpleGrantedAuthority admin = new SimpleGrantedAuthority("ROLE_ADMIN");
-                    updatedAuthorities.add(admin);
-                }
-
-
+                SecurityContextHolder.getContext().setAuthentication(authentication);
                 SecurityContextHolder.getContext().setAuthentication(
                         new UsernamePasswordAuthenticationToken(
                                 SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
                                 SecurityContextHolder.getContext().getAuthentication().getCredentials(),
-                                updatedAuthorities)
+                                userDetails.getAuthorities())
                 );
-                // roles are set------------------------------------------------------------------------
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
 
             }
 

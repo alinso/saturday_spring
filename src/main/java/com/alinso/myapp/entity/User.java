@@ -3,14 +3,17 @@ package com.alinso.myapp.entity;
 import com.alinso.myapp.entity.enums.Gender;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @NamedStoredProcedureQuery(
@@ -223,7 +226,18 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+
+        List<SimpleGrantedAuthority> updatedAuthorities = new ArrayList<SimpleGrantedAuthority>();
+
+        SimpleGrantedAuthority user = new SimpleGrantedAuthority("ROLE_USER");
+        updatedAuthorities.add(user);
+
+        //if it is admin//
+        if(this.getRole()!=null && this.getRole().equals("ROLE_ADMIN")){
+            SimpleGrantedAuthority admin = new SimpleGrantedAuthority("ROLE_ADMIN");
+            updatedAuthorities.add(admin);
+        }
+        return updatedAuthorities;
     }
 
     @Override

@@ -112,6 +112,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/profile/**").permitAll()
                 .antMatchers("/user/ok/**").permitAll()
                 .antMatchers("/m/a/**").permitAll()
+                .antMatchers("/sdklsdf/**").hasRole("ADMIN")
 
                 .antMatchers(SecurityConstants.H2_URL).permitAll()
                 .anyRequest().authenticated();
