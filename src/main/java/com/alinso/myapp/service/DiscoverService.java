@@ -1,13 +1,17 @@
 package com.alinso.myapp.service;
 
+import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.Discover;
-import com.alinso.myapp.entity.dto.event.DiscoverDto;
+import com.alinso.myapp.entity.dto.discover.DiscoverDto;
+import com.alinso.myapp.repository.CityRepository;
 import com.alinso.myapp.repository.DiscoverRepository;
 import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,28 +26,52 @@ public class DiscoverService {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    CityRepository cityRepository;
 
     @Autowired
     DiscoverRepository discoverRepository;
 
     public void save(DiscoverDto discoverDto) {
 
+        City city=cityRepository.getOne(discoverDto.getCityId());
         Discover discover = modelMapper.map(discoverDto, Discover.class);
-        discover.setDate(DateUtil.stringToDate(discoverDto.getDtString(), "dd/MM/yyyy HH:mm"));
         discover.setPhotoName(fileStorageUtil.saveFileAndReturnName(discoverDto.getFile()));
-
+        discover.setCity(city);
         discoverRepository.save(discover);
     }
 
-    public List<DiscoverDto> findNonExpiredEvents(){
-       List<Discover> discoverList =  discoverRepository.findNonExpiredEvents(new Date());
+    public List<DiscoverDto> findAll(){
+       List<Discover> discoverList =  discoverRepository.findAll();
        List<DiscoverDto> discoverDtoList =  new ArrayList<>();
        for(Discover discover : discoverList){
            DiscoverDto discoverDto = modelMapper.map(discover, DiscoverDto.class);
-           discoverDto.setDtString(DateUtil.dateToString(discover.getDate(),"dd/MM/yyyy HH:m"));
             discoverDtoList.add(discoverDto);
         }
-
         return discoverDtoList;
+    }
+
+    public DiscoverDto findById( Long id){
+        Discover discover  = discoverRepository.findById(id).get();
+        DiscoverDto discoverDto  = modelMapper.map(discover, DiscoverDto.class);
+        return discoverDto;
+    }
+
+    public void update(DiscoverDto discoverDto) {
+
+        Discover discoverInDb  = discoverRepository.findById(discoverDto.getId()).get();
+        City city=cityRepository.getOne(discoverDto.getCityId());
+
+        discoverInDb.setCity(city);
+        discoverInDb.setDetail(discoverDto.getDetail());
+        discoverInDb.setTitle(discoverDto.getTitle());
+        discoverInDb.setYoutube(discoverDto.getYoutube());
+
+        if (discoverDto.getFile() != null) {
+            fileStorageUtil.deleteFile(discoverInDb.getPhotoName());
+            discoverInDb.setPhotoName(fileStorageUtil.saveFileAndReturnName(discoverDto.getFile()));
+        }
+
+        discoverRepository.save(discoverInDb);
     }
 }

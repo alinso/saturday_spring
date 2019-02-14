@@ -1,6 +1,6 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.entity.dto.event.DiscoverDto;
+import com.alinso.myapp.entity.dto.discover.DiscoverDto;
 import com.alinso.myapp.service.DiscoverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,9 +26,15 @@ public class AdminController {
     }
 
 
-    @PostMapping("saveDiscover")
+    @PostMapping("createDiscover")
     public ResponseEntity<?> saveEvent(@Valid DiscoverDto discoverDto){
         discoverService.save(discoverDto);
+        return new ResponseEntity<>("okk",HttpStatus.OK);
+    }
+
+    @PostMapping("updateDiscover")
+    public ResponseEntity<?> updateDiscover(@Valid DiscoverDto discoverDto){
+        discoverService.update(discoverDto);
         return new ResponseEntity<>("okk",HttpStatus.OK);
     }
 }

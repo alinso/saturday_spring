@@ -20,6 +20,9 @@ public class Discover extends BaseEntity {
     @Column
     private String photoName;
 
+    @Column
+    private String youtube;
+
     public String getDetail() {
         return detail;
     }
@@ -36,13 +39,6 @@ public class Discover extends BaseEntity {
         this.title = title;
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
 
     public String getPhotoName() {
         return photoName;
@@ -54,5 +50,17 @@ public class Discover extends BaseEntity {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public String getYoutube() {
+        return youtube;
+    }
+
+    public void setYoutube(String youtube) {
+        this.youtube = youtube;
     }
 }

@@ -11,6 +11,5 @@ import java.util.List;
 public interface DiscoverRepository extends JpaRepository<Discover,Long>  {
 
 
-    @Query("select e from Discover e where e.date > :now order by date")
-    List<Discover> findNonExpiredEvents(@Param("now") Date now);
+    List<Discover> findAll();
 }

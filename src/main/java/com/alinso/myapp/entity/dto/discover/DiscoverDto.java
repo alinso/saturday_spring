@@ -1,5 +1,6 @@
-package com.alinso.myapp.entity.dto.event;
+package com.alinso.myapp.entity.dto.discover;
 
+import com.alinso.myapp.entity.City;
 import org.springframework.web.multipart.MultipartFile;
 
 public class DiscoverDto {
@@ -10,9 +11,12 @@ public class DiscoverDto {
 
     private String title;
 
-    private String dtString;
+    private String youtube;
 
     private MultipartFile file;
+    private Long cityId;
+
+    private City  city;
 
     private String photoName;
 
@@ -30,14 +34,6 @@ public class DiscoverDto {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getDtString() {
-        return dtString;
-    }
-
-    public void setDtString(String dtString) {
-        this.dtString = dtString;
     }
 
     public MultipartFile getFile() {
@@ -62,5 +58,29 @@ public class DiscoverDto {
 
     public void setPhotoName(String photoName) {
         this.photoName = photoName;
+    }
+
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public String getYoutube() {
+        return youtube;
+    }
+
+    public void setYoutube(String youtube) {
+        this.youtube = youtube;
     }
 }
