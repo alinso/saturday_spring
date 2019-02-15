@@ -43,7 +43,6 @@ public class ProfileInfoForUpdateDto {
 
     private String motivation = "";
 
-    @NotBlank(message = "Referansınız olmadan kayıt olamazsınız!")
     private String referenceCode;
 
     private Long cityId;

@@ -33,8 +33,10 @@ public class DiscoverService {
     DiscoverRepository discoverRepository;
 
     public void save(DiscoverDto discoverDto) {
+        City city=null;
+        if(discoverDto.getCityId()!=0)
+            city=cityRepository.getOne(discoverDto.getCityId());
 
-        City city=cityRepository.getOne(discoverDto.getCityId());
         Discover discover = modelMapper.map(discoverDto, Discover.class);
         discover.setPhotoName(fileStorageUtil.saveFileAndReturnName(discoverDto.getFile()));
         discover.setCity(city);
@@ -60,7 +62,9 @@ public class DiscoverService {
     public void update(DiscoverDto discoverDto) {
 
         Discover discoverInDb  = discoverRepository.findById(discoverDto.getId()).get();
-        City city=cityRepository.getOne(discoverDto.getCityId());
+        City city=null;
+        if(discoverDto.getCityId()!=0)
+            city=cityRepository.getOne(discoverDto.getCityId());
 
         discoverInDb.setCity(city);
         discoverInDb.setDetail(discoverDto.getDetail());

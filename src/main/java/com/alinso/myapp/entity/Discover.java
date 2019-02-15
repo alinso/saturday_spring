@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 public class Discover extends BaseEntity {
 
-    @Column
+    @Column(columnDefinition="TEXT")
     private String detail;
 
     @Column

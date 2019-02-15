@@ -62,7 +62,7 @@ public class MailService {
                 .replace("{personName}", trigger.getName() + " " + trigger.getSurname())
                 .replace("{messageLink}", messageLink);
 
-    //    sendMail(target, message, systemMessage.getMailSubject());
+        sendMail(target, message, systemMessage.getMailSubject());
     }
 
     public void sendNewActivityMail(User target, User trigger, Long activityID) {
@@ -73,7 +73,7 @@ public class MailService {
                 .replace("{activityLink}", activityLink)
                 .replace("{personName}", trigger.getName() + " " + trigger.getSurname())
                 .replace("{personLink}", personLink);
-    //    sendMail(target, message, systemMessage.getMailSubject());
+        sendMail(target, message, systemMessage.getMailSubject());
     }
 
     public void sendNewRequestMail(User target, User trigger, Long activityID) {
@@ -84,7 +84,7 @@ public class MailService {
                 .replace("{activityLink}", activityLink)
                 .replace("{personName}", trigger.getName() + " " + trigger.getSurname())
                 .replace("{personLink}", personLink);
-     //   sendMail(target, message, systemMessage.getMailSubject());
+        sendMail(target, message, systemMessage.getMailSubject());
     }
 
     public void sendNewRequestApprovalMail(User target, User trigger, Long activityID) {
@@ -95,7 +95,7 @@ public class MailService {
                 .replace("{activityLink}", activityLink)
                 .replace("{personName}", trigger.getName() + " " + trigger.getSurname())
                 .replace("{personLink}", personLink);
-    //    sendMail(target, message, systemMessage.getMailSubject());
+        sendMail(target, message, systemMessage.getMailSubject());
     }
 
     public void newReviewMail(User target, User trigger, Long reviewId) {
@@ -106,7 +106,7 @@ public class MailService {
                 .replace("{reviewLink}", reviewyLink)
                 .replace("{personName}", trigger.getName() + " " + trigger.getSurname())
                 .replace("{personLink}", personLink);
-    //    sendMail(target, message, systemMessage.getMailSubject());
+        sendMail(target, message, systemMessage.getMailSubject());
     }
 
     public void newReviewAvailableMail(User target, Long activityID) {
@@ -114,7 +114,7 @@ public class MailService {
         String activityLink = applicationUrl + "activityDetail/" + activityID;
         String message = systemMessage.getMessageText()
                 .replace("{activityLink}", activityLink);
-    //    sendMail(target, message, systemMessage.getMailSubject());
+        sendMail(target, message, systemMessage.getMailSubject());
     }
 
 
