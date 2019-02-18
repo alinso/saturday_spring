@@ -20,6 +20,8 @@ import com.alinso.myapp.util.UserUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -240,9 +242,10 @@ public class UserService {
         return true;
     }
 
-    public List<ProfileDto> searchUser(String searchText) {
+    public List<ProfileDto> searchUser(String searchText, Integer pageNum) {
 
-        List<User> users = userRepository.searchUser("%" + searchText + "%");
+        Pageable pageable  = PageRequest.of(pageNum,20);
+        List<User> users = userRepository.searchUser(searchText ,pageable);
         List<ProfileDto> profileDtos = new ArrayList<>();
         for (User user : users) {
             profileDtos.add(toProfileDto(user));

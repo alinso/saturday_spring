@@ -40,9 +40,9 @@ public class ActivityController {
         return new ResponseEntity<>(activityDto,HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("findAllByCityId/{cityId}")
-    public ResponseEntity<?> findAll(@PathVariable("cityId") Long cityId){
-        List<ActivityDto>  meetings = activityService.findAllNonExpiredByCityId(cityId);
+    @GetMapping("findAllByCityId/{cityId}/{pageNum}")
+    public ResponseEntity<?> findAll(@PathVariable("cityId") Long cityId, @PathVariable("pageNum") Integer pageNum){
+        List<ActivityDto>  meetings = activityService.findAllNonExpiredByCityId(cityId,pageNum);
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }

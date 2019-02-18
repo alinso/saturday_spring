@@ -17,6 +17,8 @@ import com.alinso.myapp.util.UserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -129,9 +131,10 @@ public class ActivityService {
         return activityRepository.save(activityInDb);
     }
 
-    public List<ActivityDto> findAllNonExpiredByCityId(Long cityId) {
+    public List<ActivityDto> findAllNonExpiredByCityId(Long cityId,Integer pageNum) {
 
-        List<Activity> activities = activityRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId));
+        Pageable pageable  =PageRequest.of(pageNum,20);
+        List<Activity> activities = activityRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId),pageable);
         List<ActivityDto> activityDtos = new ArrayList<>();
 
         for (Activity activity : activities) {

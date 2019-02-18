@@ -178,9 +178,9 @@ public class UserController {
         return new ResponseEntity<String>("User has been deleted", HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("search/{searchText}")
-    public ResponseEntity<?> search(@PathVariable("searchText") String searchText) {
-        List<ProfileDto> profileDtos = userService.searchUser(searchText);
+    @GetMapping("search/{searchText}/{pageNum}")
+    public ResponseEntity<?> search(@PathVariable("searchText") String searchText,@PathVariable("pageNum") Integer pageNum) {
+        List<ProfileDto> profileDtos = userService.searchUser(searchText,pageNum);
         return new ResponseEntity<>(profileDtos, HttpStatus.OK);
     }
 

@@ -26,9 +26,9 @@ public class HashtagController {
         return new ResponseEntity<List>(activityDtoList, HttpStatus.OK);
     }
 
-    @GetMapping("findUsers/{hashtag}")
-    public ResponseEntity<?> findUsers(@PathVariable("hashtag") String hashtag){
-        List<ProfileDto> profileDtoList = hashtagService.findUsersByHashtag(hashtag);
+    @GetMapping("findUsers/{hashtag}/{pageNum}")
+    public ResponseEntity<?> findUsers(@PathVariable("hashtag") String hashtag, @PathVariable("pageNum") Integer pageNum){
+        List<ProfileDto> profileDtoList = hashtagService.findUsersByHashtag(hashtag,pageNum);
         return new ResponseEntity<List>(profileDtoList, HttpStatus.OK);
     }
 

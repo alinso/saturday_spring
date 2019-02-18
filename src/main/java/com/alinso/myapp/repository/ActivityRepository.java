@@ -3,6 +3,8 @@ package com.alinso.myapp.repository;
 import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.User;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +17,7 @@ import java.util.List;
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
     @Query("select meeting from Activity meeting where meeting.deadLine > :now and meeting.city= :city order by meeting.deadLine asc ")
-    public List<Activity> findAllNonExpiredByCityIdOrderByDeadLine(@Param("now") Date now, @Param("city")City city);
+    public List<Activity> findAllNonExpiredByCityIdOrderByDeadLine(@Param("now") Date now, @Param("city")City city, Pageable pageable);
 
     public List<Activity> findByCreatorOrderByDeadLineDesc(User creator);
 

@@ -138,13 +138,13 @@ public class MessageService {
         Message message = new Message();
         message.setReader(reader);
         message.setWriter(userService.findEntityById(ali.getId()));
-        message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz:) ilk 500 kişiden bir olduğun için 1 ay premium üyelik hediye ediyoruz \n" +
+        message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz:) ilk 500 kişiye 1 ay premium üyelik hediye ediyoruz \n" +
                 " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, sinemaya gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
                 " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
                 "\n" +
                 "\n" +
-                " Activiy Friend kadın-erkek sayısı dengeli, tüm kullanıcıların referansla üye olabildiği bir sistemdir. Herhangi biriyle birşey yapmadan önce o kişi " +
-                " hakkında yazılanları okuyabilir, katıldığı aktivieleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
+                " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren bir sistemdir. Herhangi biriyle birşey yapmadan önce o kişi " +
+                " hakkında yazılanları okuyabilir, katıldığı aktivit    eleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
                 "\n Sormak istediğin herhangi birşey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarız." +
                 "\n" +
                 "İyi eğlenceler, dileriz");

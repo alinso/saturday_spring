@@ -3,6 +3,7 @@ package com.alinso.myapp.repository;
 import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.Hashtag;
 import com.alinso.myapp.entity.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -35,5 +36,5 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
 
 
     @Query("select h.user    from Hashtag h where h.name=:clearHashtag and h.user!=null")
-    List<User> findUsersByHashtag(@Param("clearHashtag") String clearHashtag);
+    List<User> findUsersByHashtag(@Param("clearHashtag") String clearHashtag, Pageable pageable);
 }

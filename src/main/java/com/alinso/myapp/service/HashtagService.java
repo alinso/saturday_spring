@@ -7,6 +7,8 @@ import com.alinso.myapp.entity.dto.activity.ActivityDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.repository.HashtagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -102,9 +104,10 @@ public class HashtagService {
         return activityService.toDtoList(activities);
     }
 
-    public List<ProfileDto> findUsersByHashtag(String hashtag) {
+    public List<ProfileDto> findUsersByHashtag(String hashtag,Integer pageNum) {
+        Pageable pageable  = PageRequest.of(pageNum,20);
         String clearHashtag = hashtag.trim().replace("#", "");
-        List<User> users = hashtagRepository.findUsersByHashtag(clearHashtag);
+        List<User> users = hashtagRepository.findUsersByHashtag(clearHashtag,pageable);
         return userService.toProfileDtoList(users);
 
     }
