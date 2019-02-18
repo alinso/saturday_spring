@@ -202,7 +202,7 @@ public class NotificationService {
 
             notificationDto.setTrigger(triggerDto);
             notificationDto.setTarget(targetDto);
-            notificationDto.setCreatedAtString(DateUtil.dateToString(notification.getCreatedAt(),"DD/MM/YYYY HH:mm"));
+            notificationDto.setCreatedAtString(DateUtil.dateToString(notification.getCreatedAt(),"dd/MM/YYYY HH:mm"));
             notificationDtos.add(notificationDto);
         }
 
