@@ -21,6 +21,7 @@ public class Message extends BaseEntity {
     @NotNull
     private User reader;
 
+
     public String getMessage() {
         return message;
     }

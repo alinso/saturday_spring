@@ -36,6 +36,24 @@ public class MobileAppController {
 
     }
 
+    @GetMapping("i/{tokenpackage}")
+    public ResponseEntity<?> iosToken(@PathVariable("tokenpackage") String tokenpackage) {
+
+        //token package consist of {userid(replace ..... to / )}----firebase app token
+        String part[] = tokenpackage.split("----");
+        String pasword = part[0].replace(".....", "/");
+        String firebaseToken = part[1];
+
+        System.out.println(pasword + " _________ " + firebaseToken);
+
+        User user = userRepository.findByPassword(pasword);
+        user.setFirebaseId(firebaseToken);
+        userRepository.save(user);
+
+        return new ResponseEntity<String>("ok", HttpStatus.OK);
+
+    }
+
     @GetMapping("ok")
     public ResponseEntity<?> ok() {
 

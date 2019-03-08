@@ -12,4 +12,7 @@ public interface DiscoverRepository extends JpaRepository<Discover,Long>  {
 
 
     List<Discover> findAll();
+
+    @Query("select d.id from Discover  d")
+    List<Long> findIds();
 }

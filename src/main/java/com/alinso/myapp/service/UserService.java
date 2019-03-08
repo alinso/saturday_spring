@@ -78,6 +78,7 @@ public class UserService {
     @Autowired
     PremiumService premiumService;
 
+    //this the registration without mail verification
     public User register(User newUser) {
 
         newUser.setConfirmPassword("");
@@ -86,12 +87,41 @@ public class UserService {
         newUser.setReviewCount(0);
         newUser.setPoint(0);
         newUser.setActivityCount(0);
+        newUser.setEnabled(true);
 
         User user = userRepository.save(newUser);
-        String token = mailVerificationTokenService.saveToken(user);
-        mailService.sendMailVerificationMail(user, token);
+        //String token = mailVerificationTokenService.saveToken(user);
+        //mailService.sendMailVerificationMail(user, token);
+
+        userEventService.setReferenceChain(user);
+        userRepository.save(user);
+        userEventService.newUserRegistered(user);
+
+
         return user;
     }
+
+
+    public Integer getUserCount(){
+        return userRepository.getUserCount();
+    }
+
+
+    //this the registration with mail verification
+//    public User register(User newUser) {
+//
+//        newUser.setConfirmPassword("");
+//        newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
+//        newUser.setPhotoCount(0);
+//        newUser.setReviewCount(0);
+//        newUser.setPoint(0);
+//        newUser.setActivityCount(0);
+//
+//        User user = userRepository.save(newUser);
+//        String token = mailVerificationTokenService.saveToken(user);
+//        mailService.sendMailVerificationMail(user, token);
+//        return user;
+//    }
 
     public void forgottePasswordSendMail(String email) {
         User user;

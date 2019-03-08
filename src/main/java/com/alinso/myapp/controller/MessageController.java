@@ -51,4 +51,11 @@ public class MessageController {
         return new ResponseEntity<>(conversationDtos,HttpStatus.OK);
     }
 
+
+    @GetMapping("deleteConversation/{otherId}")
+    public ResponseEntity<?> deleteCoversation(@PathVariable("otherId") Long otherId){
+        messageService.deleteConversation(otherId);
+        return new ResponseEntity<String>("Ok",HttpStatus.OK);
+    }
+
 }

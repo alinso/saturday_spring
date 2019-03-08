@@ -23,7 +23,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select user from User  user where user.parent=:parent")
     List<User> findByParent(@Param("parent") User parent);
 
-   Optional<User> findByReferenceCode(String referenceCode);
+    Optional<User> findByReferenceCode(String referenceCode);
+
+    @Query("select count(*) from User")
+    Integer getUserCount();
 
     User findByPassword(String pasword);
 }

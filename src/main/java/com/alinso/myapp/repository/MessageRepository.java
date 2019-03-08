@@ -24,4 +24,5 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             "on (o.reader = b.reader and o.writer = b.writer and o.createdAt<b.createdAt) " +
             "where b.createdAt is null and (o.reader=:me or o.writer=:me) order by o.createdAt desc")
     List<Message> latestMessageFromEachConversation(@Param("me") User me);
+
 }

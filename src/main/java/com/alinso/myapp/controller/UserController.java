@@ -83,6 +83,11 @@ public class UserController {
         return ResponseEntity.ok(new JWTLoginSucessReponse(true, jwt, user.getProfilePicName(),user.getCityId()));
     }
 
+    @GetMapping("userCount")
+    public ResponseEntity<?> userCount(){
+        return new ResponseEntity<>(userService.getUserCount(),HttpStatus.OK);
+    }
+
     @GetMapping("/verifyMail/{token}")
     public ResponseEntity<?> verifyMail(@PathVariable("token") String token) {
         userService.verifyMail(token);
@@ -91,7 +96,7 @@ public class UserController {
 
     @GetMapping("forgottenPassword/{mail}")
     public ResponseEntity<?> sendForgottenPasswordMail(@PathVariable("mail") String mail) {
-        userService.forgottePasswordSendMail(mail);
+        userService.forgottePasswordSendMail(mail.toLowerCase());
         return new ResponseEntity<>("mail sent", HttpStatus.OK);
     }
 

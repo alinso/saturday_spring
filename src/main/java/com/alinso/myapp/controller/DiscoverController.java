@@ -21,14 +21,20 @@ public class DiscoverController {
 
 
     @GetMapping("findNonExpiredDiscovers")
-    public ResponseEntity findNonExpiredEvents(){
+    public ResponseEntity<List<DiscoverDto>> findNonExpiredEvents(){
         List<DiscoverDto> discoverDtoList = discoverService.findAll();
-        return new ResponseEntity(discoverDtoList, HttpStatus.OK);
+        return new ResponseEntity<>(discoverDtoList, HttpStatus.OK);
     }
 
     @GetMapping("findById/{id}")
     public ResponseEntity<DiscoverDto> findById(@PathVariable("id") Long id) {
         return new ResponseEntity<>(discoverService.findById(id),HttpStatus.OK);
+    }
+
+    @GetMapping("findRandom")
+    public ResponseEntity<DiscoverDto> findRandom(){
+        DiscoverDto discoverDto = discoverService.findRandom();
+        return new ResponseEntity<>(discoverDto,HttpStatus.OK);
     }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class DiscoverService {
@@ -77,5 +78,17 @@ public class DiscoverService {
         }
 
         discoverRepository.save(discoverInDb);
+    }
+
+    public DiscoverDto findRandom() {
+        List<Long> ids = discoverRepository.findIds();
+        Integer count = ids.size();
+        Random rnd  = new Random();
+        Integer idIndex = rnd.nextInt(count-1);
+
+      Discover discover=  discoverRepository.findById(ids.get(idIndex)).get();
+      DiscoverDto discoverDto  = modelMapper.map(discover, DiscoverDto.class);
+      return  discoverDto;
+
     }
 }
