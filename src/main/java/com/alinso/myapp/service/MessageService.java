@@ -13,6 +13,8 @@ import com.alinso.myapp.repository.MessageRepository;
 import com.alinso.myapp.util.DateUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +57,18 @@ public class MessageService {
 
         messageRepository.save(message);
 
-        userEventService.newMessage(message.getReader());
+
+        //if writer id=36 dont send the message
+        if(message.getWriter().getId()==36
+                || message.getWriter().getId()==1109
+                || message.getWriter().getId()==44){
+            deleteConversationNedim(message.getReader().getId(),message.getWriter().getId());
+            return messageDto;
+        }
+        else{
+            userEventService.newMessage(message.getReader());
+        }
+
         messageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(), "DD/MM HH:mm"));
         messageDto.setReader(userService.toProfileDto(message.getReader()));
         return messageDto;
@@ -121,11 +134,12 @@ public class MessageService {
     }
 
 
-    public List<ConversationDto> getMyConversations() {
+    public List<ConversationDto> getMyConversations(Integer pageNum) {
         User me = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Pageable pageable  = PageRequest.of(pageNum,10);
 
         //read sql dtos from database
-        List<Message> latestMessageFromEachConversation = messageRepository.latestMessageFromEachConversation(me);
+        List<Message> latestMessageFromEachConversation = messageRepository.latestMessageFromEachConversation(me,pageable);
 
         latestMessageFromEachConversation = removeDeletedConversations(latestMessageFromEachConversation);
 
@@ -198,32 +212,76 @@ public class MessageService {
     public void greetingMessageForNewUser(User reader) {
 
         ProfileInfoForUpdateDto sender;
+        Message message = new Message();
 
         //this will be changed in future
-        if (reader.getGender() == Gender.FEMALE)
+        if (reader.getGender() == Gender.FEMALE) {
             sender = userService.findByEmail("kizilakca0106@gmail.com");
-        else
+            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, Activity Friend ticari kaygı gütmeyen sosyal  bir oluşumdur:)  \n" +
+                    " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
+                    " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
+                    "\n" +
+                    "\n" +
+                    " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
+                    "Sorunsuzca aktivite açıp, aktivitelere katılabilceğin bir ortam kurmaya çalışıyoruz. ÖZELLİKLE KADINLARA KARŞI RAHATSIZLIK VERİCİ EN UFAK BİR DURUMA DAHİ TAHAMMÜLÜMÜZ YOK. ISRARCI, RAHATSIZLIK VERİCİ,UYGULAMA AMACI DIŞINDA" +
+                    " YAZAN OLURSA ŞİKAYET ET, BURADA ONLARA ASLA MÜSAMAHA GÖSTERMİYORUZ." +
+                    "\n" +
+                    "\n" +
+                    " Herhangi biriyle bir şey yapmadan önce o kişi " +
+                    " hakkında yazılanları okuyabilir, katıldığı aktiviteleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
+                    "\n Sormak istediğin herhangi bir şey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarım." +
+                    "\n" +
+                    "İyi eğlenceler:)");
+        }
+        else {
             sender = userService.findByEmail("soyaslanaliinsan@gmail.com");
+
+            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, Activity Friend ticari kaygı gütmeyen sosyal  bir oluşumdur:)  \n" +
+                    " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
+                    " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
+                    "\n" +
+                    "\n" +
+                    " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
+                    " RAHATSIZLIK VERİCİ,ISRARCI,UYUGLAMAYI AMACI DIŞINDA KULLANAN PROFİLLERİ SİLİYOR VE MÜSAMAHA GÖSTERMİYORUZ." +
+                    "\n" +
+                    "\n" +
+                    " Herhangi biriyle bir şey yapmadan önce o kişi " +
+                    " hakkında yazılanları okuyabilir, katıldığı aktiviteleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
+                    "\n Sormak istediğin herhangi bir şey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarım." +
+                    "\n" +
+                    "İyi eğlenceler:)");
+
+        }
         /////
-        Message message = new Message();
         message.setReader(reader);
         message.setWriter(userService.findEntityById(sender.getId()));
-        message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz:) ilk 500 kişiye 1 ay premium üyelik hediye ediyoruz \n" +
-                " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, sinemaya gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
-                " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
-                "\n" +
-                "\n" +
-                " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren bir sistemdir. Herhangi biriyle birşey yapmadan önce o kişi " +
-                " hakkında yazılanları okuyabilir, katıldığı aktivit    eleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
-                "\n Sormak istediğin herhangi birşey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarız." +
-                "\n" +
-                "İyi eğlenceler, dileriz");
+
         messageRepository.save(message);
     }
 
     public void deleteConversation(Long otherId) {
         User eraserUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User otherUSer = userService.findEntityById(otherId);
+
+
+        DeletedConversation deletedConversation = deletedConversationRepository.findByUserIds(eraserUser, otherUSer);
+        if (deletedConversation == null)
+            deletedConversation = new DeletedConversation();
+
+        deletedConversation.setEraserUser(eraserUser);
+        deletedConversation.setOtherUser(otherUSer);
+
+        //the latest id of these messages will be saved and messages before that id wont be shown to user
+        List<Message> messagesToMark = messageRepository.getByReaderWriter(eraserUser, otherUSer);
+        deletedConversation.setLatesMessagBeforeDelete(messagesToMark.get(messagesToMark.size() - 1));
+
+
+        deletedConversationRepository.save(deletedConversation);
+    }
+
+    public void deleteConversationNedim(Long readerId,Long writerId) {
+        User eraserUser = userService.findEntityById(readerId);
+        User otherUSer = userService.findEntityById(writerId);
 
 
         DeletedConversation deletedConversation = deletedConversationRepository.findByUserIds(eraserUser, otherUSer);

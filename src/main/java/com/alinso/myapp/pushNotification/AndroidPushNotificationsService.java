@@ -78,33 +78,75 @@ public class AndroidPushNotificationsService {
     }
 
     @Async
-    public void newMessage(User trigger, User target) {
+    public Boolean newMessage(User trigger, User target) {
         String message = trigger.getName() + " " + trigger.getSurname() + " sana bir mesaj gönderdi";
         send("Yeni Mesaj", target.getFirebaseId(), message);
+        if(target.getFirebaseId()==null){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
     @Async
-    public void newRequest(User trigger, User target) {
+    public Boolean newReviewAvailable(User target) {
+        String message =  "Yakın zamanda bir aktiviteye katıldın, katılımcılarla ilgili yorum yazabilirsin";
+        send("Yorum Yap", target.getFirebaseId(), message);
+        if(target.getFirebaseId()==null){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    @Async
+    public Boolean newRequest(User trigger, User target) {
         String message = trigger.getName() + " " + trigger.getSurname() + " paylaştığın aktiviteye katılmak istiyor";
         send("Yeni İstek", target.getFirebaseId(), message);
+        if(target.getFirebaseId()==null){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
     @Async
-    public void newRequestApproval(User trigger, User target) {
+    public Boolean newRequestApproval(User trigger, User target) {
         String message = trigger.getName() + " " + trigger.getSurname() + " aktivitesi için seni onayladı !";
         send("İyi eğlenceler!", target.getFirebaseId(), message);
+        if(target.getFirebaseId()==null){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
     @Async
-    public void newReview(User trigger, User target) {
+    public Boolean newReview(User trigger, User target) {
         String message = trigger.getName() + " " + trigger.getSurname() + " senin için bir yorum yazdı";
         send("Yeni yorum", target.getFirebaseId(), message);
+        if(target.getFirebaseId()==null){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
     @Async
-    public void newMeeting(User trigger, User target) {
+    public Boolean newMeeting(User trigger, User target) {
         String message = "Listendeki " + trigger.getName() + " " + trigger.getSurname() + " yeni bir  aktivite paylaştı";
         send("Yeni aktivite", target.getFirebaseId(), message);
+        if(target.getFirebaseId()==null){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
 }

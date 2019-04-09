@@ -43,7 +43,7 @@ public class User extends BaseEntity implements UserDetails {
     private String email;
 
     @Column
-    @NotNull(message = "Telefon boş olamaz")
+    @NotBlank
     private String phone;
 
     @Column

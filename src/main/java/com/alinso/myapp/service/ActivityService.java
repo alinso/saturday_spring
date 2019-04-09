@@ -133,7 +133,7 @@ public class ActivityService {
 
     public List<ActivityDto> findAllNonExpiredByCityId(Long cityId,Integer pageNum) {
 
-        Pageable pageable  =PageRequest.of(pageNum,20);
+        Pageable pageable  =PageRequest.of(pageNum,10);
         List<Activity> activities = activityRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId),pageable);
         List<ActivityDto> activityDtos = new ArrayList<>();
 

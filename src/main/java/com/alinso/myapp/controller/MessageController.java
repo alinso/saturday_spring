@@ -44,9 +44,9 @@ public class MessageController {
     }
 
 
-    @GetMapping("/conversations")
-    public ResponseEntity<?> conversations(){
-        List<ConversationDto> conversationDtos = messageService.getMyConversations();
+    @GetMapping("/conversations/{pageNum}")
+    public ResponseEntity<?> conversations(@PathVariable("pageNum") Integer pageNum){
+        List<ConversationDto> conversationDtos = messageService.getMyConversations(pageNum);
 
         return new ResponseEntity<>(conversationDtos,HttpStatus.OK);
     }

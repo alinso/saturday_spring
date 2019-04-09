@@ -71,7 +71,12 @@ public class BlockService {
     }
 
     public Boolean isThereABlock(Long oppositId){
-        if(SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")){ //if user not logged in cannot control the blockage status
+        if(SecurityContextHolder.getContext().getAuthentication()==null){
+            //and this means that event triggered by the system(ex: new review available )
+            return false;
+        }
+        if(SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")){
+            //and this means that event triggered by the system(ex: register )
             return false;
         }
         return (isBlockedIt(oppositId) || isBlockedByIt(oppositId));

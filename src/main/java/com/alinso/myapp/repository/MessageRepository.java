@@ -2,6 +2,7 @@ package com.alinso.myapp.repository;
 
 import com.alinso.myapp.entity.Message;
 import com.alinso.myapp.entity.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,6 +24,6 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query(value = "select o from Message o left join Message b " +
             "on (o.reader = b.reader and o.writer = b.writer and o.createdAt<b.createdAt) " +
             "where b.createdAt is null and (o.reader=:me or o.writer=:me) order by o.createdAt desc")
-    List<Message> latestMessageFromEachConversation(@Param("me") User me);
+    List<Message> latestMessageFromEachConversation(@Param("me") User me, Pageable pageable);
 
 }

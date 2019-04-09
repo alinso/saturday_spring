@@ -6,6 +6,7 @@ import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.notification.NotificationDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
+import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.entity.enums.NotificationType;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
@@ -17,6 +18,8 @@ import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.UserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -92,15 +95,19 @@ public class NotificationService {
         for(Activity activity : activityList){
             //check if attendants are more than one
             Long meetingId  = activity.getId();
-            if(activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED)>1){
+            if(activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED)>0){
                 //send notification to creator
                 createNotification(activity.getCreator(),null,NotificationType.MEETING_COMMENT_AVAILABLE, meetingId.toString());
-                mailService.newReviewAvailableMail(activity.getCreator(),meetingId);
+                if(!androidPushNotificationsService.newReviewAvailable(activity.getCreator())) {
+                    mailService.newReviewAvailableMail(activity.getCreator(), meetingId);
+                }
                 //send notification to attendants
                 List<User> attendants  = activityRequesRepository.attendantsOfActivity(activity, ActivityRequestStatus.APPROVED);
                 for(User attendant :attendants){
                     createNotification(attendant,null,NotificationType.MEETING_COMMENT_AVAILABLE,meetingId.toString());
-                    mailService.newReviewAvailableMail(attendant,meetingId);
+                    if(!androidPushNotificationsService.newReviewAvailable(attendant)) {
+                        mailService.newReviewAvailableMail(attendant, meetingId);
+                    }
                 }
             }
             activity.setCommentNotificationSent(true);
@@ -111,35 +118,41 @@ public class NotificationService {
     public void newMessage(User target){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.MESSAGE,null);
-        mailService.sendNewMessageMail(target,trigger);
-        androidPushNotificationsService.newMessage(trigger,target);
+        if(!androidPushNotificationsService.newMessage(trigger,target)) {
+            mailService.sendNewMessageMail(target, trigger);
+        }
     }
 
     public void newRequest(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REQUEST,itemId.toString());
-        mailService.sendNewRequestMail(target,trigger,itemId);
-        androidPushNotificationsService.newRequest(trigger,target);
+        if(!androidPushNotificationsService.newRequest(trigger,target)) {
+            mailService.sendNewRequestMail(target,trigger,itemId);
+        }
     }
 
     public void newRequestApproval(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REQUEST_APPROVAL,itemId.toString());
-        mailService.sendNewRequestApprovalMail(target,trigger,itemId);
-        androidPushNotificationsService.newRequestApproval(trigger,target);
+        if(!androidPushNotificationsService.newRequestApproval(trigger,target)){
+            mailService.sendNewRequestApprovalMail(target,trigger,itemId);
+        }
     }
 
     public void newReview(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REVIEW,itemId.toString());
-        mailService.newReviewMail(target,trigger,itemId);
-        androidPushNotificationsService.newReview(trigger,target);
+        if(!androidPushNotificationsService.newReview(trigger,target)) {
+            mailService.newReviewMail(target, trigger, itemId);
+        }
+
     }
     public void newMeeting(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.FOLLOWING,itemId.toString());
-        mailService.sendNewActivityMail(target,trigger,itemId);
-        androidPushNotificationsService.newMeeting(trigger,target);
+        if(!androidPushNotificationsService.newMeeting(trigger,target)) {
+            mailService.sendNewActivityMail(target, trigger, itemId);
+        }
     }
     public void newGeneral(String message,User target){
         createNotification(target,null,NotificationType.GENERAL,message);
@@ -169,7 +182,8 @@ public class NotificationService {
         //now the target is logged user because we are reading notifications now, not creating
         User target  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        List<Notification> notifications = notificationRepository.findByTargetOrderByCreatedAtDesc(target);
+        Pageable pageable  = PageRequest.of(0,20);
+        List<Notification> notifications = notificationRepository.findByTargetOrderByCreatedAtDesc(target,pageable);
         List<NotificationDto> notificationDtos  =transformFromEntityToDtoList(notifications);
 
         return notificationDtos;
@@ -224,9 +238,15 @@ public class NotificationService {
     }
 
     public void newGreetingMessage(User target) {
-        User trigger  =userService.findEntityById(Long.valueOf(1));
+        User trigger  =null;
+        if (target.getGender() == Gender.FEMALE)
+            trigger = userService.findEntityById(Long.valueOf(33));
+        else
+            trigger = userService.findEntityById(Long.valueOf(1));
+
+
         createNotification(target,trigger,NotificationType.MESSAGE,null);
-        mailService.sendNewMessageMail(target,trigger);
+       // mailService.sendNewMessageMail(target,trigger);
     }
 }
 

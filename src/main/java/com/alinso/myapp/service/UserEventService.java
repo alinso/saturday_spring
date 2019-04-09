@@ -128,6 +128,7 @@ public class UserEventService {
         if(activityRequest.getActivityRequestStatus()==ActivityRequestStatus.APPROVED){
             User user = activityRequest.getApplicant();
             user.setPoint(user.getPoint()-NEW_ACTIVITY_POINT);
+            user.setActivityCount(user.getActivityCount()-1);
             userRepository.save(user);
         }
     }
@@ -199,6 +200,7 @@ public class UserEventService {
     notificationService.newGreetingMessage(child);
 
     //TODO: WİLL BE REMOVED IN FUTURE
-        premiumService.saveGift(child,PremiumDuration.ONE_MONTH);
+        //
+        // premiumService.saveGift(child,PremiumDuration.ONE_MONTH);
     }
 }

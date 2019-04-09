@@ -54,6 +54,13 @@ public class UserValidator implements Validator {
             errors.rejectValue("gender","Match", "Cinsiyet Seçiniz");
         }
 
+
+        if(user.getGender()== Gender.MALE){
+            errors.rejectValue("gender","Match", "Erkek kontenjanımız dolu olduğu için geçici olarak erkek kayıtlarımızı durdurduk." +
+                    " Açıldığında Instagramdan duyurusunu yapacağız, teşekkür ederiz");
+        }
+
+
         if(!user.getReferenceCode().equals("")) {
             User parent = referenceService.findByCode(user.getReferenceCode());
             if (parent == null) {

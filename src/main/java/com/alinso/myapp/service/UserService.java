@@ -1,5 +1,6 @@
 package com.alinso.myapp.service;
 
+import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.ForgottenPasswordToken;
 import com.alinso.myapp.entity.MailVerificationToken;
 import com.alinso.myapp.entity.User;
@@ -81,11 +82,14 @@ public class UserService {
     //this the registration without mail verification
     public User register(User newUser) {
 
+        City ankara = cityService.findById(Long.valueOf(1));
+
         newUser.setConfirmPassword("");
         newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
         newUser.setPhotoCount(0);
         newUser.setReviewCount(0);
         newUser.setPoint(0);
+        newUser.setCity(ankara);
         newUser.setActivityCount(0);
         newUser.setEnabled(true);
 
@@ -102,7 +106,7 @@ public class UserService {
     }
 
 
-    public Integer getUserCount(){
+    public Integer getUserCount() {
         return userRepository.getUserCount();
     }
 
@@ -239,11 +243,16 @@ public class UserService {
 
 
     public void deleteById(Long id) {
+
         try {
-            userRepository.deleteById(id);
+            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
+            delete_user_sp.setParameter("userId",id);
+            delete_user_sp.execute();
+
         } catch (Exception e) {
-            throw new UserWarningException("user not found id : " + id);
+            e.printStackTrace();
         }
+
     }
 
     public String updateProfilePic(SinglePhotoUploadDto singlePhotoUploadDto) {
@@ -274,8 +283,8 @@ public class UserService {
 
     public List<ProfileDto> searchUser(String searchText, Integer pageNum) {
 
-        Pageable pageable  = PageRequest.of(pageNum,20);
-        List<User> users = userRepository.searchUser(searchText ,pageable);
+        Pageable pageable = PageRequest.of(pageNum, 20);
+        List<User> users = userRepository.searchUser(searchText, pageable);
         List<ProfileDto> profileDtos = new ArrayList<>();
         for (User user : users) {
             profileDtos.add(toProfileDto(user));
@@ -299,24 +308,24 @@ public class UserService {
         return dtos;
     }
 
-    @Scheduled(fixedRate = 60*60 * 1000, initialDelay = 60 * 1000)
-    public void deleteTestUser() {
-        try {
-            User test = userRepository.findByEmail("ankaratangoclub@gmail.com").get();
-            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
-            delete_user_sp.setParameter("userId", test.getId());
-            delete_user_sp.execute();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            User test2 = userRepository.findByEmail("cincihocam@hotmail.com").get();
-            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
-            delete_user_sp.setParameter("userId", test2.getId());
-            delete_user_sp.execute();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+//    @Scheduled(fixedRate = 60*60 * 1000, initialDelay = 60 * 1000)
+//    public void deleteTestUser() {
+//        try {
+//            User test = userRepository.findByEmail("ankaratangoclub@gmail.com").get();
+//            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
+//            delete_user_sp.setParameter("userId", test.getId());
+//            delete_user_sp.execute();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            User test2 = userRepository.findByEmail("cincihocam@hotmail.com").get();
+//            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
+//            delete_user_sp.setParameter("userId", test2.getId());
+//            delete_user_sp.execute();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
 }
