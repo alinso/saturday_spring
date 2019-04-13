@@ -150,4 +150,14 @@ public class ActivityRequestService {
         }
     }
 
+    public boolean haveTheseUsersMeet(Long id1, Long id2){
+        User user1 = userService.findEntityById(id1);
+        User user2  =userService.findEntityById(id2);
+
+        Integer user1host =  activityRequesRepository.haveUser1HostUser2(user1,user2,ActivityRequestStatus.APPROVED);
+        Integer user2host =  activityRequesRepository.haveUser1HostUser2(user2,user1,ActivityRequestStatus.APPROVED);
+
+        return (user1host>0 || user2host > 0);
+    }
+
 }

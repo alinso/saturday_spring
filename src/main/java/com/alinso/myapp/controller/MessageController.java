@@ -2,6 +2,7 @@ package com.alinso.myapp.controller;
 
 import com.alinso.myapp.entity.dto.message.ConversationDto;
 import com.alinso.myapp.entity.dto.message.MessageDto;
+import com.alinso.myapp.service.ActivityRequestService;
 import com.alinso.myapp.service.MessageService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class MessageController {
     @Autowired
     MapValidationErrorUtil mapValidationErrorUtil;
 
+
+    @Autowired
+    ActivityRequestService activityRequestService;
 
 
     @PostMapping("/send")
@@ -56,6 +60,12 @@ public class MessageController {
     public ResponseEntity<?> deleteCoversation(@PathVariable("otherId") Long otherId){
         messageService.deleteConversation(otherId);
         return new ResponseEntity<String>("Ok",HttpStatus.OK);
+    }
+
+
+    @GetMapping("haveTheseUsersMeet/{id1}/{id2}")
+    public ResponseEntity<Boolean> haveTheseUsersMeet(@PathVariable("id1") Long id1,@PathVariable("id2") Long id2 ){
+        return new ResponseEntity<Boolean>(activityRequestService.haveTheseUsersMeet(id1,id2),HttpStatus.OK);
     }
 
 }
