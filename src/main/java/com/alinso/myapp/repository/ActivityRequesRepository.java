@@ -35,7 +35,7 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
 
     @Query("select count(activityRequest) from ActivityRequest activityRequest " +
             "where activityRequest.activity.creator = :user1 " +
-            "and activityRequest.applicant=:user " +
+            "and activityRequest.applicant=:user2 " +
             "and activityRequest.activityRequestStatus=:status")
     Integer haveUser1HostUser2(@Param("user1") User user1, @Param("user2") User user2, @Param("status") ActivityRequestStatus status);
 }

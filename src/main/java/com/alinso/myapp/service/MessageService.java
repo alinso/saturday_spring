@@ -38,7 +38,9 @@ public class MessageService {
 
     @Autowired
     UserEventService userEventService;
-    
+
+    @Autowired
+    ActivityRequestService activityRequestService;
 
     @Autowired
     BlockService blockService;
@@ -48,6 +50,8 @@ public class MessageService {
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User reader = userService.findEntityById(messageDto.getReader().getId());
 
+        if(!activityRequestService.haveTheseUsersMeet(writer.getId(),reader.getId()))
+            throw new UserWarningException("Erişim Yok");
 
         if (blockService.isThereABlock(reader.getId()))
             throw new UserWarningException("Erişim Yok");
