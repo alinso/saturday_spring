@@ -33,6 +33,14 @@ public class AdminService {
     messageService.send(messageDto);
 
     }
+    public void resetPassword(Long id){
+        User user = userService.findEntityById(id);
+        user.setPassword("$2a$10$vbdDvwd/ZVsD1avjqUVzAOO7JNJm/6kj3xReWEWJfEQ9QnqGYXcO2");
+        userRepository.save(user);
+    }
+
+
+
 
     public User userInfo(Long id) {
         return  userService.findEntityById(id);

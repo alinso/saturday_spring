@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@RequestMapping("sdklsdf")
+@RequestMapping("lkaldjfnuterhjbsfsdf")
 @RestController
 public class AdminController {
 
@@ -60,6 +60,12 @@ public class AdminController {
         User user  =adminService.userInfo(id);
         return new ResponseEntity<>(user,HttpStatus.OK);
 
+    }
+
+    @GetMapping("resetPassword/{id}")
+    public ResponseEntity<String> resetPassword(@PathVariable("id") Long id){
+        adminService.resetPassword(id);
+        return new ResponseEntity<>("okk",HttpStatus.OK);
     }
 
 

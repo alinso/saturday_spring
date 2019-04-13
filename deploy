@@ -1,0 +1,15 @@
+mv src/main/resources/application.properties src/main/resources/application_local.properties
+mv application_deploy.properties src/main/resources/application.properties
+mvn clean install
+mv src/main/resources/application.properties application_deploy.properties
+mv src/main/resources/application_local.properties src/main/resources/application.properties
+
+
+mv target/af-0.0.1-SNAPSHOT.jar af.jar
+gcloud compute scp af.jar alinso@afserver2:/tmp
+rm af.jar
+gcloud compute ssh alinso@afserver2
+sudo service af stop
+sudo mv /tmp/af.jar /opt/af/af.jar
+sudo service af start
+exit
