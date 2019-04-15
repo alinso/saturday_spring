@@ -55,10 +55,10 @@ public class UserValidator implements Validator {
         }
 
 
-        if(user.getGender()== Gender.MALE){
-            errors.rejectValue("gender","Match", "Erkek kontenjanımız dolu olduğu için geçici olarak erkek kayıtlarımızı durdurduk." +
-                    " Açıldığında Instagramdan duyurusunu yapacağız, teşekkür ederiz");
-        }
+//        if(user.getGender()== Gender.MALE){
+//            errors.rejectValue("gender","Match", "Erkek kontenjanımız dolu olduğu için geçici olarak erkek kayıtlarımızı durdurduk." +
+//                    " Açıldığında Instagramdan duyurusunu yapacağız, teşekkür ederiz");
+//        }
 
 
         if(!user.getReferenceCode().equals("")) {

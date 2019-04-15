@@ -83,6 +83,16 @@ public class UserController {
         return ResponseEntity.ok(new JWTLoginSucessReponse(true, jwt, user.getProfilePicName(),user.getCityId()));
     }
 
+    @GetMapping("deleteAccount/{userId}")
+    public ResponseEntity<String> deleteAccount(@PathVariable("userId") Long userId){
+        User currentUser  =(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(currentUser.getId() == userId){
+            userService.deleteById(userId);
+        }
+        return new ResponseEntity<>("Silindi",HttpStatus.OK);
+    }
+
     @GetMapping("userCount")
     public ResponseEntity<?> userCount(){
         return new ResponseEntity<>(userService.getUserCount(),HttpStatus.OK);

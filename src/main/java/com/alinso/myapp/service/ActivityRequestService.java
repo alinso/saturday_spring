@@ -123,8 +123,8 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity){
         Integer c= activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED);
-        if(c==4){
-            throw  new UserWarningException("Her aktivite için en fazla 4 kişi onaylayabilirsiniz");
+        if(c==8){
+            throw  new UserWarningException("Her aktivite için en fazla 8 kişi onaylayabilirsiniz");
         }
     }
 

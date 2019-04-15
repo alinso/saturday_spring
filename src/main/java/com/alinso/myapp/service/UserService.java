@@ -1,9 +1,7 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.entity.City;
-import com.alinso.myapp.entity.ForgottenPasswordToken;
-import com.alinso.myapp.entity.MailVerificationToken;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.*;
+import com.alinso.myapp.entity.dto.activity.ActivityDto;
 import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
 import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
@@ -23,7 +21,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,19 +38,25 @@ public class UserService {
     HashtagService hashtagService;
 
     @Autowired
+    FileStorageUtil fileStorageUtil;
+
+    @Autowired
     EntityManager entityManager;
 
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired PhotoService photoService;
+
     @Autowired
     UserRepository userRepository;
 
     @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    ActivityService activityService;
 
     @Autowired
-    FileStorageUtil fileStorageUtil;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
 
     @Autowired
     ReferenceService referenceService;
@@ -245,6 +248,26 @@ public class UserService {
     public void deleteById(Long id) {
 
         try {
+
+            User user  = userRepository.getOne(id);
+
+            //Delete profile photo
+            String profilePhoto = user.getProfilePicName();
+            fileStorageUtil.deleteFile(profilePhoto);
+
+            //Delete album photos
+            List<Photo> photos  = photoService.findByUserId(id);
+            for(Photo p : photos){
+                photoService.deletePhoto(p.getFileName());
+            }
+
+            //Delete Activity Photos
+            List<ActivityDto> activities = activityService.activitiesOfUser(id);
+            for(ActivityDto a:activities){
+                fileStorageUtil.deleteFile(a.getPhotoName());
+            }
+
+
             StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
             delete_user_sp.setParameter("userId",id);
             delete_user_sp.execute();
