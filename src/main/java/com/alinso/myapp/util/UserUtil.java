@@ -10,7 +10,7 @@ public class UserUtil {
 
     public static void checkUserOwner(Long ownerIdOfEntity){
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(ownerIdOfEntity != loggedUser.getId())
+        if(ownerIdOfEntity != loggedUser.getId() && !loggedUser.getRole().equals("ROLE_ADMIN"))
             throw new UserWarningException("Bunu yapmaya yetkiniz yok");
     }
 

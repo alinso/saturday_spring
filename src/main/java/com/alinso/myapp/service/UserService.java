@@ -10,6 +10,7 @@ import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
+import com.alinso.myapp.repository.ActivityRepository;
 import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.service.security.ForgottenPasswordTokenService;
 import com.alinso.myapp.service.security.MailVerificationTokenService;
@@ -53,6 +54,9 @@ public class UserService {
 
     @Autowired
     ActivityService activityService;
+
+    @Autowired
+    ActivityRepository activityRepository;
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -262,8 +266,9 @@ public class UserService {
             }
 
             //Delete Activity Photos
-            List<ActivityDto> activities = activityService.activitiesOfUser(id);
-            for(ActivityDto a:activities){
+             List<Activity> meetingsCreatedByUser = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+            for(Activity a:meetingsCreatedByUser){
+                if(a.getPhotoName()!=null)
                 fileStorageUtil.deleteFile(a.getPhotoName());
             }
 
