@@ -45,7 +45,7 @@ public class ReviewService {
     @Autowired
     BlockService blockService;
 
-    private final Integer DAYS_TO_WRITE_REVIEW = -10;
+    private final Integer DAYS_TO_WRITE_REVIEW = -2;
     private final Integer HOURS_TO_WRITE_REVIEW = -1;
 
 
@@ -81,27 +81,41 @@ public class ReviewService {
         List<Activity> recentMeetingsCreatedByOther = activityRepository.recentActivitiesOfCreator(start.getTime(), finish.getTime(), other);
 
 
-        //let say users havent meet initially
-        Boolean result = false;
-
         //have I attend his activity?
         for (Activity activity : recentMeetingsCreatedByOther) {
             if (haveUserAttendMeeting(activity, me)) {
-                result = true;
-                break;
+                return true;
             }
         }
 
         //has he attend my activity
         //if I already attend one of him no need to check this
-        if (!result)
+
             for (Activity activity : recentMeetingsCreatedByMe) {
                 if (haveUserAttendMeeting(activity, other)) {
-                    result = true;
-                    break;
+                    return true;
                 }
             }
-        return result;
+
+        //has we attend same activity
+        //if they hosted by saame activity
+        List<Activity> activityList1  =activityRequesRepository.activitiesAttendedByUser(me,ActivityRequestStatus.APPROVED);
+        List<Activity> activityList2  =activityRequesRepository.activitiesAttendedByUser(other,ActivityRequestStatus.APPROVED);
+
+
+        for(Activity a1 : activityList1){
+            for(Activity a2:activityList2){
+                if(a1.getId()==a2.getId()){
+                    long DAY_IN_MS = 1000 * 60 * 60 * 24;
+                    Date twoDaysAgo = new Date(System.currentTimeMillis() - (2 * DAY_IN_MS));
+                    if(a1.getDeadLine().compareTo(twoDaysAgo)>0){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+
     }
 
     public void writeReview(ReviewDto reviewDto) {
@@ -110,14 +124,16 @@ public class ReviewService {
 
         Boolean haveUsersMeetRecently = haveUsersMeetRecently(writer, reader);
 
-        if (blockService.isThereABlock(reader.getId()))
-            throw new UserWarningException("Erişim Yok");
+//        if (blockService.isThereABlock(reader.getId()))
+//            throw new UserWarningException("Erişim Yok");
 
-        if (reviewDto.getReviewType() == ReviewType.MEETING && !haveUsersMeetRecently)
-            throw new UserWarningException("Daha önce bir aktiviteye katılmadınız!");
+        if(!haveUsersMeetRecently){
+            throw  new UserWarningException("Bu kişi ile son 2 gün içinde onaylanmış bir aktiviten yok, yalnız ortak aktiviten olan kişilere yorum yazabilirsin.\n" +
+                    "Sosyalleşmek için bir aktivite oluşturabilir veya birine katılabilirsin :) ");
+        }
 
         if (isReviewedBefore(reviewDto.getReader().getId()))
-            throw new UserWarningException("Bir kişi için daha önce referans yazdınız");
+            throw new UserWarningException("Bir kişi için daha önce yorum yazdın");
 
 
         Review review = modelMapper.map(reviewDto, Review.class);
@@ -125,11 +141,10 @@ public class ReviewService {
         review.setReader(reader);
         if(haveUsersMeetRecently)
             review.setReviewType(ReviewType.MEETING);
-        if(!haveUsersMeetRecently)
-            review.setReviewType(ReviewType.FRIEND);
+
 
         reviewRepository.save(review);
-        userEventService.reviewWritten(reader, review);
+        //userEventService.reviewWritten(reader, review);
 
     }
 
@@ -153,7 +168,11 @@ public class ReviewService {
             throw new UserWarningException("Erişim Yok");
 
 
-        List<Review> reviews = reviewRepository.findByReader(user);
+        Calendar twoDaysAgo = Calendar.getInstance();
+        twoDaysAgo.setTime(new Date());
+        twoDaysAgo.add(Calendar.DATE, DAYS_TO_WRITE_REVIEW);
+
+        List<Review> reviews = reviewRepository.findByReaderBefore2Days(user,twoDaysAgo.getTime());
 
         List<ReviewDto> reviewDtos = new ArrayList<>();
         for (Review review : reviews) {

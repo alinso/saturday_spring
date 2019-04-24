@@ -156,14 +156,35 @@ public class ActivityRequestService {
             return true;
         if(id1==33  || id2 == 33)
             return true;
+        if(id1==55  || id2 == 55)
+            return true;
 
         User user1 = userService.findEntityById(id1);
         User user2  =userService.findEntityById(id2);
 
+
+        //if they hosted each other
         Integer user1host =  activityRequesRepository.haveUser1HostUser2(user1,user2,ActivityRequestStatus.APPROVED);
         Integer user2host =  activityRequesRepository.haveUser1HostUser2(user2,user1,ActivityRequestStatus.APPROVED);
 
-        return (user1host>0 || user2host > 0);
+        if(user1host>0 || user2host>0)
+            return true;
+
+
+        //if they hosted by saame activity
+        List<Activity> activityList1  =activityRequesRepository.activitiesAttendedByUser(user1,ActivityRequestStatus.APPROVED);
+        List<Activity> activityList2  =activityRequesRepository.activitiesAttendedByUser(user2,ActivityRequestStatus.APPROVED);
+
+
+        for(Activity a1 : activityList1){
+            for(Activity a2:activityList2){
+                if(a1.getId()==a2.getId()){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
+
 
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -17,4 +18,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Review myPreviousReview(@Param("me") User me, @Param("other")User other);
 
     List<Review> findByReader(User reader);
+
+    @Query("select review from Review review where review.reader=:reader and review.createdAt<:twoDaysAgo")
+    List<Review> findByReaderBefore2Days(@Param("reader")User reader, @Param("twoDaysAgo") Date twoDaysAgo);
 }
