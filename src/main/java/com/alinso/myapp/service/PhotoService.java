@@ -55,7 +55,7 @@ public class PhotoService {
             photo.setFileName(newName);
             photo.setUser(user);
             photoRepository.save(photo);
-            userEventService.newPhotoAdded();
+      //      userEventService.newPhotoAdded();
 
         }
 
@@ -78,7 +78,7 @@ public class PhotoService {
         if(photo!=null){
             fileStorageService.deleteFile(photoName);
             photoRepository.delete(photo);
-            userEventService.photoDeleted();
+        //    userEventService.photoDeleted();
         }
     }
 

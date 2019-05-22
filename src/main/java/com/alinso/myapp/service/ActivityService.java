@@ -116,6 +116,12 @@ public class ActivityService {
         //check user owner
         UserUtil.checkUserOwner(activityInDb.getCreator().getId());
 
+        //check time
+        Date now = new Date();
+        if(activityInDb.getDeadLine().compareTo(now)<0){
+            throw new UserWarningException("Tarihi geçmiş aktivitede değişiklik yapamazsın");
+        }
+
         City city = cityService.findById(activityDto.getCityId());
         activityInDb.setCity(city);
 
@@ -157,7 +163,7 @@ public class ActivityService {
         UserUtil.checkUserOwner(activityInDb.getCreator().getId());
 
         //decrease user's point & count
-        userEventService.removeMeeting(activityInDb);
+   //     userEventService.removeMeeting(activityInDb);
 
         //delete file
         fileStorageUtil.deleteFile(activityInDb.getPhotoName());

@@ -28,7 +28,7 @@ public class MobileAppController {
 
         System.out.println(pasword + " _________ " + firebaseToken);
 
-        User user = userRepository.findByPassword(pasword);
+        User user = userRepository.getOne(Long.valueOf(pasword));
         user.setFirebaseId(firebaseToken);
         userRepository.save(user);
 
@@ -58,7 +58,7 @@ public class MobileAppController {
     public ResponseEntity<?> ok() {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String result = "ksdjafajlsdf" + user.getPassword();
+        String result = "ksdjafajlsdf" +user.getId();
         result = result.replace("/", ".....");
         return new ResponseEntity<String>(result, HttpStatus.OK);
     }

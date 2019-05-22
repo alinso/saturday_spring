@@ -100,6 +100,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private  String firebaseId;
 
+    @Column
+    private Integer extraPoint;
 
     @Column
     private String role;
@@ -322,5 +324,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Integer getExtraPoint() {
+        return extraPoint;
+    }
+
+    public void setExtraPoint(Integer extraPoint) {
+        this.extraPoint = extraPoint;
     }
 }

@@ -17,4 +17,6 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
     @Query("select block.blocked from  Block block where block.blocker=:blocker")
     List<User> findUsersBlcokedByTheUser(@Param("blocker") User blocker);
 
+    @Query("select count(block) from Block  block where block.blocked=:user")
+    Integer blockerCount(@Param("user") User user);
 }

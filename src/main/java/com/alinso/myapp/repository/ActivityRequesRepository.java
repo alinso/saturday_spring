@@ -19,7 +19,7 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
     public ActivityRequest findByActivityAndApplicant(@Param("applicant") User applicant, @Param("activity") Activity activity);
 
     List<ActivityRequest> findByActivityId(Long id);
-    ActivityRequest findByApplicantId(Long id);
+    List<ActivityRequest> findByApplicantId(Long id);
 
     @Query("select count(activityRequest) from ActivityRequest activityRequest " +
             "where  activityRequest.activityRequestStatus=:status and activityRequest.activity=:activity")
@@ -40,4 +40,15 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
     Integer haveUser1HostUser2(@Param("user1") User user1, @Param("user2") User user2, @Param("status") ActivityRequestStatus status);
 
 
+    @Query("select count(activityRequest) from ActivityRequest  activityRequest"+
+            " where activityRequest.activity.creator=:user")
+    Integer incomingRequestCount(@Param("user") User user);
+
+    @Query("select count(activityRequest) from ActivityRequest  activityRequest"+
+            " where activityRequest.activity.creator=:user" +
+            " and activityRequest.activityRequestStatus=:status")
+    Integer incomingApprovedRequestCount(@Param("user") User user, @Param("status") ActivityRequestStatus status);
+
+    @Query("delete from ActivityRequest r where r.activity=:activity ")
+    void deleteByActivityCreator(@Param("activity") Activity activity);
 }

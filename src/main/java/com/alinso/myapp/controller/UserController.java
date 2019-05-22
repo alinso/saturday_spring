@@ -174,6 +174,12 @@ public class UserController {
         return new ResponseEntity<ChangePasswordDto>(changePasswordDto, HttpStatus.ACCEPTED);
     }
 
+    @GetMapping("top100")
+    public ResponseEntity<?> top100(){
+        List<ProfileDto> profileDtos  =userService.top100();
+        return new ResponseEntity<List<ProfileDto>>(profileDtos,HttpStatus.OK);
+    }
+
     @PostMapping("/updateProfilePic")
     public ResponseEntity<?> changeProfilePic(SinglePhotoUploadDto singlePhotoUploadDto, BindingResult result) {
 

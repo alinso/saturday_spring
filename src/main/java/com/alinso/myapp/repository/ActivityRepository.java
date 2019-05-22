@@ -21,6 +21,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
     public List<Activity> findByCreatorOrderByDeadLineDesc(User creator);
 
+    public Integer countActivitiesByCreator(User creator);
+
     @Query("select meeting from Activity meeting where meeting.deadLine > :start and meeting.deadLine < :finish and meeting.creator=:user")
     List<Activity> recentActivitiesOfCreator(@Param("start")Date start, @Param("finish")Date finish, @Param("user")User user);
 

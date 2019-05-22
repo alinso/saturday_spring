@@ -182,7 +182,7 @@ public class MessageService {
 
         }
 
-        userEventService.messaesRead();
+      //  userEventService.messaesRead();
         return myConversationDtos;
     }
 

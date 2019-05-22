@@ -16,6 +16,7 @@ import org.springframework.validation.DataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,27 @@ public class PhotoController {
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam MultipartFile[] files) {
 
+        MultiPhotoUploadDto multiPhotoUploadDto = new MultiPhotoUploadDto();
+        multiPhotoUploadDto.setFiles(files);
+
+        DataBinder binder = new DataBinder(multiPhotoUploadDto);
+        binder.setValidator(albumValidator);
+        binder.validate();
+
+        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(binder.getBindingResult());
+        if (errorMap != null) return errorMap;
+
+        List<String> photoNames = photoService.savePhotos(files);
+
+        return new ResponseEntity<List<String>>(photoNames, HttpStatus.ACCEPTED);
+    }
+
+
+    @PostMapping("/uploadSingle")
+    public ResponseEntity<?> uploadSingle(@RequestParam MultipartFile file) {
+
+        MultipartFile[] files = new MultipartFile[1];
+        files[0] = file;
         MultiPhotoUploadDto multiPhotoUploadDto = new MultiPhotoUploadDto();
         multiPhotoUploadDto.setFiles(files);
 

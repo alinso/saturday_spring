@@ -2,16 +2,18 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.*;
 import com.alinso.myapp.entity.dto.activity.ActivityDto;
+import com.alinso.myapp.entity.dto.activity.ActivityRequestDto;
 import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
+import com.alinso.myapp.entity.dto.review.ReviewDto;
 import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
 import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
+import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
-import com.alinso.myapp.repository.ActivityRepository;
-import com.alinso.myapp.repository.UserRepository;
+import com.alinso.myapp.repository.*;
 import com.alinso.myapp.service.security.ForgottenPasswordTokenService;
 import com.alinso.myapp.service.security.MailVerificationTokenService;
 import com.alinso.myapp.util.DateUtil;
@@ -22,6 +24,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,6 +42,12 @@ public class UserService {
     HashtagService hashtagService;
 
     @Autowired
+    ReviewService reviewService;
+
+    @Autowired
+    ActivityRequestService activityRequestService;
+
+    @Autowired
     FileStorageUtil fileStorageUtil;
 
     @Autowired
@@ -46,6 +55,12 @@ public class UserService {
 
     @Autowired
     ModelMapper modelMapper;
+
+    @Autowired
+    ReviewRepository reviewRepository;
+
+    @Autowired
+    ActivityRequesRepository activityRequesRepository;
 
     @Autowired PhotoService photoService;
 
@@ -61,6 +76,8 @@ public class UserService {
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    FollowRepository followRepository;
 
     @Autowired
     ReferenceService referenceService;
@@ -104,7 +121,7 @@ public class UserService {
         //String token = mailVerificationTokenService.saveToken(user);
         //mailService.sendMailVerificationMail(user, token);
 
-        userEventService.setReferenceChain(user);
+       // userEventService.setReferenceChain(user);
         userRepository.save(user);
         userEventService.newUserRegistered(user);
 
@@ -154,7 +171,7 @@ public class UserService {
         User user = userRepository.findById(token.getUser().getId()).get();
         user.setEnabled(true);
 
-        userEventService.setReferenceChain(user);
+        //userEventService.setReferenceChain(user);
         userRepository.save(user);
         userEventService.newUserRegistered(user);
 
@@ -212,6 +229,8 @@ public class UserService {
         } catch (Exception e) {
             throw new RecordNotFound404Exception("Kullanıcı Bulunamadı: " + id);
         }
+        //user.setPoint(calculateUserPoint(user));
+        userRepository.save(user);
         return toProfileDto(user);
     }
 
@@ -254,7 +273,14 @@ public class UserService {
         try {
 
             User user  = userRepository.getOne(id);
+            List<Activity> res = activityRepository.findByCreatorOrderByDeadLineDesc(user);
 
+            for(Activity a:res){
+                List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(a.getId());
+                for(ActivityRequest r:activityRequests){
+                    activityRequesRepository.deleteById(r.getId());
+                }
+            }
             //Delete profile photo
             String profilePhoto = user.getProfilePicName();
             fileStorageUtil.deleteFile(profilePhoto);
@@ -320,6 +346,93 @@ public class UserService {
         return profileDtos;
     }
 
+
+//    @Scheduled(fixedRate = 6*60*60 * 1000, initialDelay = 60 * 1000)
+//    private void calculateAllUserPoints() {
+//        List<User> all = userRepository.findAll();
+//        List<User> toBeSaved = new ArrayList<>();
+//
+//
+//        for (User u : all) {
+//            Integer p = calculateUserPoint(u);
+//            u.setPoint(p);
+//            toBeSaved.add(u);
+//        }
+//
+//        userRepository.saveAll(toBeSaved);
+//    }
+    public Integer calculateUserPoint(User user){
+        Integer point=user.getExtraPoint();
+        if(point==null)
+            point=0;
+
+        /*
+        * send and get request : 1
+        * accept a request : 2
+        * your request is accepted :2
+        * positive review  : 4
+        * being followed  : 2
+        * being blocked -5
+        * negative review: -5
+        * */
+
+        //get request
+        Integer incomingRequestCount = activityRequesRepository.incomingRequestCount(user);
+        point = point+incomingRequestCount;
+
+        //accept a request
+        Integer incomingApprovedRequestCount = activityRequesRepository.incomingApprovedRequestCount(user,ActivityRequestStatus.APPROVED);
+        point = point+incomingApprovedRequestCount*2;
+
+        //positive-negative reviews
+        List<Review> rewiReviewList= reviewRepository.findByReader(user);
+        for(Review r : rewiReviewList){
+            if(r.getPositive())
+                point=point+4;
+            if(!r.getPositive())
+                point=point-5;
+        }
+
+        //send request and being accepted by activity owner
+        List<ActivityRequest> activityRequests = activityRequestService.activityRequesRepository.findByApplicantId(user.getId());
+        for(ActivityRequest a : activityRequests){
+            if(a.getActivityRequestStatus()== ActivityRequestStatus.APPROVED)
+                point=point+3;
+            else
+                point=point+1;
+        }
+
+        //followed by someone
+        Integer followerCount  = followRepository.findFollowerCount(user);
+        point = point + followerCount*2;
+
+        //blocked by someone
+        Integer blockedCount = blockService.blockRepository.blockerCount(user);
+        point = point - blockedCount*5;
+
+        //review limits the points
+        if(rewiReviewList.size()==0 && point>40){
+            point=40;
+        }else if(rewiReviewList.size()>0 && rewiReviewList.size()<5 && point>100){
+            point=100;
+        }
+        else if(rewiReviewList.size()>5 && rewiReviewList.size()<10 && point>200){
+            point=200;
+        }
+
+
+        return point;
+    }
+
+    public List<ProfileDto> top100(){
+        Pageable pageable = PageRequest.of(0, 100);
+        List<User> users = userRepository.top100(pageable);
+
+        List<ProfileDto> profileDtos  =toProfileDtoList(users);
+        return  profileDtos;
+    }
+
+
     public ProfileDto toProfileDto(User user) {
         ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
         profileDto.setAge(UserUtil.calculateAge(user));
@@ -330,6 +443,7 @@ public class UserService {
 
     public List<ProfileDto> toProfileDtoList(List<User> users) {
         List<ProfileDto> dtos = new ArrayList<>();
+
         for (User u : users) {
             dtos.add(toProfileDto(u));
         }
