@@ -36,6 +36,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select user from User user where user.gender=:gender and user.point=0")
     List<User> findZeroPointWomen(@Param("gender")Gender gender);
 
+
+    @Query("select user from User user where user.gender=:gender")
+    List<User> findAllWomen(@Param("gender")Gender gender);
+
+
     @Query("select user from User user where  user.point>0")
     List<User> findNonZeroUsers();
 

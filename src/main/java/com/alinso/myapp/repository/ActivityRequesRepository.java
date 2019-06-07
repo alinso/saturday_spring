@@ -44,11 +44,12 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
             " where activityRequest.activity.creator=:user")
     Integer incomingRequestCount(@Param("user") User user);
 
-    @Query("select count(activityRequest) from ActivityRequest  activityRequest"+
+    @Query("select activityRequest from ActivityRequest  activityRequest"+
             " where activityRequest.activity.creator=:user" +
             " and activityRequest.activityRequestStatus=:status")
-    Integer incomingApprovedRequestCount(@Param("user") User user, @Param("status") ActivityRequestStatus status);
+    List<ActivityRequest> incomingApprovedRequests(@Param("user") User user, @Param("status") ActivityRequestStatus status);
 
     @Query("delete from ActivityRequest r where r.activity=:activity ")
     void deleteByActivityCreator(@Param("activity") Activity activity);
+
 }

@@ -5,6 +5,7 @@ import com.alinso.myapp.entity.ActivityRequest;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
+import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.util.UserUtil;
@@ -48,6 +49,9 @@ public class ActivityRequestService {
         if (activity.getDeadLine().compareTo(new Date()) < 0)
             throw new UserWarningException("Geçmiş tarihli bir aktivitede düzenleme yapamazsınız");
 
+
+
+
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (blockService.isThereABlock(activity.getCreator().getId()))
@@ -56,6 +60,24 @@ public class ActivityRequestService {
 
         Boolean isThisUserJoined = isThisUserJoined(activity.getId());
         if (!isThisUserJoined) {
+
+
+            if(activity.getId()!=1640 && activity.getId()!=1856) {
+                //check activity req limit
+                List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
+                if ( allRequests.size() > 14)
+                    throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
+
+
+                //check male limit
+                Integer maleCount = 0;
+                for(ActivityRequest r:allRequests){
+                    maleCount++;
+                }
+                if (loggedUser.getGender() == Gender.MALE && maleCount>6)
+                    throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
+
+            }
 
             //check if user reached the limit
             dayActionService.checkRequestLimit();
@@ -127,19 +149,23 @@ public class ActivityRequestService {
     }
 
     public void checkMaxApproveCountExceeded(Activity activity) {
+
+        if(activity.getId()==1640 || activity.getId()==1856){
+            return;
+        }
+
         Integer c = activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED);
         Integer limit = 6;
         User user = activity.getCreator();
-        if (user.getPoint() > 99 && user.getPoint() < 400) {
+        if (user.getPoint() > 40 && user.getPoint() < 100) {
             limit = 10;
+        }else if(user.getPoint()>99 && user.getPoint()<400){
+            limit=15;
         }else if(user.getPoint()>399 && user.getPoint()<800){
             limit=15;
-        }else if(user.getPoint()>799 && user.getPoint()<1500){
-            limit=20;
-        }else if(user.getPoint()>1499){
-            limit=25;
+        }else if(user.getPoint()>799){
+            limit=15;
         }
-
 
         if (c == limit) {
             throw new UserWarningException("Her aktivite için en fazla "+limit+" kişi onaylayabilirsiniz");

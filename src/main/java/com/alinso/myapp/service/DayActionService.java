@@ -14,7 +14,11 @@ import org.springframework.stereotype.Service;
 public class DayActionService {
 
 
-    private final Integer REQUEST_LIMIT = 4;
+    private final Integer FEMALE_REQUEST_LIMIT = 6;
+    private final Integer REQUEST_LIMIT = 3;
+
+
+    private final Integer FEMALE_ACTIVITY_LIMIT = 4;
     private final Integer ACTIVITY_LIMIT = 2;
 
     @Autowired
@@ -53,23 +57,28 @@ public class DayActionService {
 
 
     public void removeRequest() {
-        DayAction newDayAction = getDayAction();
-        newDayAction.setRequestCount(newDayAction.getRequestCount() - 1);
-        dayActionRepository.save(newDayAction);
+//        DayAction newDayAction = getDayAction();
+//        newDayAction.setRequestCount(newDayAction.getRequestCount() - 1);
+//        dayActionRepository.save(newDayAction);
     }
 
     public void removeActivity() {
-        DayAction newDayAction = getDayAction();
-        newDayAction.setActivityCount(newDayAction.getActivityCount() - 1);
-        dayActionRepository.save(newDayAction);
+//        DayAction newDayAction = getDayAction();
+//        newDayAction.setActivityCount(newDayAction.getActivityCount() - 1);
+//        dayActionRepository.save(newDayAction);
     }
 
     public void checkActivityLimit() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
+
+        Integer limit = ACTIVITY_LIMIT;
+        if (user.getGender() == Gender.FEMALE && user.getPoint() < 50)
+            limit = FEMALE_ACTIVITY_LIMIT;
+
         if (dayAction != null)
-            if (dayAction.getActivityCount() == ACTIVITY_LIMIT) {
-                throw new UserWarningException("Haftada en fazla " + ACTIVITY_LIMIT + " aktivite açabilirsin!");
+            if (dayAction.getActivityCount() >= limit) {
+                throw new UserWarningException("Haftada en fazla " + limit + " aktivite açabilirsin!");
             }
 
 //        if(!premiumService.isUserPremium(user) && dayAction.getActivityCount() == ACTIVITY_LIMIT){
@@ -81,9 +90,16 @@ public class DayActionService {
     public void checkRequestLimit() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
+
+
+        Integer limit = REQUEST_LIMIT;
+        if (user.getGender() == Gender.FEMALE && user.getPoint() < 100)
+            limit = FEMALE_REQUEST_LIMIT;
+
+
         if (dayAction != null)
-            if (dayAction.getRequestCount() == REQUEST_LIMIT) {
-                throw new UserWarningException("Günde en fazla " + REQUEST_LIMIT + " istek gönderebilirsin!");
+            if (dayAction.getRequestCount() >= limit) {
+                throw new UserWarningException("Günde en fazla " + limit + " istek gönderebilirsin!");
             }
 
         //        if(!premiumService.isUserPremium(user) && (dayAction.getRequestCount() == REQUEST_LIMIT){
@@ -103,9 +119,8 @@ public class DayActionService {
         dayActionRepository.clearRequest();
     }
 
+
 }
-
-
 
 
 

@@ -163,7 +163,7 @@ public class UserController {
 
     @PostMapping("/updatePassword")
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto, BindingResult result) {
-
+/*/*/
         changePasswordValidator.validate(changePasswordDto, result);
 
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);

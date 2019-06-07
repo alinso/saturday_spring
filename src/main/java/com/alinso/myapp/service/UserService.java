@@ -10,6 +10,7 @@ import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
+import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
@@ -62,7 +63,8 @@ public class UserService {
     @Autowired
     ActivityRequesRepository activityRequesRepository;
 
-    @Autowired PhotoService photoService;
+    @Autowired
+    PhotoService photoService;
 
     @Autowired
     UserRepository userRepository;
@@ -121,7 +123,7 @@ public class UserService {
         //String token = mailVerificationTokenService.saveToken(user);
         //mailService.sendMailVerificationMail(user, token);
 
-       // userEventService.setReferenceChain(user);
+        // userEventService.setReferenceChain(user);
         userRepository.save(user);
         userEventService.newUserRegistered(user);
 
@@ -229,7 +231,7 @@ public class UserService {
         } catch (Exception e) {
             throw new RecordNotFound404Exception("Kullanıcı Bulunamadı: " + id);
         }
-        //user.setPoint(calculateUserPoint(user));
+//        user.setPoint(calculateUserPoint(user));
         userRepository.save(user);
         return toProfileDto(user);
     }
@@ -272,12 +274,12 @@ public class UserService {
 
         try {
 
-            User user  = userRepository.getOne(id);
+            User user = userRepository.getOne(id);
             List<Activity> res = activityRepository.findByCreatorOrderByDeadLineDesc(user);
 
-            for(Activity a:res){
+            for (Activity a : res) {
                 List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(a.getId());
-                for(ActivityRequest r:activityRequests){
+                for (ActivityRequest r : activityRequests) {
                     activityRequesRepository.deleteById(r.getId());
                 }
             }
@@ -286,21 +288,21 @@ public class UserService {
             fileStorageUtil.deleteFile(profilePhoto);
 
             //Delete album photos
-            List<Photo> photos  = photoService.findByUserId(id);
-            for(Photo p : photos){
+            List<Photo> photos = photoService.findByUserId(id);
+            for (Photo p : photos) {
                 photoService.deletePhoto(p.getFileName());
             }
 
             //Delete Activity Photos
-             List<Activity> meetingsCreatedByUser = activityRepository.findByCreatorOrderByDeadLineDesc(user);
-            for(Activity a:meetingsCreatedByUser){
-                if(a.getPhotoName()!=null)
-                fileStorageUtil.deleteFile(a.getPhotoName());
+            List<Activity> meetingsCreatedByUser = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+            for (Activity a : meetingsCreatedByUser) {
+                if (a.getPhotoName() != null)
+                    fileStorageUtil.deleteFile(a.getPhotoName());
             }
 
 
             StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
-            delete_user_sp.setParameter("userId",id);
+            delete_user_sp.setParameter("userId", id);
             delete_user_sp.execute();
 
         } catch (Exception e) {
@@ -347,7 +349,7 @@ public class UserService {
     }
 
 
-//    @Scheduled(fixedRate = 6*60*60 * 1000, initialDelay = 60 * 1000)
+    //    @Scheduled(fixedRate = 6*60*60 * 1000, initialDelay = 60 * 1000)
 //    private void calculateAllUserPoints() {
 //        List<User> all = userRepository.findAll();
 //        List<User> toBeSaved = new ArrayList<>();
@@ -361,75 +363,100 @@ public class UserService {
 //
 //        userRepository.saveAll(toBeSaved);
 //    }
-    public Integer calculateUserPoint(User user){
-        Integer point=user.getExtraPoint();
-        if(point==null)
-            point=0;
+    public Integer calculateUserPoint(User user) {
+        Integer point = user.getExtraPoint();
+        if (point == null)
+            point = 0;
 
         /*
-        * send and get request : 1
-        * accept a request : 2
-        * your request is accepted :2
-        * positive review  : 4
-        * being followed  : 2
-        * being blocked -5
-        * negative review: -5
-        * */
+         * send and get request : 1 (max:10 of activity count)
+         * accept a request : 2
+         * accept a unique request:3
+         * your request is accepted :2
+         * positive review  : 3
+         * being followed  : 2
+         * being blocked -5
+         * negative review: -5
+         * */
 
-        //get request
-        Integer incomingRequestCount = activityRequesRepository.incomingRequestCount(user);
-        point = point+incomingRequestCount;
+        //plain incoming requests
+        List<ActivityRequest> incomingRequests = activityRequesRepository.incomingApprovedRequests(user, ActivityRequestStatus.APPROVED);
+        List<Activity> userActivities  =activityRepository.findByCreatorOrderByDeadLineDesc(user);
+        Integer incomingRequestPoint = incomingRequests.size();
+        if(incomingRequestPoint>(userActivities.size()*10))
+        incomingRequestPoint=userActivities.size()*10;
+        point=point+incomingRequestPoint; //////// get request
 
-        //accept a request
-        Integer incomingApprovedRequestCount = activityRequesRepository.incomingApprovedRequestCount(user,ActivityRequestStatus.APPROVED);
-        point = point+incomingApprovedRequestCount*2;
+
+
+        List<Long> userIds = new ArrayList<>();
+        for (ActivityRequest r : incomingRequests) {
+
+            if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
+                Boolean uniqueUser = true;
+                for (Long oldUserId : userIds) {
+                    if (oldUserId == r.getApplicant().getId()) {
+                        uniqueUser = false;
+                        break;
+                    }
+                }
+                if (uniqueUser) {
+                    point = point + 1; ////////////// accept a request
+                } else {
+                    point = point + 2;
+                    userIds.add(r.getApplicant().getId()); ////////accept a unique request
+                }
+            }
+        }
+
 
         //positive-negative reviews
-        List<Review> rewiReviewList= reviewRepository.findByReader(user);
-        for(Review r : rewiReviewList){
-            if(r.getPositive())
-                point=point+4;
-            if(!r.getPositive())
-                point=point-5;
+        List<Review> rewiReviewList = reviewRepository.findByReader(user);
+        for (Review r : rewiReviewList) {
+            if (r.getPositive())
+                point = point + 3;  ////get a posivie review
+            if (!r.getPositive())
+                point = point - 5; ////get a negative review
         }
 
         //send request and being accepted by activity owner
         List<ActivityRequest> activityRequests = activityRequestService.activityRequesRepository.findByApplicantId(user.getId());
-        for(ActivityRequest a : activityRequests){
-            if(a.getActivityRequestStatus()== ActivityRequestStatus.APPROVED)
-                point=point+3;
-            else
-                point=point+1;
+        for (ActivityRequest a : activityRequests) {
+            if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
+                point = point + 2;  //////// your request is approved
+            }
+            else if(a.getActivityRequestStatus()==ActivityRequestStatus.WAITING && user.getGender()== Gender.FEMALE) {
+                point = point + 1;
+            }
         }
 
         //followed by someone
-        Integer followerCount  = followRepository.findFollowerCount(user);
-        point = point + followerCount*2;
+        Integer followerCount = followRepository.findFollowerCount(user);
+        point = point + followerCount;
 
         //blocked by someone
         Integer blockedCount = blockService.blockRepository.blockerCount(user);
-        point = point - blockedCount*5;
+        point = point - blockedCount * 5;  //////////being blocked
 
         //review limits the points
-        if(rewiReviewList.size()==0 && point>40){
-            point=40;
-        }else if(rewiReviewList.size()>0 && rewiReviewList.size()<5 && point>100){
-            point=100;
-        }
-        else if(rewiReviewList.size()>5 && rewiReviewList.size()<10 && point>200){
-            point=200;
+        if (rewiReviewList.size() == 0 && point > 30) {
+            point = 30;
+        } else if (rewiReviewList.size() > 0 && rewiReviewList.size() < 5 && point > 60) {
+            point = 60;
+        } else if (rewiReviewList.size() > 5 && rewiReviewList.size() < 10 && point > 120) {
+            point = 120;
         }
 
 
         return point;
     }
 
-    public List<ProfileDto> top100(){
+    public List<ProfileDto> top100() {
         Pageable pageable = PageRequest.of(0, 100);
         List<User> users = userRepository.top100(pageable);
 
-        List<ProfileDto> profileDtos  =toProfileDtoList(users);
-        return  profileDtos;
+        List<ProfileDto> profileDtos = toProfileDtoList(users);
+        return profileDtos;
     }
 
 
