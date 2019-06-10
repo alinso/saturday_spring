@@ -240,9 +240,9 @@ public class NotificationService {
     public void newGreetingMessage(User target) {
         User trigger  =null;
         if (target.getGender() == Gender.FEMALE)
-            trigger = userService.findEntityById(Long.valueOf(33));
+            trigger = userService.findEntityById(Long.valueOf(3212));
         else
-            trigger = userService.findEntityById(Long.valueOf(1));
+            trigger = userService.findEntityById(Long.valueOf(3212));
 
 
         createNotification(target,trigger,NotificationType.MESSAGE,null);

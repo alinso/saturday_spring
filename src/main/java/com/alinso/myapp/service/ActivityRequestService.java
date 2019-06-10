@@ -62,7 +62,7 @@ public class ActivityRequestService {
         if (!isThisUserJoined) {
 
 
-            if(activity.getId()!=1640 && activity.getId()!=1856) {
+            if(activity.getId()!=1640 && activity.getId()!=1856 && activity.getId()!=2079) {
                 //check activity req limit
                 List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
                 if ( allRequests.size() > 14)
@@ -150,7 +150,7 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity) {
 
-        if(activity.getId()==1640 || activity.getId()==1856){
+        if(activity.getId()==1640 || activity.getId()==1856 || activity.getId()==2079){
             return;
         }
 
@@ -197,12 +197,11 @@ public class ActivityRequestService {
 
     public boolean haveTheseUsersMeet(Long id1, Long id2) {
 
-        if (id1 == 1 || id2 == 1)
+        if (id1 == 3212 || id2 == 3212)
             return true;
-        if (id1 == 33 || id2 == 33)
+        if (id1 == 3211)
             return true;
-        if (id1 == 55 || id2 == 55)
-            return true;
+
 
         User user1 = userService.findEntityById(id1);
         User user2 = userService.findEntityById(id2);

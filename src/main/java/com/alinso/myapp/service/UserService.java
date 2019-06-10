@@ -380,17 +380,21 @@ public class UserService {
          * */
 
         //plain incoming requests
-        List<ActivityRequest> incomingRequests = activityRequesRepository.incomingApprovedRequests(user, ActivityRequestStatus.APPROVED);
+        Integer incomingRequestPoint  = activityRequesRepository.incomingRequestCount(user);
         List<Activity> userActivities  =activityRepository.findByCreatorOrderByDeadLineDesc(user);
-        Integer incomingRequestPoint = incomingRequests.size();
+
         if(incomingRequestPoint>(userActivities.size()*10))
         incomingRequestPoint=userActivities.size()*10;
+
         point=point+incomingRequestPoint; //////// get request
 
 
 
+
+        //approved requests
+        List<ActivityRequest> activityRequestList  =activityRequesRepository.incomingApprovedRequests( user,ActivityRequestStatus.APPROVED);
         List<Long> userIds = new ArrayList<>();
-        for (ActivityRequest r : incomingRequests) {
+        for (ActivityRequest r : activityRequestList) {
 
             if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
                 Boolean uniqueUser = true;
@@ -401,10 +405,10 @@ public class UserService {
                     }
                 }
                 if (uniqueUser) {
-                    point = point + 1; ////////////// accept a request
-                } else {
-                    point = point + 2;
+                    point = point + 2; ////////////// accept a request
                     userIds.add(r.getApplicant().getId()); ////////accept a unique request
+                } else {
+                    point = point + 1;
                 }
             }
         }

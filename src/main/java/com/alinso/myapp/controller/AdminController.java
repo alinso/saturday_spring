@@ -93,7 +93,6 @@ public class AdminController {
 
             userEventService.newMessage(message.getReader());
 
-
         }
         return new ResponseEntity<>("okk", HttpStatus.OK);
 
@@ -126,6 +125,7 @@ public class AdminController {
         return new ResponseEntity<>("okk", HttpStatus.OK);
 
     }
+
 
     @GetMapping("userInfo/{id}")
     public ResponseEntity<User> userInfo(@PathVariable("id") Long id) {

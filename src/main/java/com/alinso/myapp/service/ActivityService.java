@@ -63,6 +63,8 @@ public class ActivityService {
     @Autowired
     DayActionService dayActionService;
 
+    @Autowired
+    AdminService adminService;
 
 
     public ActivityDto findById(Long id) {
@@ -148,7 +150,7 @@ public class ActivityService {
         //balon futbolu
         if(pageNum==0) {
             Activity selected2 = activityRepository.findById(Long.valueOf(1640)).get();
-            Activity selected = activityRepository.findById(Long.valueOf(1856)).get();
+            Activity selected = activityRepository.findById(Long.valueOf(2079)).get();
             activityDtos.add(toDto(selected));
             activityDtos.add(toDto(selected2));
         }
@@ -171,6 +173,8 @@ public class ActivityService {
 
         //check user authorized
         UserUtil.checkUserOwner(activityInDb.getCreator().getId());
+        if(user.getId()==3211)
+            adminService.deleteActivity(id);
 
         //decrease user's point & count
    //     userEventService.removeMeeting(activityInDb);
