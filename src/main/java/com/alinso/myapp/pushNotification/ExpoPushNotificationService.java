@@ -35,16 +35,13 @@ public class ExpoPushNotificationService {
             body.put("to", to);
             body.put("Content-Type", "application/json");
 
-//            JSONObject notification = new JSONObject();
-//            notification.put("title", title);
-//            notification.put("body", message);
-//            notification.put("screen",screen);
-//            notification.put("idOfScreen",idOfScreen);
+            JSONObject notification = new JSONObject();
+            notification.put("screen",screen);
+            notification.put("idOfScreen",idOfScreen);
 
             body.put("title", title);
             body.put("body", message);
-            body.put("screen", screen);
-            body.put("idOfScreen", idOfScreen);
+            body.put("data",notification);
 
 
             HttpEntity<String> request = new HttpEntity<>(body.toString());
