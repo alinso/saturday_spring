@@ -114,7 +114,7 @@ public class AdminController {
     @GetMapping("deleteUser/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
 
-        userService.deleteById(id);
+        userService.deleteByIdAdmin(id);
         return new ResponseEntity<>("okk", HttpStatus.OK);
 
     }

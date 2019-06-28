@@ -62,7 +62,7 @@ public class ActivityRequestService {
         if (!isThisUserJoined) {
 
 
-            if(activity.getId()!=1640 && activity.getId()!=1856 && activity.getId()!=2079) {
+            if(activity.getId()!=1640 && activity.getId()!=1856 && activity.getId()!=2079 && activity.getId()!=2037 && activity.getId()!=2176  && activity.getId()!=2417) {
                 //check activity req limit
                 List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
                 if ( allRequests.size() > 14)
@@ -150,7 +150,7 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity) {
 
-        if(activity.getId()==1640 || activity.getId()==1856 || activity.getId()==2079){
+        if(activity.getId()==1640 || activity.getId()==1856 || activity.getId()==2079  || activity.getId()==2037  || activity.getId()==2176 || activity.getId()==2417){
             return;
         }
 
@@ -199,7 +199,7 @@ public class ActivityRequestService {
 
         if (id1 == 3212 || id2 == 3212)
             return true;
-        if (id1 == 3211)
+        if (id2 == 3211)
             return true;
 
 

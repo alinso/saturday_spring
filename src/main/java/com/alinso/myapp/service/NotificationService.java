@@ -11,6 +11,7 @@ import com.alinso.myapp.entity.enums.NotificationType;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
 import com.alinso.myapp.pushNotification.AndroidPushNotificationsService;
+import com.alinso.myapp.pushNotification.ExpoPushNotificationService;
 import com.alinso.myapp.repository.ActivityRepository;
 import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.repository.NotificationRepository;
@@ -42,6 +43,9 @@ public class NotificationService {
 
     @Autowired
     AndroidPushNotificationsService androidPushNotificationsService;
+
+    @Autowired
+    ExpoPushNotificationService expoPushNotificationService;
 
     @Autowired
     MailService  mailService;
@@ -118,6 +122,7 @@ public class NotificationService {
     public void newMessage(User target){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.MESSAGE,null);
+        expoPushNotificationService.newMessage(trigger,target);
         if(!androidPushNotificationsService.newMessage(trigger,target)) {
             mailService.sendNewMessageMail(target, trigger);
         }

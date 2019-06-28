@@ -20,9 +20,9 @@ public class HashtagController {
     @Autowired
     HashtagService hashtagService;
 
-    @GetMapping("findActivities/{hashtag}")
-    public ResponseEntity<?> findActivities(@PathVariable("hashtag") String hashtag){
-        List<ActivityDto> activityDtoList = hashtagService.findActivitiesByHashtag(hashtag);
+    @GetMapping("findActivities/{hashtag}/{pageNum}")
+    public ResponseEntity<?> findActivities(@PathVariable("hashtag") String hashtag, @PathVariable("pageNum") Integer pageNum){
+        List<ActivityDto> activityDtoList = hashtagService.findActivitiesByHashtag(hashtag,pageNum);
         return new ResponseEntity<List>(activityDtoList, HttpStatus.OK);
     }
 

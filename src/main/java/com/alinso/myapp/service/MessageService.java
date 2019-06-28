@@ -50,7 +50,7 @@ public class MessageService {
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User reader = userService.findEntityById(messageDto.getReader().getId());
 
-        if(!activityRequestService.haveTheseUsersMeet(writer.getId(),reader.getId()))
+        if(!activityRequestService.haveTheseUsersMeet(reader.getId(),writer.getId()))
             throw new UserWarningException("Erişim Yok");
 
         if (blockService.isThereABlock(reader.getId()))

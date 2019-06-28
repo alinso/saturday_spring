@@ -481,6 +481,54 @@ public class UserService {
         return dtos;
     }
 
+    public void deleteByIdAdmin(Long id) {
+        try {
+
+            User user = userRepository.getOne(id);
+            List<Activity> res = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+
+            for (Activity a : res) {
+                List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(a.getId());
+                for (ActivityRequest r : activityRequests) {
+                    activityRequesRepository.deleteById(r.getId());
+                }
+            }
+            //Delete profile photo
+            String profilePhoto = user.getProfilePicName();
+            fileStorageUtil.deleteFile(profilePhoto);
+
+            //Delete album photos
+            List<Photo> photos = photoService.findByUserId(id);
+            for (Photo p : photos) {
+                photoService.deletePhoto(p.getFileName());
+            }
+
+            //Delete Activity Photos
+            List<Activity> meetingsCreatedByUser = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+            for (Activity a : meetingsCreatedByUser) {
+                if (a.getPhotoName() != null)
+                    fileStorageUtil.deleteFile(a.getPhotoName());
+            }
+
+            user.setName("silinmiş");
+            user.setSurname("kullanıcı");
+            user.setProfilePicName("");
+            user.setAbout("");
+            user.setMotivation("");
+            user.setPassword("$2a$10$vbdDvwd/ZdsDdavjdUVzdOd7dNJm/6kk3xRehEWJtEQ9QntGYXcO2");
+            userRepository.save(user);
+
+//            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
+//            delete_user_sp.setParameter("userId", id);
+//            delete_user_sp.execute();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 //    @Scheduled(fixedRate = 60*60 * 1000, initialDelay = 60 * 1000)
 //    public void deleteTestUser() {
 //        try {

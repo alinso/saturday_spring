@@ -98,9 +98,10 @@ public class HashtagService {
     }
 
 
-    public List<ActivityDto> findActivitiesByHashtag(String hashtag) {
+    public List<ActivityDto> findActivitiesByHashtag(String hashtag,Integer pageNum) {
         String clearHashtag = hashtag.trim().replace("#", "");
-        List<Activity> activities = hashtagRepository.findActivitiesByHashtag(clearHashtag);
+        Pageable pageable  = PageRequest.of(pageNum,5);
+        List<Activity> activities = hashtagRepository.findActivitiesByHashtag(clearHashtag,pageable);
         return activityService.toDtoList(activities);
     }
 

@@ -1,15 +1,15 @@
 package com.alinso.myapp.controller;
 
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.FireBaseTokenDto;
 import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("m")
@@ -33,7 +33,20 @@ public class MobileAppController {
         userRepository.save(user);
 
         return new ResponseEntity<String>("ok", HttpStatus.OK);
+    }
 
+
+    @GetMapping("a/{userId}/{token}")
+    public ResponseEntity<?> androidTokenNew(@PathVariable("userId")Long userId, @PathVariable("token") String token) {
+
+
+        String t1=token.replaceAll("____","[");
+        String t2=t1.replaceAll("----","]");
+
+        User user = userRepository.getOne(userId);
+        user.setFirebaseId(t2);
+        userRepository.save(user);
+        return new ResponseEntity<String>("ok", HttpStatus.OK);
     }
 
     @GetMapping("i/{tokenpackage}")
@@ -58,7 +71,7 @@ public class MobileAppController {
     public ResponseEntity<?> ok() {
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String result = "ksdjafajlsdf" +user.getId();
+        String result = "ksdjafajlsdf" + user.getId();
         result = result.replace("/", ".....");
         return new ResponseEntity<String>(result, HttpStatus.OK);
     }
