@@ -86,9 +86,9 @@ public class ExpoPushNotificationService {
     }
 
     @Async
-    public Boolean newReviewAvailable(User target) {
+    public Boolean newReviewAvailable(User target,Long activityId) {
         String message =  "Yakın zamanda bir aktiviteye katıldın, katılımcılarla ilgili yorum yazabilirsin";
-       // send("Yorum Yap", target.getFirebaseId(), message);
+        send("Yorum Yap", target.getFirebaseId(), message,"ActivityDetail",activityId);
         if(target.getFirebaseId()==null){
             return false;
         }
@@ -98,9 +98,9 @@ public class ExpoPushNotificationService {
     }
 
     @Async
-    public Boolean newRequest(User trigger, User target) {
+    public Boolean newRequest(User trigger, User target,Long activityId) {
         String message = trigger.getName() + " " + trigger.getSurname() + " paylaştığın aktiviteye katılmak istiyor";
-      //  send("Yeni İstek", target.getFirebaseId(), message);
+        send("Yeni İstek", target.getFirebaseId(), message,"ActivityRequests",activityId);
         if(target.getFirebaseId()==null){
             return false;
         }
@@ -110,9 +110,9 @@ public class ExpoPushNotificationService {
     }
 
     @Async
-    public Boolean newRequestApproval(User trigger, User target) {
+    public Boolean newRequestApproval(User trigger, User target,Long activityId) {
         String message = trigger.getName() + " " + trigger.getSurname() + " aktivitesi için seni onayladı !";
-    //    send("İyi eğlenceler!", target.getFirebaseId(), message);
+        send("İyi eğlenceler!", target.getFirebaseId(), message,"ActivityDetail",activityId);
         if(target.getFirebaseId()==null){
             return false;
         }
@@ -121,22 +121,22 @@ public class ExpoPushNotificationService {
         }
     }
 
-    @Async
-    public Boolean newReview(User trigger, User target) {
-        String message = trigger.getName() + " " + trigger.getSurname() + " senin için bir yorum yazdı";
-      //  send("Yeni yorum", target.getFirebaseId(), message);
-        if(target.getFirebaseId()==null){
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
+//    @Async
+//    public Boolean newReview(User trigger, User target) {
+//        String message = trigger.getName() + " " + trigger.getSurname() + " senin için bir yorum yazdı";
+//      //  send("Yeni yorum", target.getFirebaseId(), message);
+//        if(target.getFirebaseId()==null){
+//            return false;
+//        }
+//        else{
+//            return true;
+//        }
+//    }
 
     @Async
-    public Boolean newMeeting(User trigger, User target) {
+    public Boolean newMeeting(User trigger, User target,Long activityId) {
         String message = "Listendeki " + trigger.getName() + " " + trigger.getSurname() + " yeni bir  aktivite paylaştı";
-    //    send("Yeni aktivite", target.getFirebaseId(), message);
+        send("Yeni aktivite", target.getFirebaseId(), message,"ActivityDetail",activityId);
         if(target.getFirebaseId()==null){
             return false;
         }

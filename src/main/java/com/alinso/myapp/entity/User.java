@@ -106,6 +106,16 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String role;
 
+    public Integer getSmsCode() {
+        return smsCode;
+    }
+
+    public void setSmsCode(Integer smsCode) {
+        this.smsCode = smsCode;
+    }
+
+    @Column
+    private Integer smsCode;
 
 //
 //    @Column

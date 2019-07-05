@@ -70,28 +70,31 @@ public class AdminController {
                 toBeSaved.clear();
             }
         }
-        return new ResponseEntity<String>("guncelendi "+i, HttpStatus.OK);
+        return new ResponseEntity<String>("guncelendi " + i, HttpStatus.OK);
     }
 
 
     @GetMapping("autoMessage")
-    public ResponseEntity<?> autoMessage(){
-        List<User> selectedUsers = userRepository.findAllWomen(Gender.FEMALE);
-        User tuuce  =userRepository.getOne(Long.valueOf(33));
+    public ResponseEntity<?> autoMessage() {
+        List<User> selectedUsers = userRepository.findInactiveUsers();
+        User tuuce = userRepository.getOne(Long.valueOf(1));
 
-        List<Message> toBeSaved  =new ArrayList<>();
-        int i=0;
-        for(User u:selectedUsers){
-            String messageText = "15 Haziranda İncek'te bir havuzlu villa kiralayıp mangal partisi yapacağız. Activity Friend ve üyemiz Halil birlikteliği ile düzenlediğimiz bu aktivite ve her zamanki gibi güvenli,kaliteli bir topluluk ile keyifli zaman geçireceğimiz unutulmaz bir gün olacak. " +
-                    "Ayrıca bu zamana kadar yapılmış olan en büyük AF aktivitesi olacak. Gelecek olan kişiler yine aynı şekilde Halil'in aktivitesine istek atacak ve aralarından seçeceğiz.  Kişileri özel olarak seçecek ve kadın/erkek sayısal dengesini dikkate alacağız. " +
-                    "Gerekli güvenlik önlemlerinin alınacağı partimizde çeşitli oyunlar-eğlenceler bizi bekliyor olacak. Daha fazla detay için soru sorabilir veya aktiviteye istek atabilirsin. Bu günü kaçırma!";
-            Message message =  new Message();
-            message.setReader(u);
-            message.setWriter(tuuce);
-            message.setMessage(messageText);
-            messageRepository.save(message);
+        List<Message> toBeSaved = new ArrayList<>();
+        int i = 0;
+        for (User u : selectedUsers) {
+            i++;
+            if (i > 1000)
+                break;
 
-            userEventService.newMessage(message.getReader());
+
+                String messageText =  "Merhaba "+u.getName()+", keyifler nasıl? Haftaya Cuma, 12.07.2019 Activity Friend olarak ilk partimizi düzenliyoruz, Zaytung Zone' da. Bol bol Masa oyunları oynayıp yeni insanlar ile tanışacağız ve ardından" +
+                        " dj Ahmet Altuntaş bizimle,  doyasıya dans etmek için :) Senin de gelmeni çok isterim, müsaitmisin? Lütfen sorun varsa, çekinme";
+                Message message = new Message();
+                message.setReader(u);
+                message.setWriter(tuuce);
+                message.setMessage(messageText);
+                messageRepository.save(message);
+                userEventService.newMessage(message.getReader());
 
         }
         return new ResponseEntity<>("okk", HttpStatus.OK);

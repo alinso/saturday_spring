@@ -93,16 +93,22 @@ public class UserController {
         return new ResponseEntity<>("Silindi",HttpStatus.OK);
     }
 
+    @GetMapping("verifyMobile/{code}")
+    public ResponseEntity<?> verifyCode(@PathVariable("code") Integer code){
+        userService.completeRegistration(code);
+        return new ResponseEntity<String>("verified", HttpStatus.OK);
+    }
+
     @GetMapping("userCount")
     public ResponseEntity<?> userCount(){
         return new ResponseEntity<>(userService.getUserCount(),HttpStatus.OK);
     }
 
-    @GetMapping("/verifyMail/{token}")
-    public ResponseEntity<?> verifyMail(@PathVariable("token") String token) {
-        userService.verifyMail(token);
-        return new ResponseEntity<String>("verified", HttpStatus.OK);
-    }
+//    @GetMapping("/verifyMail/{token}")
+//    public ResponseEntity<?> verifyMail(@PathVariable("token") String token) {
+//        userService.verifyMail(token);
+//        return new ResponseEntity<String>("verified", HttpStatus.OK);
+//    }
 
     @GetMapping("forgottenPassword/{mail}")
     public ResponseEntity<?> sendForgottenPasswordMail(@PathVariable("mail") String mail) {

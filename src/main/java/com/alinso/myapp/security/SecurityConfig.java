@@ -104,7 +104,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(SecurityConstants.SIGN_UP_URL).permitAll()
                 .antMatchers(SecurityConstants.LOGIN_URL).permitAll()
                 .antMatchers(SecurityConstants.LOGIN_URL).permitAll()
-                .antMatchers("/user/verifyMail/**").permitAll()
+                .antMatchers("/user/verifyMobile/**").permitAll()
                 .antMatchers("/user/search/**").permitAll()
                 .antMatchers("/hashtag/findUsers/**").permitAll()
                 .antMatchers("/user/forgottenPassword/**").permitAll()

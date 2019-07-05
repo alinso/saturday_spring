@@ -62,7 +62,7 @@ public class ActivityRequestService {
         if (!isThisUserJoined) {
 
 
-            if(activity.getId()!=1640 && activity.getId()!=1856 && activity.getId()!=2079 && activity.getId()!=2037 && activity.getId()!=2176  && activity.getId()!=2417) {
+            if(activity.getId()!=2545) {
                 //check activity req limit
                 List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
                 if ( allRequests.size() > 14)
@@ -150,12 +150,12 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity) {
 
-        if(activity.getId()==1640 || activity.getId()==1856 || activity.getId()==2079  || activity.getId()==2037  || activity.getId()==2176 || activity.getId()==2417){
+        if(activity.getId()==2545){
             return;
         }
 
         Integer c = activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED);
-        Integer limit = 6;
+        Integer limit = 10;
         User user = activity.getCreator();
         if (user.getPoint() > 40 && user.getPoint() < 100) {
             limit = 10;

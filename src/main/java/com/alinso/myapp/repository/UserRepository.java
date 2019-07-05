@@ -46,4 +46,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select user from User user order by user.point desc")
     List<User> top100(Pageable pageable);
+
+    @Query("select user from User user where user.point>=0 and user.point<10")
+    List<User> findInactiveUsers();
+
+
+    @Query("select user from User  user where user.smsCode=:code")
+    User findBySmsCode(@Param("code") Integer code);
 }

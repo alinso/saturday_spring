@@ -19,6 +19,7 @@ import com.alinso.myapp.service.security.ForgottenPasswordTokenService;
 import com.alinso.myapp.service.security.MailVerificationTokenService;
 import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
+import com.alinso.myapp.util.SendSms;
 import com.alinso.myapp.util.UserUtil;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
@@ -35,6 +36,7 @@ import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 @Service
 public class UserService {
@@ -117,17 +119,34 @@ public class UserService {
         newUser.setPoint(0);
         newUser.setCity(ankara);
         newUser.setActivityCount(0);
-        newUser.setEnabled(true);
+        newUser.setEnabled(false);
 
+
+        Random rnd =  new Random();
+        Integer code = rnd.nextInt(999999);
+        newUser.setSmsCode(code);
         User user = userRepository.save(newUser);
+
+
+        SendSms.send("Activity Friend kaydı tamamlamak için sms onay kodu : "+code.toString(),newUser.getPhone());
         //String token = mailVerificationTokenService.saveToken(user);
         //mailService.sendMailVerificationMail(user, token);
-
         // userEventService.setReferenceChain(user);
+
+        return user;
+    }
+
+
+    public User completeRegistration(Integer code){
+
+        User user =  userRepository.findBySmsCode(code);
+        if(user==null)
+            throw new UserWarningException("Bu kullanıcı bulunamadı");
+
+
+        user.setEnabled(true);
         userRepository.save(user);
         userEventService.newUserRegistered(user);
-
-
         return user;
     }
 
@@ -210,11 +229,11 @@ public class UserService {
         loggedUser.setCity(cityService.findById(profileInfoForUpdateDto.getCityId()));
         loggedUser.setSurname(profileInfoForUpdateDto.getSurname());
         loggedUser.setEmail(profileInfoForUpdateDto.getEmail());
-        loggedUser.setPhone(profileInfoForUpdateDto.getPhone());
+        //loggedUser.setPhone(profileInfoForUpdateDto.getPhone());
         loggedUser.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(), "dd/MM/yyyy"));
         loggedUser.setMotivation(profileInfoForUpdateDto.getMotivation());
         loggedUser.setAbout(profileInfoForUpdateDto.getAbout());
-        loggedUser.setGender(profileInfoForUpdateDto.getGender());
+        //loggedUser.setGender(profileInfoForUpdateDto.getGender());
         //loggedUser.setInterests(profileInfoForUpdateDto.getInterests());
         //loggedUser.setReferenceCode(profileInfoForUpdateDto.getReferenceCode());
         hashtagService.saveUserHashtag(loggedUser, profileInfoForUpdateDto.getInterests());
@@ -510,17 +529,22 @@ public class UserService {
                     fileStorageUtil.deleteFile(a.getPhotoName());
             }
 
-            user.setName("silinmiş");
-            user.setSurname("kullanıcı");
-            user.setProfilePicName("");
-            user.setAbout("");
-            user.setMotivation("");
-            user.setPassword("$2a$10$vbdDvwd/ZdsDdavjdUVzdOd7dNJm/6kk3xRehEWJtEQ9QntGYXcO2");
-            userRepository.save(user);
+            User u= new User();
+            u.setName("silinmiş");
+            u.setSurname("kullanıcı");
+            u.setProfilePicName("");
+            u.setAbout("");
+            u.setEmail("useasdfffasdf4trfd@uyegjfbd.com");
+            u.setPoint(0);
+            u.setMotivation("");
+            u.setGender(user.getGender());
+            u.setPhone(user.getPhone());
+            u.setPassword("$2a$10$vbdDvwd/ZdsDdavjdUVzdOd7dNJm/6kk3xRehEWJtEQ9QntGYXcO2");
+            userRepository.save(u);
 
-//            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
-//            delete_user_sp.setParameter("userId", id);
-//            delete_user_sp.execute();
+            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
+            delete_user_sp.setParameter("userId", id);
+            delete_user_sp.execute();
 
         } catch (Exception e) {
             e.printStackTrace();

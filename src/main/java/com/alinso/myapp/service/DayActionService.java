@@ -18,8 +18,8 @@ public class DayActionService {
     private final Integer REQUEST_LIMIT = 3;
 
 
-    private final Integer FEMALE_ACTIVITY_LIMIT = 4;
-    private final Integer ACTIVITY_LIMIT = 2;
+    private final Integer FEMALE_ACTIVITY_LIMIT = 5;
+    private final Integer ACTIVITY_LIMIT = 5;
 
     @Autowired
     DayActionRepository dayActionRepository;

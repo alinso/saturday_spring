@@ -30,7 +30,7 @@ public class CustomAuthenticationProvider
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(name);
 
         if(!userDetails.isEnabled()){
-            throw new UserWarningException("Lütfen mailinize gelen linki onaylanıyınız");
+            throw new UserWarningException("Buraya tıklayıp telefonuna gelen kodu girmelisin");
         }
 
 
