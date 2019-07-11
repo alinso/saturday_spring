@@ -21,6 +21,7 @@ import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.util.SendSms;
 import com.alinso.myapp.util.UserUtil;
+import com.sun.jmx.snmp.SnmpMsg;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +113,10 @@ public class UserService {
 
         City ankara = cityService.findById(Long.valueOf(1));
 
+
+        if(newUser.getPhone().length()==10)
+            newUser.setPhone("0"+newUser.getPhone());
+
         newUser.setConfirmPassword("");
         newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
         newUser.setPhotoCount(0);
@@ -140,7 +145,7 @@ public class UserService {
     public User completeRegistration(Integer code){
 
         User user =  userRepository.findBySmsCode(code);
-        if(user==null)
+        if(user==null || user.getName().equals("silinen"))
             throw new UserWarningException("Bu kullanıcı bulunamadı");
 
 
@@ -172,34 +177,44 @@ public class UserService {
 //        return user;
 //    }
 
-    public void forgottePasswordSendMail(String email) {
+    public void forgottePasswordSendPass(String phone) {
         User user;
         try {
-            user = userRepository.findByEmail(email).get();
+            user = userRepository.findByPhone(phone);
         } catch (NoSuchElementException e) {
-            throw new UserWarningException("Bu E-Posta ile kayıtlı kullanıcı bulunamadı");
+            throw new UserWarningException("Bu numara ile kayıtlı kullanıcı bulunamadı");
         }
-        String token = forgottenPasswordTokenService.saveToken(user);
-        mailService.sendForgottenPasswordMail(user, token);
-    }
 
-    public void verifyMail(String tokenString) {
-        MailVerificationToken token = mailVerificationTokenService.findByActiveToken(tokenString);
+        if(user.getName().equals("silinen"))
+            throw new UserWarningException("Bu numara ile kayıtlı kullanıcı bulunamadı");
 
-        if (token == null) {
-            throw new RecordNotFound404Exception("Geçersiz link");
-        }
-        User user = userRepository.findById(token.getUser().getId()).get();
-        user.setEnabled(true);
 
-        //userEventService.setReferenceChain(user);
+        Random rnd  =new Random();
+        Integer pureRand = rnd.nextInt(999999);
+        Integer pass = pureRand+100000;
+        user.setPassword(bCryptPasswordEncoder.encode(pass.toString()));
         userRepository.save(user);
-        userEventService.newUserRegistered(user);
 
-        //if we dont delete token every time user clicks the link, same process above duplicates
-        mailVerificationTokenService.delete(token);
-
+        SendSms.send("Activity Friend yeni şifreniz : "+pass.toString(),phone);
     }
+
+//    public void verifyMail(String tokenString) {
+//        MailVerificationToken token = mailVerificationTokenService.findByActiveToken(tokenString);
+//
+//        if (token == null) {
+//            throw new RecordNotFound404Exception("Geçersiz link");
+//        }
+//        User user = userRepository.findById(token.getUser().getId()).get();
+//        user.setEnabled(true);
+//
+//        //userEventService.setReferenceChain(user);
+//        userRepository.save(user);
+//        userEventService.newUserRegistered(user);
+//
+//        //if we dont delete token every time user clicks the link, same process above duplicates
+//        mailVerificationTokenService.delete(token);
+//
+//    }
 
     public void resetPassword(ResetPasswordDto resetPasswordDto) {
         if (resetPasswordDto.getToken() == null) {
@@ -270,7 +285,7 @@ public class UserService {
 
     public ProfileInfoForUpdateDto findByPhone(String phone) {
         try {
-            User user = userRepository.findByPhone(phone).get();
+            User user = userRepository.findByPhone(phone);
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             return profileInfoForUpdateDto;
         } catch (Exception e) {
@@ -530,7 +545,7 @@ public class UserService {
             }
 
             User u= new User();
-            u.setName("silinmiş");
+            u.setName("silinen");
             u.setSurname("kullanıcı");
             u.setProfilePicName("");
             u.setAbout("");

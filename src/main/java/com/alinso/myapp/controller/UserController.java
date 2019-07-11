@@ -110,9 +110,9 @@ public class UserController {
 //        return new ResponseEntity<String>("verified", HttpStatus.OK);
 //    }
 
-    @GetMapping("forgottenPassword/{mail}")
-    public ResponseEntity<?> sendForgottenPasswordMail(@PathVariable("mail") String mail) {
-        userService.forgottePasswordSendMail(mail.toLowerCase());
+    @GetMapping("forgottenPassword/{phone}")
+    public ResponseEntity<?> sendForgottenPasswordMail(@PathVariable("phone") String phone) {
+        userService.forgottePasswordSendPass(phone);
         return new ResponseEntity<>("mail sent", HttpStatus.OK);
     }
 

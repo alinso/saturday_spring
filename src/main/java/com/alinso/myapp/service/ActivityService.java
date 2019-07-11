@@ -149,8 +149,8 @@ public class ActivityService {
 
         //balon futbolu
         if(pageNum==0) {
-            Activity selected2 = activityRepository.findById(Long.valueOf(2545)).get();
-            activityDtos.add(toDto(selected2));
+         //   Activity selected = activityRepository.findById(Long.valueOf(2602)).get();
+           // activityDtos.add(toDto(selected));
         }
 
         for (Activity activity : activities) {

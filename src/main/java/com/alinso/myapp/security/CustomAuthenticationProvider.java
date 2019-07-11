@@ -1,5 +1,6 @@
 package com.alinso.myapp.security;
 
+import com.alinso.myapp.exception.InvalidLoginResponse;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.service.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;

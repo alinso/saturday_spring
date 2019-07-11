@@ -76,8 +76,8 @@ public class AdminController {
 
     @GetMapping("autoMessage")
     public ResponseEntity<?> autoMessage() {
-        List<User> selectedUsers = userRepository.findInactiveUsers();
-        User tuuce = userRepository.getOne(Long.valueOf(1));
+        List<User> selectedUsers = userRepository.findAbove20();
+        User tuuce = userRepository.getOne(Long.valueOf(3212));
 
         List<Message> toBeSaved = new ArrayList<>();
         int i = 0;
@@ -86,9 +86,8 @@ public class AdminController {
             if (i > 1000)
                 break;
 
-
-                String messageText =  "Merhaba "+u.getName()+", keyifler nasıl? Haftaya Cuma, 12.07.2019 Activity Friend olarak ilk partimizi düzenliyoruz, Zaytung Zone' da. Bol bol Masa oyunları oynayıp yeni insanlar ile tanışacağız ve ardından" +
-                        " dj Ahmet Altuntaş bizimle,  doyasıya dans etmek için :) Senin de gelmeni çok isterim, müsaitmisin? Lütfen sorun varsa, çekinme";
+                String messageText =  u.getName()+"selamlar, Bu günlerde aramıza yeni katılan çok arkadaşımız olacak, tanıtım sürecini tekrar başlattık💥 Bir süre hızlı büyüyeceğiz.  Yeni katılan ve puanı düşük olanları daha çok aktivitelerimize kabul edip, onların aktivitelerine dahil olursak Activity Friend'in gerçekten samimi ve iyi insanlarla dolu olduğunu herkese gösterebiliriz. Senin puanın yüksek ve Activity Friend'in bir parçası olduğun için minettarız. Senin de desteğinle yeni gelenleri bu şekilde kazanabiliriz. Az sayıda büyük buluşamalar yerine çok sayıda küçük aktiviteler bunun için daha etkili.  Bu da önemli bir ayrıntı ve projemizin daha büyük güzel bir ortama kavuşması için faydalı olacak." +
+                        "(Activity Friend Ekibi )";
                 Message message = new Message();
                 message.setReader(u);
                 message.setWriter(tuuce);

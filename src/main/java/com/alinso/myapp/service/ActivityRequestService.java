@@ -62,7 +62,7 @@ public class ActivityRequestService {
         if (!isThisUserJoined) {
 
 
-            if(activity.getId()!=2545) {
+            if(activity.getId()!=2545 && activity.getId()!=2602) {
                 //check activity req limit
                 List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
                 if ( allRequests.size() > 14)
@@ -150,7 +150,7 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity) {
 
-        if(activity.getId()==2545){
+        if(activity.getId()==2545 || activity.getId()==2602){
             return;
         }
 

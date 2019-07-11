@@ -16,7 +16,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-    Optional<User> findByPhone(String phone);
+    @Query("select user from User user where user.phone like CONCAT('%',:phone,'%') ")
+    User findByPhone(@Param("phone") String phone);
 
     @Query("select user from User user where  CONCAT( user.name,  ' ', user.surname )  like CONCAT('%',:search,'%') ")
     List<User> searchUser(@Param("search") String search, Pageable pageable);
@@ -53,4 +54,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select user from User  user where user.smsCode=:code")
     User findBySmsCode(@Param("code") Integer code);
+
+    @Query("select user from User user where user.point>=20")
+    List<User> findAbove20();
 }
