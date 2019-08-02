@@ -16,7 +16,6 @@ import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.util.UserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -74,7 +73,14 @@ public class ActivityService {
         } catch (NoSuchElementException e) {
             throw new UserWarningException("Aktivite Bulunamadı");
         }
-        return toDto(activity);
+
+        ActivityDto activityDto =   toDto(activity);
+
+        if(!activityRequestService.isThisUserApprovedAllTimes(activity))
+            activityDto.setAttendants(null);
+
+        return activityDto;
+
     }
 
 
@@ -149,8 +155,8 @@ public class ActivityService {
 
         //balon futbolu
         if(pageNum==0) {
-         //   Activity selected = activityRepository.findById(Long.valueOf(2602)).get();
-           // activityDtos.add(toDto(selected));
+            Activity selected = activityRepository.findById(Long.valueOf(3205)).get();
+            activityDtos.add(toDto(selected));
         }
 
         for (Activity activity : activities) {

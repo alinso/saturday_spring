@@ -58,8 +58,16 @@ public class AdminService {
 
         MessageDto messageDto = new MessageDto();
         messageDto.setReader(userService.toProfileDto(activity.getCreator()));
-        messageDto.setMessage("Merhaba:) Net olmayan veya ticari amaç taşıyan veya ahlak-mantık-yasa dışı veya uygulama amacına uymayan aktiviteleri siliyoruz. Bunların tekrarı halinde " +
-                " bu aktiviteleri açan hesapları siliyoruz. Buna dikkat ederek net, ahlak-yasa ve mantıga uygun, para kazanma amacı taşımayan aktiviteler açarsan seviniriz");
+        messageDto.setMessage("Merhaba:) İceriği açıklayıcı-net olmayan" +
+                " veya ticari amaç taşıyan " +
+                "veya tanıtım amacı taşıyan " +
+                "veya organizatör-katılımcı modelinde " +
+                "veya ahlak-mantık-yasa dışı " +
+                "veya uygulama amacına uymayan " +
+                "veya büyük kalabalıklara hitap eden " +
+                "veya sanal bir platformda grup oluşturma amaçlı" +
+                "veya sanal bir platformun tanıtımı amaçlı veya genal reklam-tanıtım amaçlı aktiviteleri siliyoruz. Bunların tekrarı halinde " +
+                " bu aktiviteleri açan hesapları siliyoruz. Aktiviten bu kurallarımızdan bir veya birkaçını ihlal ediyor. Buna dikkat ederek  aktivitelerini açarsan seviniriz, teşekkürler");
 
         messageService.send(messageDto);
 

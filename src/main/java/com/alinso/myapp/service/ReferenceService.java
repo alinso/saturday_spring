@@ -33,15 +33,15 @@ public class ReferenceService {
 
     public String makeReferenceCode() {
         Character[] characterArray = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'y', 'z',
-                '1', '2', '3', '4', '5', '6', '8', '9', '0'};
+                '1', '2', '3', '4', '5', '6', '8', '9', '0', '_', '-'};
 
         Random rnd = new Random();
-        Character c1 = characterArray[rnd.nextInt(31)];
-        Character c2 = characterArray[rnd.nextInt(31)];
-        Character c3 = characterArray[rnd.nextInt(31)];
-        Character c4 = characterArray[rnd.nextInt(31)];
-        Character c5 = characterArray[rnd.nextInt(31)];
-        Character c6 = characterArray[rnd.nextInt(31)];
+        Character c1 = characterArray[rnd.nextInt(33)];
+        Character c2 = characterArray[rnd.nextInt(33)];
+        Character c3 = characterArray[rnd.nextInt(33)];
+        Character c4 = characterArray[rnd.nextInt(33)];
+        Character c5 = characterArray[rnd.nextInt(33)];
+        Character c6 = characterArray[rnd.nextInt(33)];
 
         String newName = c1.toString() + c2.toString() + c4.toString() + c3.toString() + c5.toString() + c6.toString();
         return newName;
@@ -55,12 +55,7 @@ public class ReferenceService {
     }
 
     public User findByCode(String referenceCode) {
-        User user= null;
-        try {
-            user = userRepository.findByReferenceCode(referenceCode).get();
-        }catch (NoSuchElementException e){
-        }
-
+        User user = userRepository.findByReferenceCode(referenceCode);
         return user;
     }
 

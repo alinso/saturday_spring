@@ -45,7 +45,7 @@ public class ReviewService {
     @Autowired
     BlockService blockService;
 
-    private final Integer DAYS_TO_WRITE_REVIEW = -2;
+    private final Integer DAYS_TO_WRITE_REVIEW = -5;
     private final Integer HOURS_TO_WRITE_REVIEW = -1;
 
 

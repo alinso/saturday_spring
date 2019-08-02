@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select user from User  user where user.parent=:parent")
     List<User> findByParent(@Param("parent") User parent);
 
-    Optional<User> findByReferenceCode(String referenceCode);
+    User findByReferenceCode(String referenceCode);
 
     @Query("select count(*) from User")
     Integer getUserCount();
@@ -34,7 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     //auto message queries
-    @Query("select user from User user where user.gender=:gender and user.point=0")
+    @Query("select user from User user where user.gender=:gender and user.point<10")
     List<User> findZeroPointWomen(@Param("gender")Gender gender);
 
 

@@ -94,7 +94,7 @@ public class MessageService {
             MessageDto messageDto = new MessageDto();
             messageDto.setMessage(message.getMessage());
             messageDto.setReader(userService.toProfileDto(message.getReader()));
-            messageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(), "dd/MM HH:mm"));
+            messageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(), "dd/MM/YYYY HH:mm"));
             messageDtos.add(messageDto);
         }
         return messageDtos;

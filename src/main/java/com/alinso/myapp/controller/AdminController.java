@@ -74,21 +74,33 @@ public class AdminController {
     }
 
 
+
+
     @GetMapping("autoMessage")
     public ResponseEntity<?> autoMessage() {
-        List<User> selectedUsers = userRepository.findAbove20();
+        List<User> selectedUsers = userRepository.findAll();
         User tuuce = userRepository.getOne(Long.valueOf(3212));
 
         List<Message> toBeSaved = new ArrayList<>();
         int i = 0;
         for (User u : selectedUsers) {
             i++;
-            if (i > 1000)
-                break;
 
-                String messageText =  u.getName()+"selamlar, Bu günlerde aramıza yeni katılan çok arkadaşımız olacak, tanıtım sürecini tekrar başlattık💥 Bir süre hızlı büyüyeceğiz.  Yeni katılan ve puanı düşük olanları daha çok aktivitelerimize kabul edip, onların aktivitelerine dahil olursak Activity Friend'in gerçekten samimi ve iyi insanlarla dolu olduğunu herkese gösterebiliriz. Senin puanın yüksek ve Activity Friend'in bir parçası olduğun için minettarız. Senin de desteğinle yeni gelenleri bu şekilde kazanabiliriz. Az sayıda büyük buluşamalar yerine çok sayıda küçük aktiviteler bunun için daha etkili.  Bu da önemli bir ayrıntı ve projemizin daha büyük güzel bir ortama kavuşması için faydalı olacak." +
-                        "(Activity Friend Ekibi )";
-                Message message = new Message();
+            if(i<4000)
+                continue;
+
+//            if (i > 4000)
+//                break;
+
+//                String messageText =  u.getName()+" selam nasılsın, bu pazar seğmenlerde aramıza yeni katılan veya aktif olamayan arkadaşlarla tanışacak sohbet edeceğiz" +
+//                        "Katılmak için Ali Soyaslan'ın atkivitesine istek atabilirsin, hem eskilerle tanışabilir hem de soruların varsa sorabilirsin bekleriz:)";
+
+
+            String messageText =  u.getName()+" selam nasıl gidiyor? bu pazar günü Kadir'in balon futbolu aktivitesindeyiz. Çok eğlenceli olacak bunu kaçırma detaylar için Kadir Çorlu'nun aktivitesine istek atabilirsin" +
+                    " grupta detaylar konuşuluyor. Seni de bekliyoruz mutlaka:) iyi akşamlar";
+
+
+            Message message = new Message();
                 message.setReader(u);
                 message.setWriter(tuuce);
                 message.setMessage(messageText);

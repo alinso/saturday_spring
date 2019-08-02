@@ -112,7 +112,11 @@ public class UserService {
     public User register(User newUser) {
 
         City ankara = cityService.findById(Long.valueOf(1));
+        String referenceCode  =referenceService.makeReferenceCode();
 
+        User parent=null;
+        if(newUser.getGender()==Gender.MALE)
+             parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
 
         if(newUser.getPhone().length()==10)
             newUser.setPhone("0"+newUser.getPhone());
@@ -124,7 +128,9 @@ public class UserService {
         newUser.setPoint(0);
         newUser.setCity(ankara);
         newUser.setActivityCount(0);
+        newUser.setReferenceCode(referenceCode);
         newUser.setEnabled(false);
+        newUser.setParent(parent);
 
 
         Random rnd =  new Random();
@@ -277,6 +283,10 @@ public class UserService {
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             profileInfoForUpdateDto.setbDateString(DateUtil.dateToString(user.getBirthDate(), "dd/MM/yyyy"));
             profileInfoForUpdateDto.setInterests(hashtagService.findByUserStr(user));
+
+            profileInfoForUpdateDto.setReferenceCode("");
+
+
             return profileInfoForUpdateDto;
         } catch (Exception e) {
             throw new UserWarningException("Hata oluştu");

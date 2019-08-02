@@ -203,4 +203,8 @@ public class UserEventService {
         //
         // premiumService.saveGift(child,PremiumDuration.ONE_MONTH);
     }
+
+    public void newMessageActivity(User reader, Activity triggerActivity){
+        notificationService.newMessageActivity(reader,triggerActivity);
+    }
 }

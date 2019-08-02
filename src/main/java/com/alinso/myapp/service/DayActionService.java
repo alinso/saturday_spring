@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 public class DayActionService {
 
 
-    private final Integer FEMALE_REQUEST_LIMIT = 6;
+    private final Integer FEMALE_REQUEST_LIMIT = 7;
     private final Integer REQUEST_LIMIT = 3;
 
 
     private final Integer FEMALE_ACTIVITY_LIMIT = 5;
-    private final Integer ACTIVITY_LIMIT = 5;
+    private final Integer ACTIVITY_LIMIT = 2;
 
     @Autowired
     DayActionRepository dayActionRepository;
@@ -73,7 +73,7 @@ public class DayActionService {
         DayAction dayAction = dayActionRepository.findByUser(user);
 
         Integer limit = ACTIVITY_LIMIT;
-        if (user.getGender() == Gender.FEMALE && user.getPoint() < 50)
+        if (user.getGender() == Gender.FEMALE && user.getPoint() < 100)
             limit = FEMALE_ACTIVITY_LIMIT;
 
         if (dayAction != null)

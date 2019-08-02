@@ -62,7 +62,7 @@ public class ActivityRequestService {
         if (!isThisUserJoined) {
 
 
-            if(activity.getId()!=2545 && activity.getId()!=2602) {
+            if(activity.getId()!=3083 && activity.getId()!=2602 && activity.getId()!=3205 && activity.getId()!=3434  ) {
                 //check activity req limit
                 List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
                 if ( allRequests.size() > 14)
@@ -72,6 +72,7 @@ public class ActivityRequestService {
                 //check male limit
                 Integer maleCount = 0;
                 for(ActivityRequest r:allRequests){
+                    if(r.getApplicant().getGender()==Gender.MALE)
                     maleCount++;
                 }
                 if (loggedUser.getGender() == Gender.MALE && maleCount>6)
@@ -103,6 +104,49 @@ public class ActivityRequestService {
         return !isThisUserJoined;
     }
 
+    public Boolean isThisUserApprovedTwoDaysLimit(Activity activity){
+
+      User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+      if(u.getId()==3211)
+          return true;
+
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        now.add(Calendar.DATE, -2);
+
+        if(activity.getDeadLine().compareTo(now.getTime())<0)
+            return false;
+
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(activity.getCreator().getId() == loggedUser.getId())
+            return true;
+
+        Boolean isThisUserApproved   = false;
+        List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(activity.getId());
+        for (ActivityRequest activityRequest : activityRequests) {
+            if (activityRequest.getApplicant().getId() == loggedUser.getId() && activityRequest.getActivityRequestStatus().equals(ActivityRequestStatus.APPROVED)) {
+                isThisUserApproved = true;
+            }
+        }
+        return isThisUserApproved;
+    }
+
+    public Boolean isThisUserApprovedAllTimes(Activity activity){
+
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(activity.getCreator().getId() == loggedUser.getId())
+            return true;
+
+        Boolean isThisUserApproved   = false;
+        List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(activity.getId());
+        for (ActivityRequest activityRequest : activityRequests) {
+            if (activityRequest.getApplicant().getId() == loggedUser.getId() && activityRequest.getActivityRequestStatus().equals(ActivityRequestStatus.APPROVED)) {
+                isThisUserApproved = true;
+            }
+        }
+        return isThisUserApproved;
+    }
 
     public ActivityRequestStatus approveRequest(Long id) {
         ActivityRequest activityRequest = activityRequesRepository.findById(id).get();
@@ -150,7 +194,7 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity) {
 
-        if(activity.getId()==2545 || activity.getId()==2602){
+        if(activity.getId()==2951 || activity.getId()==3083|| activity.getId()==3205 || activity.getId()==3434){
             return;
         }
 
@@ -188,6 +232,18 @@ public class ActivityRequestService {
         return profileDtos;
     }
 
+    public List<User> findAttendantEntities(Activity activity) {
+        List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(activity.getId());
+
+        List<User> attendantUsers = new ArrayList<>();
+        for (ActivityRequest request : activityRequests) {
+            if (request.getActivityRequestStatus() == ActivityRequestStatus.APPROVED)
+                attendantUsers.add(request.getApplicant());
+        }
+
+        return attendantUsers;
+    }
+
     public void deleteByActivityId(Long id) {
         for (ActivityRequest activityRequest : activityRequesRepository.findByActivityId(id)) {
             activityRequesRepository.delete(activityRequest);
@@ -196,6 +252,11 @@ public class ActivityRequestService {
 
 
     public boolean haveTheseUsersMeet(Long id1, Long id2) {
+
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        now.add(Calendar.DATE, -2);
+
 
         if (id1 == 3212 || id2 == 3212)
             return true;
@@ -208,27 +269,25 @@ public class ActivityRequestService {
 
 
         //if they hosted each other
-        Integer user1host = activityRequesRepository.haveUser1HostUser2(user1, user2, ActivityRequestStatus.APPROVED);
-        Integer user2host = activityRequesRepository.haveUser1HostUser2(user2, user1, ActivityRequestStatus.APPROVED);
+        Integer user1host = activityRequesRepository.haveUser1HostUser2(user1, user2, ActivityRequestStatus.APPROVED,now.getTime());
+        Integer user2host = activityRequesRepository.haveUser1HostUser2(user2, user1, ActivityRequestStatus.APPROVED,now.getTime());
 
         if (user1host > 0 || user2host > 0)
             return true;
 
 
-        //if they hosted by saame activity
+        //if they hosted by same activity
         List<Activity> activityList1 = activityRequesRepository.activitiesAttendedByUser(user1, ActivityRequestStatus.APPROVED);
         List<Activity> activityList2 = activityRequesRepository.activitiesAttendedByUser(user2, ActivityRequestStatus.APPROVED);
 
 
         for (Activity a1 : activityList1) {
             for (Activity a2 : activityList2) {
-                if (a1.getId() == a2.getId()) {
+                if (a1.getId() == a2.getId() && a1.getDeadLine().compareTo(now.getTime()) >0 ) {
                     return true;
                 }
             }
         }
         return false;
     }
-
-
 }

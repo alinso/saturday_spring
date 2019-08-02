@@ -79,7 +79,7 @@ public class AndroidPushNotificationsService {
 
     @Async
     public Boolean newMessage(User trigger, User target) {
-        String message = trigger.getName() + " " + trigger.getSurname() + " sana bir mesaj gönderdi";
+        String message = trigger.getName() + " " + trigger.getSurname() + " sana/gruba bir mesaj gönderdi";
         send("Yeni Mesaj", target.getFirebaseId(), message);
         if(target.getFirebaseId()==null){
             return false;

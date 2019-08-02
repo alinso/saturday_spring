@@ -11,7 +11,6 @@ import com.alinso.myapp.entity.enums.NotificationType;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
 import com.alinso.myapp.pushNotification.AndroidPushNotificationsService;
-import com.alinso.myapp.pushNotification.ExpoPushNotificationService;
 import com.alinso.myapp.repository.ActivityRepository;
 import com.alinso.myapp.repository.ActivityRequesRepository;
 import com.alinso.myapp.repository.NotificationRepository;
@@ -43,9 +42,6 @@ public class NotificationService {
 
     @Autowired
     AndroidPushNotificationsService androidPushNotificationsService;
-
-    @Autowired
-    ExpoPushNotificationService expoPushNotificationService;
 
     @Autowired
     MailService  mailService;
@@ -102,7 +98,7 @@ public class NotificationService {
             if(activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED)>0){
                 //send notification to creator
                 createNotification(activity.getCreator(),null,NotificationType.MEETING_COMMENT_AVAILABLE, meetingId.toString());
-                expoPushNotificationService.newReviewAvailable(activity.getCreator(),activity.getId());
+               // expoPushNotificationService.newReviewAvailable(activity.getCreator(),activity.getId());
                 if(!androidPushNotificationsService.newReviewAvailable(activity.getCreator())) {
                     mailService.newReviewAvailableMail(activity.getCreator(), meetingId);
                 }
@@ -110,7 +106,7 @@ public class NotificationService {
                 List<User> attendants  = activityRequesRepository.attendantsOfActivity(activity, ActivityRequestStatus.APPROVED);
                 for(User attendant :attendants){
                     createNotification(attendant,null,NotificationType.MEETING_COMMENT_AVAILABLE,meetingId.toString());
-                    expoPushNotificationService.newReviewAvailable(attendant,activity.getId());
+                  //  expoPushNotificationService.newReviewAvailable(attendant,activity.getId());
                     if(!androidPushNotificationsService.newReviewAvailable(attendant)) {
                         mailService.newReviewAvailableMail(attendant, meetingId);
                     }
@@ -124,7 +120,6 @@ public class NotificationService {
     public void newMessage(User target){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.MESSAGE,null);
-        expoPushNotificationService.newMessage(trigger,target);
         if(!androidPushNotificationsService.newMessage(trigger,target)) {
             mailService.sendNewMessageMail(target, trigger);
         }
@@ -133,7 +128,6 @@ public class NotificationService {
     public void newRequest(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REQUEST,itemId.toString());
-        expoPushNotificationService.newRequest(trigger,target,itemId);
         if(!androidPushNotificationsService.newRequest(trigger,target)) {
             mailService.sendNewRequestMail(target,trigger,itemId);
         }
@@ -142,7 +136,6 @@ public class NotificationService {
     public void newRequestApproval(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.REQUEST_APPROVAL,itemId.toString());
-        expoPushNotificationService.newRequestApproval(trigger,target,itemId);
         if(!androidPushNotificationsService.newRequestApproval(trigger,target)){
             mailService.sendNewRequestApprovalMail(target,trigger,itemId);
         }
@@ -159,7 +152,6 @@ public class NotificationService {
     public void newMeeting(User target,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         createNotification(target,trigger,NotificationType.FOLLOWING,itemId.toString());
-        expoPushNotificationService.newMeeting(trigger,target,itemId);
         if(!androidPushNotificationsService.newMeeting(trigger,target)) {
             mailService.sendNewActivityMail(target, trigger, itemId);
         }
@@ -254,9 +246,26 @@ public class NotificationService {
         else
             trigger = userService.findEntityById(Long.valueOf(3212));
 
-        expoPushNotificationService.newMessage(trigger,target);
         createNotification(target,trigger,NotificationType.MESSAGE,null);
        // mailService.sendNewMessageMail(target,trigger);
+    }
+
+    public void newMessageActivity(User target,Activity triggerActivity) {
+        Long triggerId= triggerActivity.getId();
+        User user  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Notification notification = new Notification();
+        notification.setNotificationType(NotificationType.MESSAGE_ACTIVITY);
+        notification.setTarget(target);
+        notification.setMessage(triggerId.toString());
+        notification.setTrigger(user);
+        notification.setRead(false);
+        notificationRepository.save(notification);
+
+
+        if(!androidPushNotificationsService.newMessage(user,target)) {
+            mailService.sendNewMessageMail(target, user);
+        }
     }
 }
 

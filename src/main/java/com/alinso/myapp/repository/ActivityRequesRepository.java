@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 @Repository
 public interface ActivityRequesRepository extends JpaRepository<ActivityRequest, Long> {
@@ -36,8 +37,9 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
     @Query("select count(activityRequest) from ActivityRequest activityRequest " +
             "where activityRequest.activity.creator = :user1 " +
             "and activityRequest.applicant=:user2 " +
+            "and activityRequest.activity.deadLine>:twoDaysEgo " +
             "and activityRequest.activityRequestStatus=:status")
-    Integer haveUser1HostUser2(@Param("user1") User user1, @Param("user2") User user2, @Param("status") ActivityRequestStatus status);
+    Integer haveUser1HostUser2(@Param("user1") User user1, @Param("user2") User user2, @Param("status") ActivityRequestStatus status, @Param("twoDaysEgo") Date twoDaysEgo);
 
 
     @Query("select count(activityRequest) from ActivityRequest  activityRequest"+
