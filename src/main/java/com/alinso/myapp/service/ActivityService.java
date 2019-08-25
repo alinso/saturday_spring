@@ -74,9 +74,9 @@ public class ActivityService {
             throw new UserWarningException("Aktivite Bulunamadı");
         }
 
-        ActivityDto activityDto =   toDto(activity);
+        ActivityDto activityDto = toDto(activity);
 
-        if(!activityRequestService.isThisUserApprovedAllTimes(activity))
+        if (!activityRequestService.isThisUserApprovedAllTimes(activity))
             activityDto.setAttendants(null);
 
         return activityDto;
@@ -87,7 +87,7 @@ public class ActivityService {
     public Activity findEntityById(Long id) {
         Activity activity = null;
         try {
-          activity=  activityRepository.findById(id).get();
+            activity = activityRepository.findById(id).get();
         } catch (NoSuchElementException e) {
             throw new UserWarningException("Aktivite Bulunamadı");
         }
@@ -124,9 +124,11 @@ public class ActivityService {
         //check user owner
         UserUtil.checkUserOwner(activityInDb.getCreator().getId());
 
+        cannotEditInLAstTwoHours(activityInDb);
+
         //check time
         Date now = new Date();
-        if(activityInDb.getDeadLine().compareTo(now)<0){
+        if (activityInDb.getDeadLine().compareTo(now) < 0) {
             throw new UserWarningException("Tarihi geçmiş aktivitede değişiklik yapamazsın");
         }
 
@@ -145,18 +147,17 @@ public class ActivityService {
         return activityRepository.save(activityInDb);
     }
 
-    public List<ActivityDto> findAllNonExpiredByCityId(Long cityId,Integer pageNum) {
+    public List<ActivityDto> findAllNonExpiredByCityId(Long cityId, Integer pageNum) {
 
 
-
-        Pageable pageable  =PageRequest.of(pageNum,10);
-        List<Activity> activities = activityRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId),pageable);
+        Pageable pageable = PageRequest.of(pageNum, 10);
+        List<Activity> activities = activityRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId), pageable);
         List<ActivityDto> activityDtos = new ArrayList<>();
 
         //balon futbolu
-        if(pageNum==0) {
-            Activity selected = activityRepository.findById(Long.valueOf(3205)).get();
-            activityDtos.add(toDto(selected));
+        if (pageNum == 0) {
+            //   Activity selected = activityRepository.findById(Long.valueOf(3775)).get();
+            //   activityDtos.add(toDto(selected));
         }
 
         for (Activity activity : activities) {
@@ -177,11 +178,14 @@ public class ActivityService {
 
         //check user authorized
         UserUtil.checkUserOwner(activityInDb.getCreator().getId());
-        if(user.getId()==3211)
+        if (user.getId() == 3211)
             adminService.deleteActivity(id);
 
+
+        cannotEditInLAstTwoHours(activityInDb);
+
         //decrease user's point & count
-   //     userEventService.removeMeeting(activityInDb);
+        //     userEventService.removeMeeting(activityInDb);
 
         //delete file
         fileStorageUtil.deleteFile(activityInDb.getPhotoName());
@@ -196,6 +200,16 @@ public class ActivityService {
         dayActionService.removeActivity();
 
         activityRepository.deleteById(id);
+    }
+
+
+    public void cannotEditInLAstTwoHours(Activity activityInDb){
+        if (
+                activityInDb.getDeadLine().compareTo(DateUtil.xHoursLater(2)) < 0
+                        &&
+                        activityInDb.getDeadLine().compareTo(new Date()) > 0
+        )
+            throw new UserWarningException("Son 2 saatte  aktiviteyi silemez/değiştiremezsin");
     }
 
     public List<ActivityDto> activitiesOfUser(Long id) {
@@ -264,9 +278,9 @@ public class ActivityService {
     public List<ActivityDto> toDtoList(List<Activity> activities) {
         List<ActivityDto> activityDtos = new ArrayList<>();
         for (Activity a : activities) {
-        activityDtos.add(toDto(a));
+            activityDtos.add(toDto(a));
         }
-        return  activityDtos;
+        return activityDtos;
     }
 }
 

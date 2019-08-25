@@ -13,6 +13,6 @@ public interface DiscoverRepository extends JpaRepository<Discover,Long>  {
 
     List<Discover> findAll();
 
-    @Query("select d.id from Discover  d")
+    @Query("select d.id from Discover  d where d.youtube <> ''")
     List<Long> findIds();
 }

@@ -64,15 +64,15 @@ public class MessageService {
 
 
         //if writer id=36 dont send the message
-        if(message.getWriter().getId()==36
-                || message.getWriter().getId()==1109
-                || message.getWriter().getId()==44){
-            deleteConversationNedim(message.getReader().getId(),message.getWriter().getId());
-            return messageDto;
-        }
-        else{
+//        if(message.getWriter().getId()==36
+//                || message.getWriter().getId()==1109
+//                || message.getWriter().getId()==44){
+//            deleteConversationNedim(message.getReader().getId(),message.getWriter().getId());
+//            return messageDto;
+//        }
+//        else{
             userEventService.newMessage(message.getReader());
-        }
+     //   }
 
         messageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(), "DD/MM HH:mm"));
         messageDto.setReader(userService.toProfileDto(message.getReader()));

@@ -2,6 +2,7 @@ package com.alinso.myapp.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtil {
@@ -31,6 +32,15 @@ public class DateUtil {
         else{
             return null;
         }
+    }
+
+
+    public static Date xHoursLater(int x){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.HOUR_OF_DAY, x);
+        Date twoHoursLater = calendar.getTime();
+        return twoHoursLater;
     }
 
 

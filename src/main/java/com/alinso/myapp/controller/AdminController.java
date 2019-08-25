@@ -1,8 +1,11 @@
 package com.alinso.myapp.controller;
 
+import com.alinso.myapp.entity.Activity;
+import com.alinso.myapp.entity.Complain;
 import com.alinso.myapp.entity.Message;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.discover.DiscoverDto;
+import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.repository.ActivityRepository;
 import com.alinso.myapp.repository.ActivityRequesRepository;
@@ -30,8 +33,6 @@ public class AdminController {
 
     @Autowired
     ActivityRequesRepository activityRequesRepository;
-    @Autowired
-    UserService userService;
 
     @Autowired
     UserEventService userEventService;
@@ -53,32 +54,16 @@ public class AdminController {
         return new ResponseEntity<String>("okk", HttpStatus.OK);
     }
 
-    @GetMapping("updatePoint/")
-    public ResponseEntity<?> updatePoint() {
-
-        List<User> all = userRepository.findAll();
-        List<User> toBeSaved = new ArrayList<>();
-
-        int i = 0;
-        for (User u : all) {
-            Integer p = userService.calculateUserPoint(u);
-            u.setPoint(p);
-            toBeSaved.add(u);
-            i++;
-            if (i % 50 == 0) {
-                userRepository.saveAll(toBeSaved);
-                toBeSaved.clear();
-            }
-        }
-        return new ResponseEntity<String>("guncelendi " + i, HttpStatus.OK);
-    }
 
 
+    @GetMapping("autoMessage/{page}")
+    public ResponseEntity<?> autoMessage(@PathVariable("page") Integer page) {
+        List<User> selectedUsers = userRepository.findAllWomen(Gender.FEMALE);
+
+        Activity activity =activityRepository.findById(Long.valueOf(3775)).get();
+        List<User> attendedUsers = activityRequesRepository.attendantsOfActivity(activity, ActivityRequestStatus.APPROVED);
 
 
-    @GetMapping("autoMessage")
-    public ResponseEntity<?> autoMessage() {
-        List<User> selectedUsers = userRepository.findAll();
         User tuuce = userRepository.getOne(Long.valueOf(3212));
 
         List<Message> toBeSaved = new ArrayList<>();
@@ -86,18 +71,31 @@ public class AdminController {
         for (User u : selectedUsers) {
             i++;
 
-            if(i<4000)
+
+            if(i<((page-1)*500))
+                continue;
+            if (i > (page*500))
+                break;
+
+
+
+            Boolean attended=false;
+            for(User attendedUser:attendedUsers){
+                if(attendedUser.getId()==u.getId()) {
+                    attended = true;
+                    break;
+                }
+            }
+
+            if(attended)
                 continue;
 
-//            if (i > 4000)
-//                break;
 
-//                String messageText =  u.getName()+" selam nasılsın, bu pazar seğmenlerde aramıza yeni katılan veya aktif olamayan arkadaşlarla tanışacak sohbet edeceğiz" +
-//                        "Katılmak için Ali Soyaslan'ın atkivitesine istek atabilirsin, hem eskilerle tanışabilir hem de soruların varsa sorabilirsin bekleriz:)";
-
-
-            String messageText =  u.getName()+" selam nasıl gidiyor? bu pazar günü Kadir'in balon futbolu aktivitesindeyiz. Çok eğlenceli olacak bunu kaçırma detaylar için Kadir Çorlu'nun aktivitesine istek atabilirsin" +
-                    " grupta detaylar konuşuluyor. Seni de bekliyoruz mutlaka:) iyi akşamlar";
+            String messageText = "Activity Friend partisine bir gün kaldı, sen daha istek göndermedin mi? \n" +
+                    "\n" +
+                    "İlk gelen girişte 100 kişiye ücretsiz shot, dans gösterileri, yarışmalar ve elbette sınırsız müzik ve dans seni bekliyor.\n" +
+                    "\n" +
+                    "Ağustosun en eğlenceli aktivitesine katılmak için acele et ve AF üyelerine özel bu gecede sen de aramızda ol.";
 
 
             Message message = new Message();
@@ -128,18 +126,10 @@ public class AdminController {
     @GetMapping("deleteUser/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
 
-        userService.deleteByIdAdmin(id);
+        adminService.deleteByIdAdmin(id);
         return new ResponseEntity<>("okk", HttpStatus.OK);
 
     }
-
-    @GetMapping("updateUser/{id}")
-    public ResponseEntity<String> updateUSer(@PathVariable("id") Long id) {
-        adminService.updateInvalidUsername(id);
-        return new ResponseEntity<>("okk", HttpStatus.OK);
-
-    }
-
 
     @GetMapping("userInfo/{id}")
     public ResponseEntity<User> userInfo(@PathVariable("id") Long id) {
@@ -152,6 +142,12 @@ public class AdminController {
     public ResponseEntity<String> resetPassword(@PathVariable("id") Long id) {
         adminService.resetPassword(id);
         return new ResponseEntity<>("okk", HttpStatus.OK);
+    }
+
+    @GetMapping("allComplaints")
+    public ResponseEntity<?> getAllComplaints(){
+        List<Complain> complainList  =adminService.getAllComplaints();
+        return new ResponseEntity<>(complainList,HttpStatus.OK);
     }
 
 

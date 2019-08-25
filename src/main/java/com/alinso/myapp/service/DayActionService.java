@@ -14,12 +14,20 @@ import org.springframework.stereotype.Service;
 public class DayActionService {
 
 
-    private final Integer FEMALE_REQUEST_LIMIT = 7;
+    private final Integer FEMALE_REQUEST_LIMIT = 6;
+
+
+    private final Integer NEW_MALE_REQUEST_LIMIT = 2;
     private final Integer REQUEST_LIMIT = 3;
+    private final Integer OLD_MALE_REQUEST_LIMIT = 4;
 
 
-    private final Integer FEMALE_ACTIVITY_LIMIT = 5;
+
+    private final Integer FEMALE_ACTIVITY_LIMIT = 4;
+
+    private final Integer NEW_MALE_ACTIVITY_LIMIT = 1;
     private final Integer ACTIVITY_LIMIT = 2;
+
 
     @Autowired
     DayActionRepository dayActionRepository;
@@ -73,12 +81,25 @@ public class DayActionService {
         DayAction dayAction = dayActionRepository.findByUser(user);
 
         Integer limit = ACTIVITY_LIMIT;
-        if (user.getGender() == Gender.FEMALE && user.getPoint() < 100)
+        String warning  ="";
+        if (user.getGender() == Gender.FEMALE && user.getPoint() < 100) {
             limit = FEMALE_ACTIVITY_LIMIT;
+            warning = "Haftada en fazla " + limit + " aktivite açabilirsin!";
+        }
+        if (user.getGender() == Gender.MALE && user.getPoint() < 30) {
+            limit = NEW_MALE_ACTIVITY_LIMIT;
+            warning = "30 puan altı olduğun için haftada en fazla " + limit + " aktivite açabilirsin!";
+        }
+        if (user.getGender() == Gender.MALE && user.getPoint() >= 30) {
+            limit = ACTIVITY_LIMIT;
+            warning = "Haftada en fazla " + limit + " aktivite açabilirsin!";
+        }
+
+
 
         if (dayAction != null)
             if (dayAction.getActivityCount() >= limit) {
-                throw new UserWarningException("Haftada en fazla " + limit + " aktivite açabilirsin!");
+                throw new UserWarningException(warning);
             }
 
 //        if(!premiumService.isUserPremium(user) && dayAction.getActivityCount() == ACTIVITY_LIMIT){
@@ -93,13 +114,29 @@ public class DayActionService {
 
 
         Integer limit = REQUEST_LIMIT;
-        if (user.getGender() == Gender.FEMALE && user.getPoint() < 100)
+        String warning = "";
+        if (user.getGender() == Gender.FEMALE && user.getPoint() < 100) {
             limit = FEMALE_REQUEST_LIMIT;
+            warning="Günde en fazla " + limit + " istek gönderebilirsin!";
+        }
+
+        if (user.getGender() == Gender.MALE && user.getPoint() < 50) {
+            limit = NEW_MALE_REQUEST_LIMIT;
+            warning=" 50 puan altı olduğun için günde en fazla " + limit + " istek gönderebilirsin!";
+        }
+        if (user.getGender() == Gender.MALE && user.getPoint() < 150 && user.getPoint() > 50) {
+            limit = REQUEST_LIMIT;
+            warning=" 150 puan altı olduğun için günde en fazla " + limit + " istek gönderebilirsin!";
+        }
+        if (user.getGender() == Gender.MALE && user.getPoint() > 150) {
+            limit = OLD_MALE_REQUEST_LIMIT;
+            warning="Günde en fazla " + limit + " istek gönderebilirsin!";
+        }
 
 
         if (dayAction != null)
             if (dayAction.getRequestCount() >= limit) {
-                throw new UserWarningException("Günde en fazla " + limit + " istek gönderebilirsin!");
+                throw new UserWarningException(warning);
             }
 
         //        if(!premiumService.isUserPremium(user) && (dayAction.getRequestCount() == REQUEST_LIMIT){

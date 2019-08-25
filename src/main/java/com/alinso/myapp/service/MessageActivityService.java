@@ -39,6 +39,11 @@ public class MessageActivityService {
         MessageActivity message = new MessageActivity();
         message.setMessage(messageActivityDto.getMessage());
 
+        if(messageActivityDto.getActivityId()==3775)
+            throw new  UserWarningException("Bu aktivite mesaj gönderimlerine kapalıdır. Sorularını instagramdan sorabilirsin");
+
+
+
         //modelMapper.map(messageActivityDto, MessageActivity.class);
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Activity activity= activityService.findEntityById(messageActivityDto.getActivityId());

@@ -108,6 +108,10 @@ public class UserService {
     @Autowired
     PremiumService premiumService;
 
+
+    @Autowired
+    ComplainRepository complainRepository;
+
     //this the registration without mail verification
     public User register(User newUser) {
 
@@ -137,6 +141,12 @@ public class UserService {
         Integer code = rnd.nextInt(999999);
         newUser.setSmsCode(code);
         User user = userRepository.save(newUser);
+
+
+        if(parent!=null) {
+            parent.setReferenceCode(referenceService.makeReferenceCode());
+            userRepository.save(parent);
+        }
 
 
         SendSms.send("Activity Friend kaydı tamamlamak için sms onay kodu : "+code.toString(),newUser.getPhone());
@@ -345,6 +355,16 @@ public class UserService {
             }
 
 
+            //move children
+            User batman = userRepository.getOne(Long.valueOf(3211));
+            List<User> children = userRepository.findByParent(user);
+            for(User child : children){
+                child.setParent(batman);
+                userRepository.save(child);
+            }
+
+
+
             StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
             delete_user_sp.setParameter("userId", id);
             delete_user_sp.execute();
@@ -413,31 +433,49 @@ public class UserService {
             point = 0;
 
         /*
-         * send and get request : 1 (max:10 of activity count)
-         * accept a request : 2
-         * accept a unique request:3
+         * send and get request : 1 (max:8 of activity count)
+         * accept a unique request:3(max:6 of activity count)
          * your request is accepted :2
          * positive review  : 3
          * being followed  : 2
          * being blocked -5
          * negative review: -5
+         * opening an activity 2
+         * complain 2
          * */
+
+        int OPTIMAL_REQUEST_COUNT=8;
+        int OPTIMAL_APPROVAL_COUNT=5;
+        int ACCEPT_UNIQUE_REQUEST=3;
+        int POSITIVE_REVIEW=3;
+        int NEGATIVE_REVIEW=-5;
+        int APPROVED_REQUEST=2;
+        int BEING_FOLLOWED=2;
+        int BEING_BLOCKED=-5;
+        int OPENING_ACTIVITY=2;
+        int COMPLAIN=2;
+
+
+        List<Activity> userActivities  =activityRepository.findByCreatorOrderByDeadLineDesc(user);
+        Integer activityCount=userActivities.size();
 
         //plain incoming requests
         Integer incomingRequestPoint  = activityRequesRepository.incomingRequestCount(user);
-        List<Activity> userActivities  =activityRepository.findByCreatorOrderByDeadLineDesc(user);
 
-        if(incomingRequestPoint>(userActivities.size()*10))
-        incomingRequestPoint=userActivities.size()*10;
+        if(incomingRequestPoint>(activityCount*OPTIMAL_REQUEST_COUNT))
+        incomingRequestPoint=activityCount*OPTIMAL_REQUEST_COUNT;
 
         point=point+incomingRequestPoint; //////// get request
 
 
+        //opening an activity
+        point=point+(activityCount*OPENING_ACTIVITY);
 
 
         //approved requests
         List<ActivityRequest> activityRequestList  =activityRequesRepository.incomingApprovedRequests( user,ActivityRequestStatus.APPROVED);
         List<Long> userIds = new ArrayList<>();
+        int approvalCount = 0;
         for (ActivityRequest r : activityRequestList) {
 
             if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
@@ -449,10 +487,12 @@ public class UserService {
                     }
                 }
                 if (uniqueUser) {
-                    point = point + 2; ////////////// accept a request
+                    point = point + ACCEPT_UNIQUE_REQUEST; ////////////// accept a request
                     userIds.add(r.getApplicant().getId()); ////////accept a unique request
-                } else {
-                    point = point + 1;
+                    approvalCount++;
+                    if(approvalCount>(OPTIMAL_APPROVAL_COUNT*activityCount))
+                        break;
+
                 }
             }
         }
@@ -462,16 +502,16 @@ public class UserService {
         List<Review> rewiReviewList = reviewRepository.findByReader(user);
         for (Review r : rewiReviewList) {
             if (r.getPositive())
-                point = point + 3;  ////get a posivie review
+                point = point + POSITIVE_REVIEW;  ////get a posivie review
             if (!r.getPositive())
-                point = point - 5; ////get a negative review
+                point = point +NEGATIVE_REVIEW; ////get a negative review
         }
 
         //send request and being accepted by activity owner
         List<ActivityRequest> activityRequests = activityRequestService.activityRequesRepository.findByApplicantId(user.getId());
         for (ActivityRequest a : activityRequests) {
             if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
-                point = point + 2;  //////// your request is approved
+                point = point + APPROVED_REQUEST;  //////// your request is approved
             }
             else if(a.getActivityRequestStatus()==ActivityRequestStatus.WAITING && user.getGender()== Gender.FEMALE) {
                 point = point + 1;
@@ -480,23 +520,31 @@ public class UserService {
 
         //followed by someone
         Integer followerCount = followRepository.findFollowerCount(user);
-        point = point + followerCount;
+        point = point + followerCount*BEING_FOLLOWED;
 
         //blocked by someone
         Integer blockedCount = blockService.blockRepository.blockerCount(user);
-        point = point - blockedCount * 5;  //////////being blocked
+        point = point + (blockedCount * BEING_BLOCKED);  //////////being blocked
+
+
+
+        //complain count
+        Integer complainCount  =complainRepository.countOfComplaintsByTheUser(user);
+        point=point+(complainCount*COMPLAIN);
+
+
 
         //review limits the points
-        if (rewiReviewList.size() == 0 && point > 30) {
-            point = 30;
+        if (rewiReviewList.size() == 0 && point > 20) {
+            point = 20;
         } else if (rewiReviewList.size() > 0 && rewiReviewList.size() < 5 && point > 60) {
-            point = 60;
+            point = 50;
         } else if (rewiReviewList.size() > 5 && rewiReviewList.size() < 10 && point > 120) {
             point = 120;
         }
 
 
-        return point;
+        return (point*2/3);
     }
 
     public List<ProfileDto> top100() {
@@ -525,57 +573,7 @@ public class UserService {
         return dtos;
     }
 
-    public void deleteByIdAdmin(Long id) {
-        try {
 
-            User user = userRepository.getOne(id);
-            List<Activity> res = activityRepository.findByCreatorOrderByDeadLineDesc(user);
-
-            for (Activity a : res) {
-                List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(a.getId());
-                for (ActivityRequest r : activityRequests) {
-                    activityRequesRepository.deleteById(r.getId());
-                }
-            }
-            //Delete profile photo
-            String profilePhoto = user.getProfilePicName();
-            fileStorageUtil.deleteFile(profilePhoto);
-
-            //Delete album photos
-            List<Photo> photos = photoService.findByUserId(id);
-            for (Photo p : photos) {
-                photoService.deletePhoto(p.getFileName());
-            }
-
-            //Delete Activity Photos
-            List<Activity> meetingsCreatedByUser = activityRepository.findByCreatorOrderByDeadLineDesc(user);
-            for (Activity a : meetingsCreatedByUser) {
-                if (a.getPhotoName() != null)
-                    fileStorageUtil.deleteFile(a.getPhotoName());
-            }
-
-            User u= new User();
-            u.setName("silinen");
-            u.setSurname("kullanıcı");
-            u.setProfilePicName("");
-            u.setAbout("");
-            u.setEmail("useasdfffasdf4trfd@uyegjfbd.com");
-            u.setPoint(0);
-            u.setMotivation("");
-            u.setGender(user.getGender());
-            u.setPhone(user.getPhone());
-            u.setPassword("$2a$10$vbdDvwd/ZdsDdavjdUVzdOd7dNJm/6kk3xRehEWJtEQ9QntGYXcO2");
-            userRepository.save(u);
-
-            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
-            delete_user_sp.setParameter("userId", id);
-            delete_user_sp.execute();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
 
 //    @Scheduled(fixedRate = 60*60 * 1000, initialDelay = 60 * 1000)

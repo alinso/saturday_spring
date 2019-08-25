@@ -8,6 +8,8 @@ import javax.validation.constraints.NotNull;
 
 public class ReviewDto {
 
+    private Long reviewId;
+
     @NotBlank(message = "Yorum metni boş olamaz")
     private String review;
 
@@ -60,5 +62,13 @@ public class ReviewDto {
 
     public void setPositive(Boolean positive) {
         isPositive = positive;
+    }
+
+    public Long getReviewId() {
+        return reviewId;
+    }
+
+    public void setReviewId(Long reviewId) {
+        this.reviewId = reviewId;
     }
 }

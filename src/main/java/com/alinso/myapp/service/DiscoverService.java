@@ -84,7 +84,7 @@ public class DiscoverService {
         List<Long> ids = discoverRepository.findIds();
         Integer count = ids.size();
         Random rnd  = new Random();
-        Integer idIndex = rnd.nextInt(count-1);
+        Integer idIndex = rnd.nextInt(count);
 
       Discover discover=  discoverRepository.findById(ids.get(idIndex)).get();
       DiscoverDto discoverDto  = modelMapper.map(discover, DiscoverDto.class);

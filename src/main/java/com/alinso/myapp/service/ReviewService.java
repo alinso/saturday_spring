@@ -108,8 +108,11 @@ public class ReviewService {
             for(Activity a2:activityList2){
                 if(a1.getId()==a2.getId()){
                     long DAY_IN_MS = 1000 * 60 * 60 * 24;
-                    Date twoDaysAgo = new Date(System.currentTimeMillis() - (2 * DAY_IN_MS));
-                    if(a1.getDeadLine().compareTo(twoDaysAgo)>0){
+                    long HOUR_IN_MS = 1000*60*60;
+                    Date twoDaysAgo = new Date(System.currentTimeMillis() - (5 * DAY_IN_MS));
+                    Date oneHourAgo = new Date(System.currentTimeMillis() - HOUR_IN_MS);
+
+                    if(a1.getDeadLine().compareTo(twoDaysAgo)>0  && a1.getDeadLine().compareTo(oneHourAgo)<0){
                         return true;
                     }
                 }
@@ -180,6 +183,7 @@ public class ReviewService {
             ReviewDto reviewDto = modelMapper.map(review, ReviewDto.class);
             reviewDto.setWriter(userService.toProfileDto(review.getWriter()));
             reviewDto.setReader(userService.toProfileDto(review.getReader()));
+            reviewDto.setReviewId(review.getId());
             reviewDtos.add(reviewDto);
         }
         return reviewDtos;

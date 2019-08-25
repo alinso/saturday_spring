@@ -114,6 +114,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/m/a/**").permitAll()
                 .antMatchers("/lkaldjfnuterhjbsfsdf/updatePoint/").permitAll()
                 .antMatchers("/lkaldjfnuterhjbsfsdf/**").hasRole("ADMIN")
+                .antMatchers("/xbatmany/**").hasRole("ADMIN")
                 .antMatchers("/infoPage/update/**").hasRole("ADMIN")
                 .antMatchers("/infoPage/findById/**").permitAll()
 

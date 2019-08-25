@@ -1,12 +1,17 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.entity.Activity;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.*;
 import com.alinso.myapp.entity.dto.message.MessageDto;
-import com.alinso.myapp.repository.ActivityRepository;
-import com.alinso.myapp.repository.UserRepository;
+import com.alinso.myapp.exception.UserWarningException;
+import com.alinso.myapp.repository.*;
+import com.alinso.myapp.util.FileStorageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.StoredProcedureQuery;
+import java.util.List;
 
 @Service
 public class AdminService {
@@ -21,40 +26,113 @@ public class AdminService {
     UserRepository userRepository;
 
     @Autowired
+    ComplainRepository complainRepository;
+
+    @Autowired
     ActivityService activityService;
+
+
+    @Autowired
+    BatmanLogRepository batmanLogRepository;
+
 
     @Autowired
     MessageService messageService;
 
+    @Autowired
+    ActivityRequesRepository activityRequesRepository;
 
-    public void updateInvalidUsername(Long id) {
-        User user = userService.findEntityById(id);
-        user.setName("GEÇERSİZ");
-        user.setSurname("İSİM");
-        userRepository.save(user);
+    @Autowired
+    FileStorageUtil fileStorageUtil;
 
-        MessageDto messageDto = new MessageDto();
-        messageDto.setReader(userService.toProfileDto(user));
-        messageDto.setMessage("Merhaba:) Activity Friend içinde insanların gerçek-tam isimlerini kullanmaları gerektiğini düşünüyoruz. Bu nedenle tam ismini kullanırsan seviniriz:)");
+    @Autowired
+    PhotoService photoService;
 
-        messageService.send(messageDto);
+    @Autowired
+    EntityManager entityManager;
+
+    /////////////////////admin////////////////////////////////////////////////////////////////////////////////
+    public List<Complain> getAllComplaints() {
+
+        return complainRepository.findAll();
+
 
     }
-    public void resetPassword(Long id){
+
+    public void resetPassword(Long id) {
         User user = userService.findEntityById(id);
         user.setPassword("$2a$10$vbdDvwd/ZVsD1avjqUVzAOO7JNJm/6kj3xReWEWJfEQ9QnqGYXcO2");
         userRepository.save(user);
     }
 
+    public void deleteByIdAdmin(Long id) {
+        try {
 
 
+            User currentBatman= (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(currentBatman.getId()!=3211)
+                throw new UserWarningException("Erişim Yok!");
 
-    public User userInfo(Long id) {
-        return  userService.findEntityById(id);
+
+            User user = userRepository.getOne(id);
+            List<Activity> res = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+
+            for (Activity a : res) {
+                List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(a.getId());
+                for (ActivityRequest r : activityRequests) {
+                    activityRequesRepository.deleteById(r.getId());
+                }
+            }
+            //Delete profile photo
+            String profilePhoto = user.getProfilePicName();
+            fileStorageUtil.deleteFile(profilePhoto);
+
+            //Delete album photos
+            List<Photo> photos = photoService.findByUserId(id);
+            for (Photo p : photos) {
+                photoService.deletePhoto(p.getFileName());
+            }
+
+            //Delete Activity Photos
+            List<Activity> meetingsCreatedByUser = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+            for (Activity a : meetingsCreatedByUser) {
+                if (a.getPhotoName() != null)
+                    fileStorageUtil.deleteFile(a.getPhotoName());
+            }
+
+            //move children
+            User batman = userRepository.getOne(Long.valueOf(3211));
+            List<User> children = userRepository.findByParent(user);
+            for (User child : children) {
+                child.setParent(batman);
+                userRepository.save(child);
+            }
+
+            User u = new User();
+            u.setName("silinen");
+            u.setSurname("kullanıcı");
+            u.setProfilePicName("");
+            u.setAbout("");
+            u.setEmail("useasdfffasdf4trfd@uyegjfbd.com");
+            u.setPoint(0);
+            u.setMotivation("");
+            u.setGender(user.getGender());
+            u.setPhone(user.getPhone());
+            u.setPassword("$2a$10$vbdDvwd/ZdsDdavjdUVzdOd7dNJm/6kk3xRehEWJtEQ9QntGYXcO2");
+            userRepository.save(u);
+
+            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
+            delete_user_sp.setParameter("userId", id);
+            delete_user_sp.execute();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void deleteActivity(Long id) {
-        Activity activity  =activityRepository.getOne(id);
+        Activity activity = activityRepository.getOne(id);
 
         MessageDto messageDto = new MessageDto();
         messageDto.setReader(userService.toProfileDto(activity.getCreator()));
@@ -72,4 +150,44 @@ public class AdminService {
         messageService.send(messageDto);
 
     }
+
+
+    //////////////////batman/////////////////////////////////////////////////////////////////////////////////////
+    public void updateInvalidUsername(Long id) {
+        User user = userService.findEntityById(id);
+        user.setName("GEÇERSİZ");
+        user.setSurname("İSİM");
+        userRepository.save(user);
+
+        MessageDto messageDto = new MessageDto();
+        messageDto.setReader(userService.toProfileDto(user));
+        messageDto.setMessage("Merhaba:) Activity Friend içinde insanların gerçek-tam isimlerini kullanmaları gerektiğini düşünüyoruz. Bu nedenle tam ismini kullanırsan seviniriz:)");
+
+        messageService.send(messageDto);
+
+    }
+
+    public void updateExtraPoint(Long id, Integer extraPoint) {
+        User user = userService.findEntityById(id);
+
+//////////////////////////////////////////////////////////
+        BatmanLog batmanLog =  new BatmanLog();
+        User batman  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        batmanLog.setBatman(batman);
+        batmanLog.setUser(user);
+        batmanLog.setPoint(extraPoint);
+        batmanLog.setOldPoint(user.getExtraPoint());
+        batmanLogRepository.save(batmanLog);
+///////////////////////////////////////////////
+        user.setExtraPoint(extraPoint);
+        userRepository.save(user);
+
+    }
+
+    public User userInfo(Long id) {
+        return userService.findEntityById(id);
+    }
+
+
 }

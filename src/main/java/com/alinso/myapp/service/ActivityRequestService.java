@@ -8,6 +8,7 @@ import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.ActivityRequesRepository;
+import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.UserUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class ActivityRequestService {
         if (!isThisUserJoined) {
 
 
-            if(activity.getId()!=3083 && activity.getId()!=2602 && activity.getId()!=3205 && activity.getId()!=3434  ) {
+            if(activity.getId()!=3783 && activity.getId()!=3775 && activity.getId()!=3826  ) {
                 //check activity req limit
                 List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
                 if ( allRequests.size() > 14)
@@ -73,9 +74,10 @@ public class ActivityRequestService {
                 Integer maleCount = 0;
                 for(ActivityRequest r:allRequests){
                     if(r.getApplicant().getGender()==Gender.MALE)
-                    maleCount++;
+
+                        maleCount++;
                 }
-                if (loggedUser.getGender() == Gender.MALE && maleCount>6)
+                if (loggedUser.getGender() == Gender.MALE && maleCount>4 && activity.getCreator().getGender()==Gender.FEMALE)
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
             }
@@ -95,6 +97,11 @@ public class ActivityRequestService {
             ActivityRequest activityRequest = activityRequesRepository.findByActivityAndApplicant(loggedUser, activity);
             //delete points if this activity request was approved
             //    userEventService.removeApprovedRequestPoints(activityRequest);
+
+
+            if (activity.getDeadLine().compareTo(DateUtil.xHoursLater(2)) < 0)
+                throw new UserWarningException("Son 2 saatte isteği iptal edemezsin");
+
             activityRequesRepository.delete(activityRequest);
             dayActionService.removeRequest();
         }
@@ -104,12 +111,13 @@ public class ActivityRequestService {
         return !isThisUserJoined;
     }
 
+
     public Boolean isThisUserApprovedTwoDaysLimit(Activity activity){
 
-      User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-      if(u.getId()==3211)
-          return true;
+        if(u.getId()==3211)
+            return true;
 
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
@@ -194,20 +202,20 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity) {
 
-        if(activity.getId()==2951 || activity.getId()==3083|| activity.getId()==3205 || activity.getId()==3434){
+        if(activity.getId()==3783 || activity.getId()==3775 || activity.getId()==3826 ){
             return;
         }
 
         Integer c = activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED);
-        Integer limit = 10;
+        Integer limit = 4;
         User user = activity.getCreator();
-        if (user.getPoint() > 40 && user.getPoint() < 100) {
-            limit = 10;
-        }else if(user.getPoint()>99 && user.getPoint()<400){
-            limit=15;
-        }else if(user.getPoint()>399 && user.getPoint()<800){
-            limit=15;
-        }else if(user.getPoint()>799){
+        if (user.getPoint() > 20 && user.getPoint() < 60) {
+            limit = 6;
+        }else if(user.getPoint()>60 && user.getPoint()<100){
+            limit=8;
+        }else if(user.getPoint()>100 && user.getPoint()<200){
+            limit=12;
+        }else if(user.getPoint()>200){
             limit=15;
         }
 
@@ -260,7 +268,9 @@ public class ActivityRequestService {
 
         if (id1 == 3212 || id2 == 3212)
             return true;
-        if (id2 == 3211)
+
+
+        if (id2 == 3211 || id2 == 5633 || id2 == 5634 || id2 == 5635 || id2 == 5516)
             return true;
 
 
