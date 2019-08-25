@@ -118,9 +118,18 @@ public class UserService {
         City ankara = cityService.findById(Long.valueOf(1));
         String referenceCode  =referenceService.makeReferenceCode();
 
+
+        //reference code for men
         User parent=null;
+        Integer starterPoint=0;
         if(newUser.getGender()==Gender.MALE)
              parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
+
+        if(newUser.getGender()==Gender.FEMALE && !newUser.getReferenceCode().equals("")) {
+            parent = findEntityById(Long.valueOf(newUser.getReferenceCode()));
+            starterPoint=5;
+        }
+
 
         if(newUser.getPhone().length()==10)
             newUser.setPhone("0"+newUser.getPhone());
@@ -130,6 +139,7 @@ public class UserService {
         newUser.setPhotoCount(0);
         newUser.setReviewCount(0);
         newUser.setPoint(0);
+        newUser.setExtraPoint(starterPoint);
         newUser.setCity(ankara);
         newUser.setActivityCount(0);
         newUser.setReferenceCode(referenceCode);
@@ -428,9 +438,9 @@ public class UserService {
 //        userRepository.saveAll(toBeSaved);
 //    }
     public Integer calculateUserPoint(User user) {
-        Integer point = user.getExtraPoint();
-        if (point == null)
-            point = 0;
+
+        Integer oldPoint  =user.getPoint();
+        Integer point =0;
 
         /*
          * send and get request : 1 (max:8 of activity count)
@@ -543,8 +553,23 @@ public class UserService {
             point = 120;
         }
 
+        Integer newPoint=point*2/3;
 
-        return (point*2/3);
+        Integer extraPoint=user.getExtraPoint();
+        if(extraPoint==null)
+            extraPoint=0;
+        newPoint=newPoint+extraPoint;
+
+        if(oldPoint<10 && newPoint>10 && user.getGender()==Gender.FEMALE && user.getParent()!=null){
+            User parent=user.getParent();
+            Integer parentPoint = parent.getExtraPoint()+10;
+            parent.setExtraPoint(parentPoint);
+            userRepository.save(parent);
+        }
+
+
+
+        return newPoint;
     }
 
     public List<ProfileDto> top100() {

@@ -56,8 +56,15 @@ public class UserValidator implements Validator {
         }
 
 
+        if (user.getGender() == Gender.FEMALE && !user.getReferenceCode().equals("")) {
 
+            try {
+                User parent = userService.findEntityById(Long.valueOf(user.getReferenceCode()));
+            }catch(Exception e){
+                errors.rejectValue("referenceCode", "Match", "Geçersiz Referans Kodu");
 
+            }
+        }
 
         if (user.getGender() == Gender.MALE) {
             if (user.getReferenceCode().equals("")) {

@@ -37,9 +37,9 @@ public class ReferenceController {
 
         String referenceCode = user.getReferenceCode();
         if(user.getGender()== Gender.MALE && user.getPoint()<50)
-            referenceCode="Referans olabilmek için yeterli puana(50) sahip değilsin";
+            referenceCode="Erkeklere referans olabilmek için yeterli puana(50) sahip değilsin";
         if(user.getGender()== Gender.FEMALE && user.getPoint()<20)
-            referenceCode="Referans olabilmek için yeterli puana(20) sahip değilsin";
+            referenceCode="Erkeklere referans olabilmek için yeterli puana(20) sahip değilsin";
 
         return new ResponseEntity<>(referenceCode,HttpStatus.OK);
     }

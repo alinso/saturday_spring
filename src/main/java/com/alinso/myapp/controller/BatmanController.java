@@ -43,7 +43,7 @@ public class BatmanController  {
             u.setPoint(p);
             toBeSaved.add(u);
             i++;
-            if (i % 50 == 0) {
+            if (i % 50 == 0   ||  (i+1)==all.size()) {
                 userRepository.saveAll(toBeSaved);
                 toBeSaved.clear();
             }

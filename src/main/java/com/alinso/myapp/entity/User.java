@@ -1,6 +1,7 @@
 package com.alinso.myapp.entity;
 
 import com.alinso.myapp.entity.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -75,6 +76,7 @@ public class User extends BaseEntity implements UserDetails {
 
     //reference parent
     @ManyToOne
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User parent;
 
     @Column
