@@ -44,14 +44,15 @@ public class ActivityRequestService {
     @Autowired
     DayActionService dayActionService;
 
+
+    @Autowired
+    PremiumService premiumService;
+
     public Boolean sendRequest(Long id) {
 
         Activity activity = activityService.findEntityById(id);
         if (activity.getDeadLine().compareTo(new Date()) < 0)
             throw new UserWarningException("Geçmiş tarihli bir aktivitede düzenleme yapamazsınız");
-
-
-
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -63,10 +64,16 @@ public class ActivityRequestService {
         if (!isThisUserJoined) {
 
 
-            if(activity.getId()!=3783 && activity.getId()!=3775 && activity.getId()!=3826  ) {
+            if(activity.getId()!=3783 && activity.getId()!=3490 && activity.getId()!=3826  && activity.getId()!=4136  ) {
+
+
+                String activityCreatorpremiumType = premiumService.userPremiumType(activity.getCreator());
+                String requestSenderpremiumType = premiumService.userPremiumType(loggedUser);
+
+
                 //check activity req limit
                 List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
-                if ( allRequests.size() > 14)
+                if ( allRequests.size() > 14 && !activityCreatorpremiumType.equals("GOLD") && !requestSenderpremiumType.equals("GOLD"))
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
 
@@ -77,7 +84,7 @@ public class ActivityRequestService {
 
                         maleCount++;
                 }
-                if (loggedUser.getGender() == Gender.MALE && maleCount>4 && activity.getCreator().getGender()==Gender.FEMALE)
+                if (loggedUser.getGender() == Gender.MALE && maleCount>4 && activity.getCreator().getGender()==Gender.FEMALE && !requestSenderpremiumType.equals("GOLD"))
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
             }
@@ -202,13 +209,16 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity) {
 
-        if(activity.getId()==3783 || activity.getId()==3775 || activity.getId()==3826 ){
+        if(activity.getId()==3783 || activity.getId()==3490 || activity.getId()==3826 || activity.getId()==4136 ){
             return;
         }
 
         Integer c = activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED);
         Integer limit = 4;
         User user = activity.getCreator();
+
+
+
         if (user.getPoint() > 20 && user.getPoint() < 60) {
             limit = 6;
         }else if(user.getPoint()>60 && user.getPoint()<100){
@@ -218,6 +228,15 @@ public class ActivityRequestService {
         }else if(user.getPoint()>200){
             limit=15;
         }
+
+        String premiumType = premiumService.userPremiumType(user);
+        if(premiumType.equals("GOLD")){
+            limit=25;
+        }
+        if(premiumType.equals("SILVER")){
+            limit=15;
+        }
+
 
         if (c == limit) {
             throw new UserWarningException("Her aktivite için en fazla "+limit+" kişi onaylayabilirsiniz");

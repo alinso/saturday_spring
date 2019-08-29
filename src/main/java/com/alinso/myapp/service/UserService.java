@@ -11,6 +11,7 @@ import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
+import com.alinso.myapp.entity.enums.PremiumDuration;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
@@ -285,14 +286,14 @@ public class UserService {
 
     public ProfileDto getProfileById(Long id) {
         User user;
-
         try {
             user = userRepository.findById(id).get();
+
         } catch (Exception e) {
             throw new RecordNotFound404Exception("Kullanıcı Bulunamadı: " + id);
         }
 //        user.setPoint(calculateUserPoint(user));
-        userRepository.save(user);
+  //      userRepository.save(user);
         return toProfileDto(user);
     }
 
@@ -502,7 +503,6 @@ public class UserService {
                     approvalCount++;
                     if(approvalCount>(OPTIMAL_APPROVAL_COUNT*activityCount))
                         break;
-
                 }
             }
         }
@@ -585,7 +585,8 @@ public class UserService {
         ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
         profileDto.setAge(UserUtil.calculateAge(user));
         profileDto.setInterests(hashtagService.findByUserStr(user));
-        profileDto.setUserPremium(premiumService.isUserPremium(user));
+        profileDto.setPremiumType(premiumService.userPremiumType(user));
+
         return profileDto;
     }
 

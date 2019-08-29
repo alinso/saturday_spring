@@ -1,5 +1,6 @@
 package com.alinso.myapp.entity.dto.user;
 
+import com.alinso.myapp.entity.Premium;
 import com.alinso.myapp.entity.enums.Gender;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,10 @@ public class ProfileDto {
 
     private Integer age;
 
+
+
+    private String premiumType;
+
     @NotNull(message = "Cinsiyet Seçiniz")
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
@@ -41,11 +46,17 @@ public class ProfileDto {
     private Integer point;
     private String interests;
     private String referenceCode;
-   private Boolean isUserPremium;
 
 
 
 //getter setter
+public String getPremiumType() {
+    return premiumType;
+}
+
+    public void setPremiumType(String premiumType) {
+        this.premiumType = premiumType;
+    }
 
     public Integer getReviewCount() {
         return reviewCount;
@@ -171,11 +182,5 @@ public class ProfileDto {
         this.referenceCode = referenceCode;
     }
 
-    public Boolean getUserPremium() {
-        return isUserPremium;
-    }
-
-    public void setUserPremium(Boolean userPremium) {
-        isUserPremium = userPremium;
-    }
 }
+

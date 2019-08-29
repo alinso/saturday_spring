@@ -58,15 +58,11 @@ public class AdminController {
 
     @GetMapping("autoMessage/{page}")
     public ResponseEntity<?> autoMessage(@PathVariable("page") Integer page) {
-        List<User> selectedUsers = userRepository.findAllWomen(Gender.FEMALE);
-
-        Activity activity =activityRepository.findById(Long.valueOf(3775)).get();
-        List<User> attendedUsers = activityRequesRepository.attendantsOfActivity(activity, ActivityRequestStatus.APPROVED);
+        List<User> selectedUsers = userRepository.findZeroPointWomen(Gender.FEMALE);
 
 
         User tuuce = userRepository.getOne(Long.valueOf(3212));
-
-        List<Message> toBeSaved = new ArrayList<>();
+       // List<Message> toBeSaved = new ArrayList<>();
         int i = 0;
         for (User u : selectedUsers) {
             i++;
@@ -79,23 +75,9 @@ public class AdminController {
 
 
 
-            Boolean attended=false;
-            for(User attendedUser:attendedUsers){
-                if(attendedUser.getId()==u.getId()) {
-                    attended = true;
-                    break;
-                }
-            }
-
-            if(attended)
-                continue;
-
-
-            String messageText = "Activity Friend partisine bir gün kaldı, sen daha istek göndermedin mi? \n" +
-                    "\n" +
-                    "İlk gelen girişte 100 kişiye ücretsiz shot, dans gösterileri, yarışmalar ve elbette sınırsız müzik ve dans seni bekliyor.\n" +
-                    "\n" +
-                    "Ağustosun en eğlenceli aktivitesine katılmak için acele et ve AF üyelerine özel bu gecede sen de aramızda ol.";
+            String messageText = "Yarın akşam(28 Ağustos) saat 19'da Kızılay-Route'da buluşuyoruz. Sohbet edip, birşeyler içip tanışıyoruz" +
+                    " Aramıza yeni katılanlar veya aktif olamayanlar için topluluğumuzu tanımaları adına güzel bir fırsat. Hadi sen de gel," +
+                    " merak etme kimse birbirini tanımıyor fakat yine de konuşacak çok şeyimiz var. Katılmak istersen aktiviteme istek atabilirsin (kontenjan 30 kişi)";
 
 
             Message message = new Message();

@@ -144,6 +144,8 @@ public class AdminService {
                 "veya uygulama amacına uymayan " +
                 "veya büyük kalabalıklara hitap eden " +
                 "veya sanal bir platformda grup oluşturma amaçlı" +
+                "veya biriyle ortak olarak açılmış" +
+                "veya aynısından iki tane açılmış" +
                 "veya sanal bir platformun tanıtımı amaçlı veya genal reklam-tanıtım amaçlı aktiviteleri siliyoruz. Bunların tekrarı halinde " +
                 " bu aktiviteleri açan hesapları siliyoruz. Aktiviten bu kurallarımızdan bir veya birkaçını ihlal ediyor. Buna dikkat ederek  aktivitelerini açarsan seviniriz, teşekkürler");
 

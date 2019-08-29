@@ -3,6 +3,7 @@ package com.alinso.myapp.controller;
 import com.alinso.myapp.entity.dto.message.MessageActivityDto;
 import com.alinso.myapp.service.MessageActivityService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
+import com.alinso.myapp.validator.MessageActivityValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +22,16 @@ public class MessageActivityController {
     @Autowired
     MapValidationErrorUtil mapValidationErrorUtil;
 
+    @Autowired
+    MessageActivityValidator messageActivityValidator;
+
     @PostMapping("/send")
     public ResponseEntity<?> send(@Valid @RequestBody MessageActivityDto messageActivityDto, BindingResult result){
 
+        messageActivityValidator.validate(messageActivityDto,result);
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
+
         MessageActivityDto  newMessageDto  =messageActivityService.send(messageActivityDto);
 
         return new ResponseEntity<>(newMessageDto, HttpStatus.ACCEPTED);

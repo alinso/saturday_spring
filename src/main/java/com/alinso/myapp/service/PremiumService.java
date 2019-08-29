@@ -16,39 +16,47 @@ import java.util.List;
 @Service
 public class PremiumService {
 
-    private final double ONE_MONTH_PRICE = 14.90;
-    private final double THREE_MONTHS_PRICE = 39.90;
-    private final double SIX_MONTHS_PRICE = 69.90;
+//    private final double ONE_MONTH_PRICE = 20;
+//    private final double THREE_MONTHS_PRICE = 50;
+//    private final double SIX_MONTHS_PRICE = 90;
 
     @Autowired
     PremiumRepository premiumRepository;
+    @Autowired
+    UserService userService;
 
-    public void save(Premium premium) {
+
+
+    public void save(Premium premium, Long userId) {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if(loggedUser.getId()!=3211)
+//            return;
+
+        User toBePremium  =userService.findEntityById(userId);
 
         //check if already premium
         //if already premium set created at last day of current premium
-        if (isUserPremium(loggedUser))
-            premium.setStartDate(getPremiumLastDate(loggedUser));
+        if (isUserPremium(toBePremium)!=null)
+            premium.setStartDate(getPremiumLastDate(toBePremium));
         else
             premium.setStartDate(new Date());
 
-        premium.setUser(loggedUser);
+        premium.setUser(toBePremium);
         premiumRepository.save(premium);
     }
 
-    public void saveGift(User user, PremiumDuration duration) {
-        Premium premium = new Premium();
-        premium.setType(PremiumType.GIFTED);
-        premium.setDuration(duration);
-        if (isUserPremium(user))
-            premium.setStartDate(getPremiumLastDate(user));
-        else
-            premium.setStartDate(new Date());
-        premium.setUser(user);
-        premiumRepository.save(premium);
-
-    }
+//    public void saveGift(User user, PremiumDuration duration) {
+//        Premium premium = new Premium();
+//        premium.setType(PremiumType.GIFTED);
+//        premium.setDuration(duration);
+//        if (isUserPremium(user))
+//            premium.setStartDate(getPremiumLastDate(user));
+//        else
+//            premium.setStartDate(new Date());
+//        premium.setUser(user);
+//        premiumRepository.save(premium);
+//
+//    }
 
     public Date getPremiumLastDate(User user) {
         //when is final date of premium membership of this use
@@ -62,52 +70,59 @@ public class PremiumService {
         Calendar premiumFinish = Calendar.getInstance();
         premiumFinish.setTime(latestPremium.getStartDate());
 
-        if (latestPremium.getDuration() == PremiumDuration.ONE_MONTH) {
+        if (latestPremium.getDuration() == PremiumDuration.SONE_MONTH || latestPremium.getDuration() == PremiumDuration.GONE_MONTH) {
             premiumFinish.add(Calendar.DATE, 30);
         }
-        if (latestPremium.getDuration() == PremiumDuration.THREE_MONTHS) {
+        if (latestPremium.getDuration() == PremiumDuration.STHREE_MONTHS || latestPremium.getDuration() == PremiumDuration.GTHREE_MONTHS) {
             premiumFinish.add(Calendar.DATE, 90);
         }
-        if (latestPremium.getDuration() == PremiumDuration.SIX_MONTHS) {
+        if (latestPremium.getDuration() == PremiumDuration.SSIX_MONTHS || latestPremium.getDuration() == PremiumDuration.GSIX_MONTHS) {
             premiumFinish.add(Calendar.DATE, 180);
         }
         return premiumFinish.getTime();
     }
 
 
-    public Boolean isUserPremium(User user) {
+    public Premium isUserPremium(User user) {
 
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
 
         Date premiumFinish = getPremiumLastDate(user);
         if (premiumFinish == null)
-            return false;
+            return null;
 
-           /* Calendar premiumFinish = Calendar.getInstance();
-            premiumFinish.setTime(premium.getCreatedAt());
+        if (now.getTime().compareTo(premiumFinish) > 0)
+            return null;
 
-            if (premium.getDuration()== PremiumDuration.ONE_MONTH){
-                premiumFinish.add(Calendar.DATE, 30);
-                if(now.getTime().compareTo(premiumFinish.getTime())<0)
-                    return true;
-            }
-            if (premium.getDuration()== PremiumDuration.THREE_MONTHS){
-                premiumFinish.add(Calendar.DATE, 90);
-                if(now.getTime().compareTo(premiumFinish.getTime())<0)
-                    return true;
-            }
-            if (premium.getDuration()== PremiumDuration.SIX_MONTHS){
-                premiumFinish.add(Calendar.DATE, 180);
-                if(now.getTime().compareTo(premiumFinish.getTime())<0)
-                    return true;
-            }*/
+        List<Premium> latestPremiumList = premiumRepository.findLatestPremiumRecordOfByUser(user);
+        Premium latestPremium = latestPremiumList.get(0);
 
-        if (now.getTime().compareTo(premiumFinish) < 0)
-            return true;
 
-        return false;
+        return latestPremium;
+    }
 
+    public String userPremiumType(User user){
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+
+        Date premiumFinish = getPremiumLastDate(user);
+        if (premiumFinish == null)
+            return "";
+
+        if (now.getTime().compareTo(premiumFinish) > 0)
+            return "";
+
+        List<Premium> latestPremiumList = premiumRepository.findLatestPremiumRecordOfByUser(user);
+        Premium latestPremium = latestPremiumList.get(0);
+
+        if(latestPremium.getDuration()==PremiumDuration.GONE_MONTH || latestPremium.getDuration()==PremiumDuration.GTHREE_MONTHS || latestPremium.getDuration()==PremiumDuration.GSIX_MONTHS){
+            return "GOLD";
+        }
+        if(latestPremium.getDuration()==PremiumDuration.SONE_MONTH || latestPremium.getDuration()==PremiumDuration.STHREE_MONTHS || latestPremium.getDuration()==PremiumDuration.SSIX_MONTHS){
+            return "SILVER";
+        }
+        return null;
     }
 
 }

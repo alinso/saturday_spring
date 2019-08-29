@@ -188,7 +188,7 @@ public class UserEventService {
 //            //check the number of child for this parent
 //            List<ProfileDto> children = referenceService.getChildrenOfParent(parent);
 //            if(children.size()==5){
-//                premiumService.saveGift(parent, PremiumDuration.ONE_MONTH);
+//                premiumService.saveGift(parent, PremiumDuration.SONE_MONTH);
 //                mailService.newPremiumFor5ReferenceMail(parent);
 //            }
 //        }
@@ -201,7 +201,7 @@ public class UserEventService {
 
     //TODO: WİLL BE REMOVED IN FUTURE
         //
-        // premiumService.saveGift(child,PremiumDuration.ONE_MONTH);
+        // premiumService.saveGift(child,PremiumDuration.SONE_MONTH);
     }
 
     public void newMessageActivity(User reader, Activity triggerActivity){

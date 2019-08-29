@@ -1,5 +1,6 @@
 package com.alinso.myapp.entity.enums;
 
 public enum PremiumDuration {
-    ONE_MONTH, THREE_MONTHS, SIX_MONTHS
+    SONE_MONTH, STHREE_MONTHS, SSIX_MONTHS,
+    GONE_MONTH, GTHREE_MONTHS, GSIX_MONTHS
 }

@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("premium")
+@RequestMapping("/premium")
 public class PremiumController {
 
     @Autowired
@@ -22,10 +22,10 @@ public class PremiumController {
     @Autowired
     DayActionService dayActionService;
 
-    @PostMapping("save")
-    public ResponseEntity<?> save(@RequestBody Premium premium) {
+    @PostMapping("save/{userId}")
+    public ResponseEntity<?> save(@RequestBody Premium premium, @PathVariable("userId") Long userId) {
         premium.setType(PremiumType.SOLD);
-        premiumService.save(premium);
+        premiumService.save(premium,userId);
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
