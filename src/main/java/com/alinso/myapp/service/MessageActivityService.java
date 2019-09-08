@@ -38,15 +38,15 @@ public class MessageActivityService {
     public MessageActivityDto send(MessageActivityDto messageActivityDto) {
         MessageActivity message = new MessageActivity();
         message.setMessage(messageActivityDto.getMessage());
+        Activity activity= activityService.findEntityById(messageActivityDto.getActivityId());
 
-        if(messageActivityDto.getActivityId()==3775)
-            throw new  UserWarningException("Bu aktivite mesaj gönderimlerine kapalıdır. Sorularını instagramdan sorabilirsin");
 
+        if(activity.getCreator().getId()==3212)
+            throw new  UserWarningException("Bu aktivite mesaj gönderimlerine kapalı. Sorularını özelden sorabilirsin");
 
 
         //modelMapper.map(messageActivityDto, MessageActivity.class);
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Activity activity= activityService.findEntityById(messageActivityDto.getActivityId());
 
         if(!activityRequestService.isThisUserApprovedTwoDaysLimit(activity))
             throw new UserWarningException("Erişim Yok");

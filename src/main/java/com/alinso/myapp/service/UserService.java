@@ -117,23 +117,23 @@ public class UserService {
     public User register(User newUser) {
 
         City ankara = cityService.findById(Long.valueOf(1));
-        String referenceCode  =referenceService.makeReferenceCode();
+        String referenceCode = referenceService.makeReferenceCode();
 
 
         //reference code for men
-        User parent=null;
-        Integer starterPoint=0;
-        if(newUser.getGender()==Gender.MALE)
-             parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
+        User parent = null;
+        Integer starterPoint = 0;
+        if (newUser.getGender() == Gender.MALE)
+            parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
 
-        if(newUser.getGender()==Gender.FEMALE && !newUser.getReferenceCode().equals("")) {
+        if (newUser.getGender() == Gender.FEMALE && !newUser.getReferenceCode().equals("")) {
             parent = findEntityById(Long.valueOf(newUser.getReferenceCode()));
-            starterPoint=5;
+            starterPoint = 5;
         }
 
 
-        if(newUser.getPhone().length()==10)
-            newUser.setPhone("0"+newUser.getPhone());
+        if (newUser.getPhone().length() == 10)
+            newUser.setPhone("0" + newUser.getPhone());
 
         newUser.setConfirmPassword("");
         newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
@@ -148,19 +148,19 @@ public class UserService {
         newUser.setParent(parent);
 
 
-        Random rnd =  new Random();
+        Random rnd = new Random();
         Integer code = rnd.nextInt(999999);
         newUser.setSmsCode(code);
         User user = userRepository.save(newUser);
 
 
-        if(parent!=null) {
+        if (parent != null) {
             parent.setReferenceCode(referenceService.makeReferenceCode());
             userRepository.save(parent);
         }
 
 
-        SendSms.send("Activity Friend kaydı tamamlamak için sms onay kodu : "+code.toString(),newUser.getPhone());
+        SendSms.send("Activity Friend kaydı tamamlamak için sms onay kodu : " + code.toString(), newUser.getPhone());
         //String token = mailVerificationTokenService.saveToken(user);
         //mailService.sendMailVerificationMail(user, token);
         // userEventService.setReferenceChain(user);
@@ -169,10 +169,10 @@ public class UserService {
     }
 
 
-    public User completeRegistration(Integer code){
+    public User completeRegistration(Integer code) {
 
-        User user =  userRepository.findBySmsCode(code);
-        if(user==null || user.getName().equals("silinen"))
+        User user = userRepository.findBySmsCode(code);
+        if (user == null || user.getName().equals("silinen"))
             throw new UserWarningException("Bu kullanıcı bulunamadı");
 
 
@@ -212,17 +212,17 @@ public class UserService {
             throw new UserWarningException("Bu numara ile kayıtlı kullanıcı bulunamadı");
         }
 
-        if(user.getName().equals("silinen"))
+        if (user.getName().equals("silinen"))
             throw new UserWarningException("Bu numara ile kayıtlı kullanıcı bulunamadı");
 
 
-        Random rnd  =new Random();
+        Random rnd = new Random();
         Integer pureRand = rnd.nextInt(999999);
-        Integer pass = pureRand+100000;
+        Integer pass = pureRand + 100000;
         user.setPassword(bCryptPasswordEncoder.encode(pass.toString()));
         userRepository.save(user);
 
-        SendSms.send("Activity Friend yeni şifreniz : "+pass.toString(),phone);
+        SendSms.send("Activity Friend yeni şifreniz : " + pass.toString(), phone);
     }
 
 //    public void verifyMail(String tokenString) {
@@ -293,7 +293,7 @@ public class UserService {
             throw new RecordNotFound404Exception("Kullanıcı Bulunamadı: " + id);
         }
 //        user.setPoint(calculateUserPoint(user));
-  //      userRepository.save(user);
+        //      userRepository.save(user);
         return toProfileDto(user);
     }
 
@@ -369,11 +369,10 @@ public class UserService {
             //move children
             User batman = userRepository.getOne(Long.valueOf(3211));
             List<User> children = userRepository.findByParent(user);
-            for(User child : children){
+            for (User child : children) {
                 child.setParent(batman);
                 userRepository.save(child);
             }
-
 
 
             StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
@@ -440,8 +439,8 @@ public class UserService {
 //    }
     public Integer calculateUserPoint(User user) {
 
-        Integer oldPoint  =user.getPoint();
-        Integer point =0;
+        Integer oldPoint = user.getPoint();
+        Integer point = 0;
 
         /*
          * send and get request : 1 (max:8 of activity count)
@@ -455,36 +454,36 @@ public class UserService {
          * complain 2
          * */
 
-        int OPTIMAL_REQUEST_COUNT=8;
-        int OPTIMAL_APPROVAL_COUNT=5;
-        int ACCEPT_UNIQUE_REQUEST=3;
-        int POSITIVE_REVIEW=3;
-        int NEGATIVE_REVIEW=-5;
-        int APPROVED_REQUEST=2;
-        int BEING_FOLLOWED=2;
-        int BEING_BLOCKED=-5;
-        int OPENING_ACTIVITY=2;
-        int COMPLAIN=2;
+        int OPTIMAL_REQUEST_COUNT = 8;
+        int OPTIMAL_APPROVAL_COUNT = 5;
+        int ACCEPT_UNIQUE_REQUEST = 3;
+        int POSITIVE_REVIEW = 3;
+        int NEGATIVE_REVIEW = -5;
+        int APPROVED_REQUEST = 2;
+        int BEING_FOLLOWED = 2;
+        int BEING_BLOCKED = -5;
+        int OPENING_ACTIVITY = 2;
+        int COMPLAIN = 2;
 
 
-        List<Activity> userActivities  =activityRepository.findByCreatorOrderByDeadLineDesc(user);
-        Integer activityCount=userActivities.size();
+        List<Activity> userActivities = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+        Integer activityCount = userActivities.size();
 
         //plain incoming requests
-        Integer incomingRequestPoint  = activityRequesRepository.incomingRequestCount(user);
+        Integer incomingRequestPoint = activityRequesRepository.incomingRequestCount(user);
 
-        if(incomingRequestPoint>(activityCount*OPTIMAL_REQUEST_COUNT))
-        incomingRequestPoint=activityCount*OPTIMAL_REQUEST_COUNT;
+        if (incomingRequestPoint > (activityCount * OPTIMAL_REQUEST_COUNT))
+            incomingRequestPoint = activityCount * OPTIMAL_REQUEST_COUNT;
 
-        point=point+incomingRequestPoint; //////// get request
+        point = point + incomingRequestPoint; //////// get request
 
 
         //opening an activity
-        point=point+(activityCount*OPENING_ACTIVITY);
+        point = point + (activityCount * OPENING_ACTIVITY);
 
 
         //approved requests
-        List<ActivityRequest> activityRequestList  =activityRequesRepository.incomingApprovedRequests( user,ActivityRequestStatus.APPROVED);
+        List<ActivityRequest> activityRequestList = activityRequesRepository.incomingApprovedRequests(user, ActivityRequestStatus.APPROVED);
         List<Long> userIds = new ArrayList<>();
         int approvalCount = 0;
         for (ActivityRequest r : activityRequestList) {
@@ -501,7 +500,7 @@ public class UserService {
                     point = point + ACCEPT_UNIQUE_REQUEST; ////////////// accept a request
                     userIds.add(r.getApplicant().getId()); ////////accept a unique request
                     approvalCount++;
-                    if(approvalCount>(OPTIMAL_APPROVAL_COUNT*activityCount))
+                    if (approvalCount > (OPTIMAL_APPROVAL_COUNT * activityCount))
                         break;
                 }
             }
@@ -514,34 +513,39 @@ public class UserService {
             if (r.getPositive())
                 point = point + POSITIVE_REVIEW;  ////get a posivie review
             if (!r.getPositive())
-                point = point +NEGATIVE_REVIEW; ////get a negative review
+                point = point + NEGATIVE_REVIEW; ////get a negative review
         }
 
         //send request and being accepted by activity owner
         List<ActivityRequest> activityRequests = activityRequestService.activityRequesRepository.findByApplicantId(user.getId());
         for (ActivityRequest a : activityRequests) {
-            if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
+
+
+            Integer requestResult = a.getResult();
+            if (a.getResult() == null)
+                requestResult = 1;
+
+            if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && requestResult != 0) {
                 point = point + APPROVED_REQUEST;  //////// your request is approved
-            }
-            else if(a.getActivityRequestStatus()==ActivityRequestStatus.WAITING && user.getGender()== Gender.FEMALE) {
+            } else if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && requestResult == 0) {
+                point = point - APPROVED_REQUEST;
+            } else if (a.getActivityRequestStatus() == ActivityRequestStatus.WAITING && user.getGender() == Gender.FEMALE) {
                 point = point + 1;
             }
         }
 
         //followed by someone
         Integer followerCount = followRepository.findFollowerCount(user);
-        point = point + followerCount*BEING_FOLLOWED;
+        point = point + followerCount * BEING_FOLLOWED;
 
-        //blocked by someone
+        //blocked by someoneac
         Integer blockedCount = blockService.blockRepository.blockerCount(user);
         point = point + (blockedCount * BEING_BLOCKED);  //////////being blocked
 
 
-
         //complain count
-        Integer complainCount  =complainRepository.countOfComplaintsByTheUser(user);
-        point=point+(complainCount*COMPLAIN);
-
+        Integer complainCount = complainRepository.countOfComplaintsByTheUser(user);
+        point = point + (complainCount * COMPLAIN);
 
 
         //review limits the points
@@ -553,20 +557,22 @@ public class UserService {
             point = 120;
         }
 
-        Integer newPoint=point*2/3;
+        Integer newPoint = point * 2 / 3;
 
-        Integer extraPoint=user.getExtraPoint();
-        if(extraPoint==null)
-            extraPoint=0;
-        newPoint=newPoint+extraPoint;
+        Integer extraPoint = user.getExtraPoint();
+        if (extraPoint == null)
+            extraPoint = 0;
+        newPoint = newPoint + extraPoint;
 
-        if(oldPoint<10 && newPoint>10 && user.getGender()==Gender.FEMALE && user.getParent()!=null){
-            User parent=user.getParent();
-            Integer parentPoint = parent.getExtraPoint()+10;
+        if (oldPoint < 10 && newPoint > 10 && user.getGender() == Gender.FEMALE && user.getParent() != null) {
+            User parent = user.getParent();
+            Integer parentPoint = parent.getExtraPoint();
+            if (parentPoint == null)
+                parentPoint = 10;
+
             parent.setExtraPoint(parentPoint);
             userRepository.save(parent);
         }
-
 
 
         return newPoint;
@@ -587,6 +593,33 @@ public class UserService {
         profileDto.setInterests(hashtagService.findByUserStr(user));
         profileDto.setPremiumType(premiumService.userPremiumType(user));
 
+
+        //attendance rate
+        List<ActivityRequest> activityRequests = activityRequesRepository.findByApplicantId(user.getId());
+
+        Integer approveCount = 0;
+        Integer nonAttendCount = 0;
+
+        for (ActivityRequest a : activityRequests) {
+
+            Integer result=a.getResult();
+            if(result==null)
+                result=1;
+
+            if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
+                approveCount++;
+            }
+            if (result == 0 && a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
+                nonAttendCount++;
+            }
+        }
+
+        if(approveCount>0) {
+            Integer attendCount = (approveCount - nonAttendCount) * 100;
+            Integer percent = attendCount / approveCount;
+            profileDto.setAttendPercent(percent);
+        }
+
         return profileDto;
     }
 
@@ -598,8 +631,6 @@ public class UserService {
         }
         return dtos;
     }
-
-
 
 
 //    @Scheduled(fixedRate = 60*60 * 1000, initialDelay = 60 * 1000)

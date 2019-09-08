@@ -48,6 +48,19 @@ public class ActivityRequestService {
     @Autowired
     PremiumService premiumService;
 
+
+    public void saveResult(Long requestId, Integer result) {
+
+            User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        ActivityRequest activityRequest = activityRequesRepository.findById(requestId).get();
+        if (activityRequest.getActivity().getCreator().getId() == loggedUser.getId()) {
+            activityRequest.setResult(result);
+            activityRequesRepository.save(activityRequest);
+        }
+    }
+
+
     public Boolean sendRequest(Long id) {
 
         Activity activity = activityService.findEntityById(id);
@@ -64,7 +77,7 @@ public class ActivityRequestService {
         if (!isThisUserJoined) {
 
 
-            if(activity.getId()!=3783 && activity.getId()!=3490 && activity.getId()!=3826  && activity.getId()!=4136  ) {
+            if (activity.getId() != 4469) {
 
 
                 String activityCreatorpremiumType = premiumService.userPremiumType(activity.getCreator());
@@ -73,18 +86,18 @@ public class ActivityRequestService {
 
                 //check activity req limit
                 List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
-                if ( allRequests.size() > 14 && !activityCreatorpremiumType.equals("GOLD") && !requestSenderpremiumType.equals("GOLD"))
+                if (allRequests.size() > 14 && !activityCreatorpremiumType.equals("GOLD") && !requestSenderpremiumType.equals("GOLD"))
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
 
                 //check male limit
                 Integer maleCount = 0;
-                for(ActivityRequest r:allRequests){
-                    if(r.getApplicant().getGender()==Gender.MALE)
+                for (ActivityRequest r : allRequests) {
+                    if (r.getApplicant().getGender() == Gender.MALE)
 
                         maleCount++;
                 }
-                if (loggedUser.getGender() == Gender.MALE && maleCount>4 && activity.getCreator().getGender()==Gender.FEMALE && !requestSenderpremiumType.equals("GOLD"))
+                if (loggedUser.getGender() == Gender.MALE && maleCount > 4 && activity.getCreator().getGender() == Gender.FEMALE && !requestSenderpremiumType.equals("GOLD") && !activityCreatorpremiumType.equals("GOLD"))
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
             }
@@ -119,25 +132,25 @@ public class ActivityRequestService {
     }
 
 
-    public Boolean isThisUserApprovedTwoDaysLimit(Activity activity){
+    public Boolean isThisUserApprovedTwoDaysLimit(Activity activity) {
 
-        User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(u.getId()==3211)
+        if (u.getId() == 3211)
             return true;
 
         Calendar now = Calendar.getInstance();
         now.setTime(new Date());
         now.add(Calendar.DATE, -2);
 
-        if(activity.getDeadLine().compareTo(now.getTime())<0)
+        if (activity.getDeadLine().compareTo(now.getTime()) < 0)
             return false;
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(activity.getCreator().getId() == loggedUser.getId())
+        if (activity.getCreator().getId() == loggedUser.getId())
             return true;
 
-        Boolean isThisUserApproved   = false;
+        Boolean isThisUserApproved = false;
         List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(activity.getId());
         for (ActivityRequest activityRequest : activityRequests) {
             if (activityRequest.getApplicant().getId() == loggedUser.getId() && activityRequest.getActivityRequestStatus().equals(ActivityRequestStatus.APPROVED)) {
@@ -147,13 +160,13 @@ public class ActivityRequestService {
         return isThisUserApproved;
     }
 
-    public Boolean isThisUserApprovedAllTimes(Activity activity){
+    public Boolean isThisUserApprovedAllTimes(Activity activity) {
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(activity.getCreator().getId() == loggedUser.getId())
+        if (activity.getCreator().getId() == loggedUser.getId())
             return true;
 
-        Boolean isThisUserApproved   = false;
+        Boolean isThisUserApproved = false;
         List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(activity.getId());
         for (ActivityRequest activityRequest : activityRequests) {
             if (activityRequest.getApplicant().getId() == loggedUser.getId() && activityRequest.getActivityRequestStatus().equals(ActivityRequestStatus.APPROVED)) {
@@ -171,7 +184,7 @@ public class ActivityRequestService {
 
         //check Activity time
         Date now = new Date();
-        if(activityRequest.getActivity().getDeadLine().compareTo(now)<0){
+        if (activityRequest.getActivity().getDeadLine().compareTo(now) < 0) {
             throw new UserWarningException("Tarihi geçmiş aktivitede değişiklik yapamazsın");
         }
 
@@ -209,7 +222,7 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity) {
 
-        if(activity.getId()==3783 || activity.getId()==3490 || activity.getId()==3826 || activity.getId()==4136 ){
+        if (activity.getId() == 4469) {
             return;
         }
 
@@ -218,28 +231,27 @@ public class ActivityRequestService {
         User user = activity.getCreator();
 
 
-
         if (user.getPoint() > 20 && user.getPoint() < 60) {
             limit = 6;
-        }else if(user.getPoint()>60 && user.getPoint()<100){
-            limit=8;
-        }else if(user.getPoint()>100 && user.getPoint()<200){
-            limit=12;
-        }else if(user.getPoint()>200){
-            limit=15;
+        } else if (user.getPoint() > 60 && user.getPoint() < 100) {
+            limit = 8;
+        } else if (user.getPoint() > 100 && user.getPoint() < 200) {
+            limit = 12;
+        } else if (user.getPoint() > 200) {
+            limit = 15;
         }
 
         String premiumType = premiumService.userPremiumType(user);
-        if(premiumType.equals("GOLD")){
-            limit=25;
+        if (premiumType.equals("GOLD")) {
+            limit = 25;
         }
-        if(premiumType.equals("SILVER")){
-            limit=15;
+        if (premiumType.equals("SILVER")) {
+            limit = 15;
         }
 
 
         if (c == limit) {
-            throw new UserWarningException("Her aktivite için en fazla "+limit+" kişi onaylayabilirsiniz");
+            throw new UserWarningException("Her aktivite için en fazla " + limit + " kişi onaylayabilirsiniz");
         }
     }
 
@@ -298,8 +310,8 @@ public class ActivityRequestService {
 
 
         //if they hosted each other
-        Integer user1host = activityRequesRepository.haveUser1HostUser2(user1, user2, ActivityRequestStatus.APPROVED,now.getTime());
-        Integer user2host = activityRequesRepository.haveUser1HostUser2(user2, user1, ActivityRequestStatus.APPROVED,now.getTime());
+        Integer user1host = activityRequesRepository.haveUser1HostUser2(user1, user2, ActivityRequestStatus.APPROVED, now.getTime());
+        Integer user2host = activityRequesRepository.haveUser1HostUser2(user2, user1, ActivityRequestStatus.APPROVED, now.getTime());
 
         if (user1host > 0 || user2host > 0)
             return true;
@@ -312,7 +324,38 @@ public class ActivityRequestService {
 
         for (Activity a1 : activityList1) {
             for (Activity a2 : activityList2) {
-                if (a1.getId() == a2.getId() && a1.getDeadLine().compareTo(now.getTime()) >0 ) {
+                if (a1.getId() == a2.getId() && a1.getDeadLine().compareTo(now.getTime()) > 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    public boolean haveTheseUsersMeetAllTimes(Long id1, Long id2) {
+
+
+        User user1 = userService.findEntityById(id1);
+        User user2 = userService.findEntityById(id2);
+
+
+        //if they hosted each other
+        Integer user1host = activityRequesRepository.haveUser1HostUser2AllTimes(user1, user2, ActivityRequestStatus.APPROVED);
+        Integer user2host = activityRequesRepository.haveUser1HostUser2AllTimes(user2, user1, ActivityRequestStatus.APPROVED);
+
+        if (user1host > 0 || user2host > 0)
+            return true;
+
+
+        //if they hosted by same activity
+        List<Activity> activityList1 = activityRequesRepository.activitiesAttendedByUser(user1, ActivityRequestStatus.APPROVED);
+        List<Activity> activityList2 = activityRequesRepository.activitiesAttendedByUser(user2, ActivityRequestStatus.APPROVED);
+
+
+        for (Activity a1 : activityList1) {
+            for (Activity a2 : activityList2) {
+                if (a1.getId() == a2.getId()) {
                     return true;
                 }
             }

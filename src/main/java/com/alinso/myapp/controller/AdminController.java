@@ -58,8 +58,10 @@ public class AdminController {
 
     @GetMapping("autoMessage/{page}")
     public ResponseEntity<?> autoMessage(@PathVariable("page") Integer page) {
-        List<User> selectedUsers = userRepository.findZeroPointWomen(Gender.FEMALE);
+        List<User> selectedUsers = userRepository.findAll();
 
+        if(page==0)
+            page=1;
 
         User tuuce = userRepository.getOne(Long.valueOf(3212));
        // List<Message> toBeSaved = new ArrayList<>();
@@ -75,9 +77,14 @@ public class AdminController {
 
 
 
-            String messageText = "Yarın akşam(28 Ağustos) saat 19'da Kızılay-Route'da buluşuyoruz. Sohbet edip, birşeyler içip tanışıyoruz" +
-                    " Aramıza yeni katılanlar veya aktif olamayanlar için topluluğumuzu tanımaları adına güzel bir fırsat. Hadi sen de gel," +
-                    " merak etme kimse birbirini tanımıyor fakat yine de konuşacak çok şeyimiz var. Katılmak istersen aktiviteme istek atabilirsin (kontenjan 30 kişi)";
+//            String messageText = "Yarın akşam(28 Ağustos) saat 19'da Kızılay-Route'da buluşuyoruz. Sohbet edip, birşeyler içip tanışıyoruz" +
+//                    " Aramıza yeni katılanlar veya aktif olamayanlar için topluluğumuzu tanımaları adına güzel bir fırsat. Hadi sen de gel," +
+//                    " merak etme kimse birbirini tanımıyor fakat yine de konuşacak çok şeyimiz var. Katılmak istersen aktiviteme istek atabilirsin (kontenjan 30 kişi)";
+            String messageText = "Merhaba "+u.getName()+", biliyorsun ki Activity Friend kullanıcı kalitesine çok dikkat ediyor. Kadın/Erkek cinsiyet oranının dengede olması da kalite anlayışımıza dahil. Kadınlar topluluğumuza ön yargılı yaklaşabiliyor, haklı olarak bilmedikleri bir ortam olduğu için güven sorunu yaşıyorlar. Bu konuda bize destek olabilir ve arkadaşlarına anlatıp onların da aramıza katılmalarını sağlayabilirsin. Burada çok güzel bir  topluluk olduk, bu güzelliği paylaşmamızda ve daha fazla kadına ulaşmamızda yardım et.\n" +
+                    "\n" +
+                    "                    Ayrıca profilim-referans ol sayfasındaki referans kodu ile kadınlara referans olup üye olmalarını sağlayarak puan kazanabilirsin. Senin referansınla üye olan her kadına başlangıçta 5 puan veriyoruz. Arkadaşın 10 puan olduğunda sana da 10 puan ekliyoruz.\n" +
+                    "\n" +
+                    "            Activity Friend'i bu günlere birlikte getirdik, bundan sonra da birlikte devam edeceğiz, bu serüvenin bir parçası olduğun için teşekkür ederiz";
 
 
             Message message = new Message();

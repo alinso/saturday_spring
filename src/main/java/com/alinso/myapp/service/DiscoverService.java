@@ -2,6 +2,7 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.Discover;
+import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.discover.DiscoverDto;
 import com.alinso.myapp.repository.CityRepository;
 import com.alinso.myapp.repository.DiscoverRepository;
@@ -9,6 +10,7 @@ import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -88,6 +90,13 @@ public class DiscoverService {
 
       Discover discover=  discoverRepository.findById(ids.get(idIndex)).get();
       DiscoverDto discoverDto  = modelMapper.map(discover, DiscoverDto.class);
+      User user =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+      if(user.getPoint()<20 && discoverDto.getId()==84)
+      {
+          discoverDto=null;
+      }
+
       return  discoverDto;
 
     }

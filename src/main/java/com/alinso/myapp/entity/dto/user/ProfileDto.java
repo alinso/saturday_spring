@@ -30,6 +30,8 @@ public class ProfileDto {
 
     private Integer age;
 
+    private Integer attendPercent;
+
 
 
     private String premiumType;
@@ -182,5 +184,12 @@ public String getPremiumType() {
         this.referenceCode = referenceCode;
     }
 
+    public Integer getAttendPercent() {
+        return attendPercent;
+    }
+
+    public void setAttendPercent(Integer attendPercent) {
+        this.attendPercent = attendPercent;
+    }
 }
 

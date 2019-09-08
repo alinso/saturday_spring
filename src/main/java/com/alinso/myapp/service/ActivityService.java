@@ -76,8 +76,27 @@ public class ActivityService {
 
         ActivityDto activityDto = toDto(activity);
 
-        if (!activityRequestService.isThisUserApprovedAllTimes(activity))
-            activityDto.setAttendants(null);
+
+        List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(activity.getId());
+        List<ActivityRequestDto> activityRequestDtos = new ArrayList<>();
+
+        if (activityRequestService.isThisUserApprovedAllTimes(activity)) { //only attedndats cann see attendants
+            for (ActivityRequest activityRequest : activityRequests) {
+                if (activityRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) { //only approved users should be seen
+                    ActivityRequestDto activityRequestDto = new ActivityRequestDto();
+                    activityRequestDto.setProfileDto(userService.toProfileDto(activityRequest.getApplicant()));
+                    activityRequestDto.setActivityRequestStatus(activityRequest.getActivityRequestStatus());
+                    activityRequestDto.setId(activityRequest.getId());
+                    activityRequestDto.setResult(activityRequest.getResult());
+
+                    activityRequestDtos.add(activityRequestDto);
+                }
+            }
+            activityDto.setRequests(activityRequestDtos);
+        }
+
+
+        activityDto.setAttendants(null);
 
         return activityDto;
 
@@ -155,10 +174,10 @@ public class ActivityService {
         List<ActivityDto> activityDtos = new ArrayList<>();
 
         //balon futbolu
-//        if (pageNum == 0) {
-//               Activity selected = activityRepository.findById(Long.valueOf(4136)).get();
-//               activityDtos.add(toDto(selected));
-//        }
+            if (pageNum == 0) {
+                   Activity selected = activityRepository.findById(Long.valueOf(4469)).get();
+                   activityDtos.add(toDto(selected));
+            }
 
         for (Activity activity : activities) {
 
@@ -203,9 +222,9 @@ public class ActivityService {
     }
 
 
-    public void cannotEditInLAstTwoHours(Activity activityInDb){
-        User u = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(u.getId()==3211)
+    public void cannotEditInLAstTwoHours(Activity activityInDb) {
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (u.getId() == 3211)
             return;
 
         if (

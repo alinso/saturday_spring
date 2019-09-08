@@ -23,6 +23,9 @@ public class ActivityRequest extends BaseEntity{
     @Enumerated(EnumType.ORDINAL)
     private ActivityRequestStatus activityRequestStatus;
 
+    @Column
+    private Integer result;
+
 
     public Activity getActivity() {
         return activity;
@@ -48,4 +51,11 @@ public class ActivityRequest extends BaseEntity{
         this.activityRequestStatus = activityRequestStatus;
     }
 
+    public Integer getResult() {
+        return result;
+    }
+
+    public void setResult(Integer result) {
+        this.result = result;
+    }
 }

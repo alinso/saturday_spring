@@ -33,4 +33,12 @@ public class ActivityRequestController {
     }
 
 
+    @GetMapping("requestResult/{requestId}/{result}")
+    public ResponseEntity<?> saveResults(@PathVariable("requestId") Long requestId, @PathVariable("result") Integer result){
+        activityRequestService.saveResult(requestId,result);
+
+        return new ResponseEntity<>("SAVED",HttpStatus.OK);
+    }
+
+
 }

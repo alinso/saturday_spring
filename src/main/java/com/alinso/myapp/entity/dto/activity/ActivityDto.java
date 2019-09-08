@@ -130,4 +130,5 @@ public class ActivityDto {
     public void setHashtagListString(String hashtagListString) {
         this.hashtagListString = hashtagListString;
     }
+
 }

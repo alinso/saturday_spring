@@ -8,6 +8,7 @@ public class ActivityRequestDto {
     private Long id;
     private ActivityRequestStatus activityRequestStatus;
     private ProfileDto profileDto;
+    private Integer result;
 
     public ActivityRequestStatus getActivityRequestStatus() {
         return activityRequestStatus;
@@ -31,5 +32,13 @@ public class ActivityRequestDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getResult() {
+        return result;
+    }
+
+    public void setResult(Integer result) {
+        this.result = result;
     }
 }

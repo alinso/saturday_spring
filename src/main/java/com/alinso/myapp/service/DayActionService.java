@@ -82,7 +82,7 @@ public class DayActionService {
         Integer limit = NEW_USER_ACTIVITY_LIMIT;
         String warning  ="50 puan altı olduğun için haftada en fazla " + limit + " aktivite açabilirsin!";
 
-        if (user.getGender() == Gender.MALE && user.getPoint() > 50) {
+        if (user.getPoint() > 50) {
             limit = OLD_USER_ACTIVITY_LIMIT;
             warning = "Haftada en fazla " + limit + " aktivite açabilirsin!";
         }
