@@ -215,6 +215,9 @@ public class UserController {
     public ResponseEntity<?> profile(@PathVariable("id") Long id) {
         ProfileDto profileDto = userService.getProfileById(id);
 
+        profileDto.setAttendPercent(userService.attendanceRate(id));
+        profileDto.setFollowerCount(userService.followerCount(id));
+
         //TODO: references and reviews will be loaded too..
 
         return new ResponseEntity<>(profileDto, HttpStatus.OK);

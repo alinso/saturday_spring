@@ -35,11 +35,11 @@ public class PremiumController {
         return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
-    @GetMapping("checkRequestLimit")
-    public ResponseEntity<?> checkRequestLimit() {
-        dayActionService.checkRequestLimit();
-        return new ResponseEntity<>("OK", HttpStatus.OK);
-    }
+//    @GetMapping("checkRequestLimit")
+//    public ResponseEntity<?> checkRequestLimit() {
+//        dayActionService.checkRequestLimit();
+//        return new ResponseEntity<>("OK", HttpStatus.OK);
+//    }
 
 
     @GetMapping("latestPremiumDate")

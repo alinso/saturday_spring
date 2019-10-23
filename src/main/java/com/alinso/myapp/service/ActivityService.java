@@ -174,8 +174,9 @@ public class ActivityService {
         List<ActivityDto> activityDtos = new ArrayList<>();
 
         //balon futbolu
-            if (pageNum == 0) {
-                   Activity selected = activityRepository.findById(Long.valueOf(4469)).get();
+        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (pageNum == 0 && u.getCity().getId()==1) {
+                   Activity selected = activityRepository.findById(Long.valueOf(5645)).get();
                    activityDtos.add(toDto(selected));
             }
 

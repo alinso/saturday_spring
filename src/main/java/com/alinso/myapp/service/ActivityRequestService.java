@@ -77,7 +77,7 @@ public class ActivityRequestService {
         if (!isThisUserJoined) {
 
 
-            if (activity.getId() != 4469) {
+            if (activity.getCreator().getId() != 3212 && activity.getCreator().getId() != 448) {
 
 
                 String activityCreatorpremiumType = premiumService.userPremiumType(activity.getCreator());
@@ -103,7 +103,7 @@ public class ActivityRequestService {
             }
 
             //check if user reached the limit
-            dayActionService.checkRequestLimit();
+            dayActionService.checkRequestLimit(activity);
 
 
             ActivityRequest newActivityRequest = new ActivityRequest();
@@ -222,7 +222,7 @@ public class ActivityRequestService {
 
     public void checkMaxApproveCountExceeded(Activity activity) {
 
-        if (activity.getId() == 4469) {
+        if (activity.getCreator().getId() == 3212 || activity.getCreator().getId() == 448) {
             return;
         }
 
@@ -297,7 +297,7 @@ public class ActivityRequestService {
         now.add(Calendar.DATE, -2);
 
 
-        if (id1 == 3212 || id2 == 3212)
+        if (id1 == 3212 || id2 == 3212 || id1==448 || id2==448)
             return true;
 
 
@@ -354,7 +354,13 @@ public class ActivityRequestService {
 
 
         for (Activity a1 : activityList1) {
+
+            if(a1.getCreator().getId()==3212 || a1.getCreator().getId()==448)
+                continue;
+
             for (Activity a2 : activityList2) {
+                if(a1.getCreator().getId()==3212 || a1.getCreator().getId()==448)
+                    continue;
                 if (a1.getId() == a2.getId()) {
                     return true;
                 }

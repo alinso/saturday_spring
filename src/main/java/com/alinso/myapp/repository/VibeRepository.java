@@ -19,5 +19,8 @@ public interface VibeRepository extends JpaRepository<Vibe,Long> {
 
 
     @Query("select v from Vibe v where v.reader= :reader")
-    List<Vibe> findByReader(@Param("reader") User reader);
+    List<Vibe>  findByReader(@Param("reader") User reader);
+
+    @Query("select v from Vibe v where v.writer= :writer")
+    List<Vibe> findByWriter(@Param("writer") User writer);
 }

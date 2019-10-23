@@ -40,6 +40,17 @@ public class VibeController {
         Integer vibe  =vibeService.calculateVibe(userId);
         return new ResponseEntity<Integer>(vibe,HttpStatus.OK);
     }
+    @GetMapping("vibePercentOfActivityOwner/{activityId}")
+    public ResponseEntity<?> vibePercentOfActivityOwner(@PathVariable("activityId") Long activityId){
+        Integer vibe  =vibeService.calculateVibeOfActivityOwner(activityId);
+        return new ResponseEntity<Integer>(vibe,HttpStatus.OK);
+    }
+
+    @GetMapping("vibePercentOfRequestOwner/{requestId}")
+    public ResponseEntity<?> vibePercentOfRequestOwner(@PathVariable("requestId") Long requestId){
+        Integer vibe  =vibeService.vibePercentOfRequestOwner(requestId);
+        return new ResponseEntity<Integer>(vibe,HttpStatus.OK);
+    }
 
 
     @GetMapping("myVibeOfThisUser/{userId}")

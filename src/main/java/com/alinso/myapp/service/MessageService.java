@@ -222,7 +222,7 @@ public class MessageService {
         //this will be changed in future
         if (reader.getGender() == Gender.FEMALE) {
             sender = userService.findByEmail("superman@gmail.com");
-            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, Activity Friend ticari kaygı gütmeyen sosyal  bir oluşumdur:)  \n" +
+            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, Activity Friend uygulamadan ziyade sosyal bir oluşumdur:)  \n" +
                     " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
                     " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
                     "\n" +
@@ -233,7 +233,8 @@ public class MessageService {
                     "\n" +
                     "\n" +
                     " Herhangi biriyle bir şey yapmadan önce o kişi " +
-                    " hakkında yazılanları okuyabilir, katıldığı aktiviteleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
+                    " hakkında olumlu izlenim oranını, katıldığı aktiviteleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
+                    "\n İlk bir ay boyunca uygulamayı silver kullanıcı özelliklerinde kullanıyor olacaksın, bu aramıza yeni katılan arkadaşlar için hoş geldin hediyemiz :)" +
                     "\n Sormak istediğin herhangi bir şey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarım." +
                     "\n" +
                     "İyi eğlenceler:)");
@@ -241,7 +242,7 @@ public class MessageService {
         else {
             sender = userService.findByEmail("superman@gmail.com");
 
-            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, Activity Friend ticari kaygı gütmeyen sosyal  bir oluşumdur:)  \n" +
+            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, Activity Friend uygulamadan ziyade sosyal bir oluşumdur:)  \n" +
                     " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
                     " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
                     "\n" +
@@ -252,6 +253,7 @@ public class MessageService {
                     "\n" +
                     " Herhangi biriyle bir şey yapmadan önce o kişi " +
                     " hakkında yazılanları okuyabilir, katıldığı aktiviteleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
+                    "\n İlk bir ay boyunca uygulamayı silver kullanıcı özelliklerinde kullanıyor olacaksın, bu aramıza yeni katılan arkadaşlar için hoş geldin hediyemiz :)" +
                     "\n Sormak istediğin herhangi bir şey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarım." +
                     "\n" +
                     "İyi eğlenceler:)");

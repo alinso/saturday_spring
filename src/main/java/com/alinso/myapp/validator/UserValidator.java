@@ -52,35 +52,24 @@ public class UserValidator implements Validator {
         }
 
         if (user.getGender() == Gender.UNSELECTED) {
-            errors.rejectValue("gender", "Match", "Cinsiyet Seçiniz");
+            errors.rejectValue("gender", "Match", "Cinsiyet Seçmelisin");
         }
 
 
-        if (user.getGender() == Gender.FEMALE && !user.getReferenceCode().equals("")) {
-
-            try {
-                User parent = userService.findEntityById(Long.valueOf(user.getReferenceCode()));
-            }catch(Exception e){
+        if (user.getReferenceCode().equals("")) {
+            errors.rejectValue("referenceCode", "Match", "Referans kodu olmadan kaydolamazsın, referans kodunu üyeler verebilir");
+        } else {
+            User parent = referenceService.findByCode(user.getReferenceCode());
+            if (parent == null) {
                 errors.rejectValue("referenceCode", "Match", "Geçersiz Referans Kodu");
-
             }
-        }
 
-        if (user.getGender() == Gender.MALE) {
-            if (user.getReferenceCode().equals("")) {
-                errors.rejectValue("referenceCode", "Match", "Referans kodunuz olmadan üye olamazsınız, referans kodunu üyeler verebilir");
-            } else {
-                User parent = referenceService.findByCode(user.getReferenceCode());
-                if (parent == null) {
-                    errors.rejectValue("referenceCode", "Match", "Geçersiz Referans Kodu");
-                }
-            }
 
 //            errors.rejectValue("gender","Match", "Erkek kontenjanımız dolu olduğu için geçici olarak erkek kayıtlarımızı durdurduk." +
 //                    " Bir cinsiyetin oranı diğerine karşı dengesiz bir üstünlük sağladığında ancak bu şekilde dengeyi sağlayabiliyoruz:( Anlayışla karşılayacağını " +
 //                    "umuyoruz. İnstagram hesabımızı takipte kalırsan " +
 //                    " açıldığında Instagramdan duyurusunu yapacağız, teşekkür ederiz");
-        }
+    }
 
 
 //        if (!user.getReferenceCode().equals("")) {
@@ -89,8 +78,8 @@ public class UserValidator implements Validator {
 //                errors.rejectValue("referenceCode", "Match", "");
 //            }
 //        }
-        //confirmPassword
+    //confirmPassword
 
 
-    }
+}
 }

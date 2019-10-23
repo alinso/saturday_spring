@@ -32,6 +32,8 @@ public class ProfileDto {
 
     private Integer attendPercent;
 
+    private Integer followerCount;
+
 
 
     private String premiumType;
@@ -190,6 +192,14 @@ public String getPremiumType() {
 
     public void setAttendPercent(Integer attendPercent) {
         this.attendPercent = attendPercent;
+    }
+
+    public Integer getFollowerCount() {
+        return followerCount;
+    }
+
+    public void setFollowerCount(Integer followerCount) {
+        this.followerCount = followerCount;
     }
 }
 

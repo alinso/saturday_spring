@@ -12,6 +12,7 @@ import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.entity.enums.PremiumDuration;
+import com.alinso.myapp.entity.enums.VibeType;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
@@ -35,10 +36,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.StoredProcedureQuery;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -109,6 +107,9 @@ public class UserService {
     @Autowired
     PremiumService premiumService;
 
+    @Autowired
+    VibeRepository vibeRepository;
+
 
     @Autowired
     ComplainRepository complainRepository;
@@ -116,20 +117,13 @@ public class UserService {
     //this the registration without mail verification
     public User register(User newUser) {
 
-        City ankara = cityService.findById(Long.valueOf(1));
+        //City ankara = cityService.findById(Long.valueOf(1));
         String referenceCode = referenceService.makeReferenceCode();
 
 
         //reference code for men
-        User parent = null;
         Integer starterPoint = 0;
-        if (newUser.getGender() == Gender.MALE)
-            parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
-
-        if (newUser.getGender() == Gender.FEMALE && !newUser.getReferenceCode().equals("")) {
-            parent = findEntityById(Long.valueOf(newUser.getReferenceCode()));
-            starterPoint = 5;
-        }
+        User parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
 
 
         if (newUser.getPhone().length() == 10)
@@ -140,8 +134,9 @@ public class UserService {
         newUser.setPhotoCount(0);
         newUser.setReviewCount(0);
         newUser.setPoint(0);
+        newUser.setTooNegative(0);
         newUser.setExtraPoint(starterPoint);
-        newUser.setCity(ankara);
+        // newUser.setCity(ankara);
         newUser.setActivityCount(0);
         newUser.setReferenceCode(referenceCode);
         newUser.setEnabled(false);
@@ -179,6 +174,14 @@ public class UserService {
         user.setEnabled(true);
         userRepository.save(user);
         userEventService.newUserRegistered(user);
+
+
+        Premium premium = new Premium();
+        premium.setStartDate(new Date());
+        premium.setDuration(PremiumDuration.SONE_MONTH);
+        premiumService.saveGift(premium, user);
+
+
         return user;
     }
 
@@ -454,11 +457,14 @@ public class UserService {
          * complain 2
          * */
 
-        int OPTIMAL_REQUEST_COUNT = 8;
-        int OPTIMAL_APPROVAL_COUNT = 5;
+        int OPTIMAL_REQUEST_COUNT = 7;
+        int OPTIMAL_APPROVAL_COUNT = 4;
         int ACCEPT_UNIQUE_REQUEST = 3;
-        int POSITIVE_REVIEW = 3;
-        int NEGATIVE_REVIEW = -5;
+        int POSITIVE_REVIEW = 2;
+        int NEGATIVE_REVIEW = -2;
+        int POSITIVE_VIBE = 8;
+        int NEGATIVE_VIBE = -10;
+        int VOTE_VIBE = 1;
         int APPROVED_REQUEST = 2;
         int BEING_FOLLOWED = 2;
         int BEING_BLOCKED = -5;
@@ -516,6 +522,34 @@ public class UserService {
                 point = point + NEGATIVE_REVIEW; ////get a negative review
         }
 
+        List<Vibe> vibeList = vibeRepository.findByReader(user);
+        for (Vibe v : vibeList) {
+            if (v.getVibeType() == VibeType.POSITIVE)
+                point = point + POSITIVE_VIBE;
+            if (v.getVibeType() == VibeType.NEGATIVE)
+                point = point + NEGATIVE_VIBE;
+        }
+
+
+        List<Vibe> vibeListOfWriter = vibeRepository.findByWriter(user);
+
+        Integer positiveVibeCount = 0;
+        Integer negativeVibeCount = 0;
+
+        for (Vibe v : vibeListOfWriter) {
+            if (v.getVibeType() == VibeType.POSITIVE)
+                positiveVibeCount++;
+            if (v.getVibeType() == VibeType.NEGATIVE)
+                negativeVibeCount++;
+        }
+
+        if (negativeVibeCount > positiveVibeCount) {
+            user.setTooNegative(1);
+        } else {
+            point = point + vibeListOfWriter.size() * VOTE_VIBE;
+            user.setTooNegative(0);
+        }
+
         //send request and being accepted by activity owner
         List<ActivityRequest> activityRequests = activityRequestService.activityRequesRepository.findByApplicantId(user.getId());
         for (ActivityRequest a : activityRequests) {
@@ -548,16 +582,16 @@ public class UserService {
         point = point + (complainCount * COMPLAIN);
 
 
-        //review limits the points
-        if (rewiReviewList.size() == 0 && point > 20) {
-            point = 20;
-        } else if (rewiReviewList.size() > 0 && rewiReviewList.size() < 5 && point > 60) {
-            point = 50;
-        } else if (rewiReviewList.size() > 5 && rewiReviewList.size() < 10 && point > 120) {
-            point = 120;
-        }
+        //vibe limits the points
+//        if (vibeList.size() == 0 && point > 20) {
+//            point = 20;
+//        } else if (vibeList.size() > 0 && vibeList.size() < 5 && point > 60) {
+//            point = 50;
+//        } else if (vibeList.size() > 5 && vibeList.size() < 10 && point > 150) {
+//            point = 150;
+//        }
 
-        Integer newPoint = point * 2 / 3;
+        Integer newPoint = (point * 3) / 4;
 
         Integer extraPoint = user.getExtraPoint();
         if (extraPoint == null)
@@ -587,24 +621,25 @@ public class UserService {
     }
 
 
-    public ProfileDto toProfileDto(User user) {
-        ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
-        profileDto.setAge(UserUtil.calculateAge(user));
-        profileDto.setInterests(hashtagService.findByUserStr(user));
-        profileDto.setPremiumType(premiumService.userPremiumType(user));
+    public Integer followerCount(Long userId) {
+        User user = userRepository.findById(userId).get();
+        //followers
+        Integer followerCount = followRepository.findFollowerCount(user);
+        return followerCount;
+    }
 
 
-        //attendance rate
-        List<ActivityRequest> activityRequests = activityRequesRepository.findByApplicantId(user.getId());
+    public Integer attendanceRate(Long userId) {
+        List<ActivityRequest> activityRequests = activityRequesRepository.findByApplicantId(userId);
 
         Integer approveCount = 0;
         Integer nonAttendCount = 0;
 
         for (ActivityRequest a : activityRequests) {
 
-            Integer result=a.getResult();
-            if(result==null)
-                result=1;
+            Integer result = a.getResult();
+            if (result == null)
+                result = 1;
 
             if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
                 approveCount++;
@@ -614,11 +649,21 @@ public class UserService {
             }
         }
 
-        if(approveCount>0) {
+        if (approveCount > 0) {
             Integer attendCount = (approveCount - nonAttendCount) * 100;
             Integer percent = attendCount / approveCount;
-            profileDto.setAttendPercent(percent);
+            return percent;
         }
+        return 0;
+
+    }
+
+    public ProfileDto toProfileDto(User user) {
+        ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
+        profileDto.setAge(UserUtil.calculateAge(user));
+        profileDto.setInterests(hashtagService.findByUserStr(user));
+        profileDto.setPremiumType(premiumService.userPremiumType(user));
+
 
         return profileDto;
     }

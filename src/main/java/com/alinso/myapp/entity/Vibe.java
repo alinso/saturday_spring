@@ -22,6 +22,10 @@ public class Vibe extends BaseEntity{
     @NotNull
     private VibeType vibeType;
 
+
+    @Column
+    private Integer deleted;
+
     public User getWriter() {
         return writer;
     }
@@ -44,5 +48,13 @@ public class Vibe extends BaseEntity{
 
     public void setVibeType(VibeType vibeType) {
         this.vibeType = vibeType;
+    }
+
+    public Integer getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Integer deleted) {
+        this.deleted = deleted;
     }
 }

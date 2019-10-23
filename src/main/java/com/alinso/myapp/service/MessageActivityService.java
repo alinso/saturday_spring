@@ -41,7 +41,7 @@ public class MessageActivityService {
         Activity activity= activityService.findEntityById(messageActivityDto.getActivityId());
 
 
-        if(activity.getCreator().getId()==3212)
+        if(activity.getCreator().getId()==3212 && activity.getId()!=4582 && activity.getId()!=4756)
             throw new  UserWarningException("Bu aktivite mesaj gönderimlerine kapalı. Sorularını özelden sorabilirsin");
 
 

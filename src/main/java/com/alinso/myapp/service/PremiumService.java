@@ -45,6 +45,20 @@ public class PremiumService {
         premiumRepository.save(premium);
     }
 
+    public void saveGift(Premium premium, User user) {
+
+        //check if already premium
+        //if already premium set created at last day of current premium
+        if (isUserPremium(user)!=null)
+            premium.setStartDate(getPremiumLastDate(user));
+        else
+            premium.setStartDate(new Date());
+
+        premium.setUser(user);
+        premium.setType(PremiumType.GIFTED);
+        premiumRepository.save(premium);
+    }
+
 //    public void saveGift(User user, PremiumDuration duration) {
 //        Premium premium = new Premium();
 //        premium.setType(PremiumType.GIFTED);

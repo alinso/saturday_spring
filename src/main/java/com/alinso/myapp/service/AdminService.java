@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.StoredProcedureQuery;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -51,13 +52,22 @@ public class AdminService {
     @Autowired
     EntityManager entityManager;
 
+
+    @Autowired
+    VibeRepository vibeRepository;
+
+    @Autowired
+    ActivityRequestService activityRequestService;
+
     /////////////////////admin////////////////////////////////////////////////////////////////////////////////
     public List<Complain> getAllComplaints() {
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (loggedUser.getId() != 3211)
+            return null;
 
         return complainRepository.findAll();
-
-
     }
+
 
     public void resetPassword(Long id) {
         User user = userService.findEntityById(id);
@@ -69,8 +79,8 @@ public class AdminService {
         try {
 
 
-            User currentBatman= (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if(currentBatman.getId()!=3211)
+            User currentBatman = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (currentBatman.getId() != 3211)
                 throw new UserWarningException("Erişim Yok!");
 
 
@@ -132,9 +142,9 @@ public class AdminService {
     }
 
     public void deleteActivity(Long id) {
-        User currentBatman= (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User currentBatman = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(currentBatman.getId()!=3211)
+        if (currentBatman.getId() != 3211)
             throw new UserWarningException("Erişim Yok!");
 
 
@@ -179,8 +189,8 @@ public class AdminService {
         User user = userService.findEntityById(id);
 
 //////////////////////////////////////////////////////////
-        BatmanLog batmanLog =  new BatmanLog();
-        User batman  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        BatmanLog batmanLog = new BatmanLog();
+        User batman = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         batmanLog.setBatman(batman);
         batmanLog.setUser(user);
@@ -198,4 +208,21 @@ public class AdminService {
     }
 
 
+    public List<Long> deletePartyVotes() {
+        List<Vibe> allVibes = vibeRepository.findAll();
+        List<Long> deletedVibeIds = new ArrayList<>();
+        for (Vibe v : allVibes) {
+            if(!activityRequestService.haveTheseUsersMeetAllTimes(v.getWriter().getId(),v.getReader().getId())){
+                deletedVibeIds.add(v.getId());
+                v.setDeleted(1);
+                vibeRepository.save(v);
+            }
+            else{
+                v.setDeleted(0);
+                vibeRepository.save(v);
+            }
+
+        }
+        return deletedVibeIds;
+    }
 }

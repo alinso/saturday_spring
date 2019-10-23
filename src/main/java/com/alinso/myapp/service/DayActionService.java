@@ -1,5 +1,6 @@
 package com.alinso.myapp.service;
 
+import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.DayAction;
 import com.alinso.myapp.entity.Premium;
 import com.alinso.myapp.entity.User;
@@ -16,14 +17,14 @@ import org.springframework.stereotype.Service;
 public class DayActionService {
 
 
-    private Integer NEW_USER_REQUEST_LIMIT=2;
-    private Integer OLD_USER_REQUEST_LIMIT=3;
+    private Integer NEW_USER_REQUEST_LIMIT=1;
+    private Integer OLD_USER_REQUEST_LIMIT=1;
     private Integer SILVER_USER_REQUEST_LIMIT=7;
     private Integer GOLD_USER_REQUEST_LIMIT=20;
 
 
     private Integer NEW_USER_ACTIVITY_LIMIT=1;
-    private Integer OLD_USER_ACTIVITY_LIMIT=2;
+    private Integer OLD_USER_ACTIVITY_LIMIT=1;
     private Integer SILVER_USER_ACTIVITY_LIMIT=5;
     private Integer GOLD_USER_ACTIVITY_LIMIT=10;
 
@@ -80,7 +81,7 @@ public class DayActionService {
         DayAction dayAction = dayActionRepository.findByUser(user);
 
         Integer limit = NEW_USER_ACTIVITY_LIMIT;
-        String warning  ="50 puan altı olduğun için haftada en fazla " + limit + " aktivite açabilirsin!";
+        String warning  ="Haftada en fazla " + limit + " aktivite açabilirsin!";
 
         if (user.getPoint() > 50) {
             limit = OLD_USER_ACTIVITY_LIMIT;
@@ -107,16 +108,26 @@ public class DayActionService {
             }
     }
 
-    public void checkRequestLimit() {
+    public void checkRequestLimit(Activity activity) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
 
 
         Integer limit = NEW_USER_REQUEST_LIMIT;
-        String warning = "50 puan altı olduğun için günde en fazla " + limit + " istek gönderebilirsin!";
+        String warning = "Günde en fazla " + limit + " istek gönderebilirsin!(ve +1 gold kullanıcılara)";
         if (user.getPoint() > 50) {
             limit = OLD_USER_REQUEST_LIMIT;
-            warning="Günde en fazla " + limit + " istek gönderebilirsin!";
+            warning="Günde en fazla " + limit + " istek gönderebilirsin!(ve +1 gold kullanıcılara)";
+        }
+
+        //if the activity owner is premium, request limit should be 2
+        Premium ownerPremium = premiumService.isUserPremium(activity.getCreator());
+
+        if(ownerPremium!=null){
+            if(ownerPremium.getDuration()== PremiumDuration.GONE_MONTH || ownerPremium.getDuration()==PremiumDuration.GTHREE_MONTHS || ownerPremium.getDuration()==PremiumDuration.GSIX_MONTHS){
+                limit = 2;
+                warning="Günde en fazla " + limit + " istek gönderebilirsin!";
+            }
         }
 
         Premium premium = premiumService.isUserPremium(user);

@@ -1,27 +1,18 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.entity.Activity;
-import com.alinso.myapp.entity.Complain;
-import com.alinso.myapp.entity.Message;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.*;
 import com.alinso.myapp.entity.dto.discover.DiscoverDto;
-import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
-import com.alinso.myapp.repository.ActivityRepository;
-import com.alinso.myapp.repository.ActivityRequesRepository;
-import com.alinso.myapp.repository.MessageRepository;
-import com.alinso.myapp.repository.UserRepository;
+import com.alinso.myapp.repository.*;
 import com.alinso.myapp.service.AdminService;
 import com.alinso.myapp.service.DiscoverService;
 import com.alinso.myapp.service.UserEventService;
-import com.alinso.myapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("lkaldjfnuterhjbsfsdf")
@@ -49,54 +40,77 @@ public class AdminController {
     @Autowired
     AdminService adminService;
 
+    @Autowired
+    CityRepository cityRepository;
+
     @GetMapping("dashboard")
     public ResponseEntity<?> dashboard() {
         return new ResponseEntity<String>("okk", HttpStatus.OK);
     }
 
 
-
     @GetMapping("autoMessage/{page}")
     public ResponseEntity<?> autoMessage(@PathVariable("page") Integer page) {
-        List<User> selectedUsers = userRepository.findAll();
 
-        if(page==0)
-            page=1;
+
+//        String sDate1="08/08/2019";
+//        Date date1= null;
+//        try {
+//            date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+        City city = cityRepository.findById(Long.valueOf(1)).get();
+        List<User> selectedUsers = userRepository.allOfACity(city);
+        if (page == 0)
+            page = 1;
 
         User tuuce = userRepository.getOne(Long.valueOf(3212));
-       // List<Message> toBeSaved = new ArrayList<>();
+        // List<Message> toBeSaved = new ArrayList<>();
         int i = 0;
         for (User u : selectedUsers) {
             i++;
 
 
-            if(i<((page-1)*500))
+            if (i < ((page - 1) * 500))
                 continue;
-            if (i > (page*500))
+            if (i > (page * 500))
                 break;
 
 
+//            String messageText = u.getName()+", selamlar, Nelerden hoşlanırsan onunla ilgili bir aktivite oluştur, aktivitene katılmak isteyen kişilerden dilediğini onaylayabilirsin ve" +
+//                    " sonrasında mesajlaşabilirsiniz. Şu an Eskişehir üye sayımız 300'ü geçti(çok büyük çoğunluğu kadın), büyüyoruz. Seninle aynı zevkleri paylaşan insanlarla tanışabilirsin. Nasıl bir aktivite açacağına karar " +
+//                    "veremiyorsan Ankara'da açılmış olanları inceleyebilirsin. Aktiviteler çok eğlenceli geçiyor, merak etme birbirini hiç tanımayan insanlar bir" +
+//                    "aktivite etrafında buluştuğunda çok keyfili olabiliyor. Şimdi her ne yapmak istiyorsan bir aktivite oluştur ve eğlenceye katıl!";
 
-//            String messageText = "Yarın akşam(28 Ağustos) saat 19'da Kızılay-Route'da buluşuyoruz. Sohbet edip, birşeyler içip tanışıyoruz" +
-//                    " Aramıza yeni katılanlar veya aktif olamayanlar için topluluğumuzu tanımaları adına güzel bir fırsat. Hadi sen de gel," +
-//                    " merak etme kimse birbirini tanımıyor fakat yine de konuşacak çok şeyimiz var. Katılmak istersen aktiviteme istek atabilirsin (kontenjan 30 kişi)";
-            String messageText = "Merhaba "+u.getName()+", biliyorsun ki Activity Friend kullanıcı kalitesine çok dikkat ediyor. Kadın/Erkek cinsiyet oranının dengede olması da kalite anlayışımıza dahil. Kadınlar topluluğumuza ön yargılı yaklaşabiliyor, haklı olarak bilmedikleri bir ortam olduğu için güven sorunu yaşıyorlar. Bu konuda bize destek olabilir ve arkadaşlarına anlatıp onların da aramıza katılmalarını sağlayabilirsin. Burada çok güzel bir  topluluk olduk, bu güzelliği paylaşmamızda ve daha fazla kadına ulaşmamızda yardım et.\n" +
-                    "\n" +
-                    "                    Ayrıca profilim-referans ol sayfasındaki referans kodu ile kadınlara referans olup üye olmalarını sağlayarak puan kazanabilirsin. Senin referansınla üye olan her kadına başlangıçta 5 puan veriyoruz. Arkadaşın 10 puan olduğunda sana da 10 puan ekliyoruz.\n" +
-                    "\n" +
-                    "            Activity Friend'i bu günlere birlikte getirdik, bundan sonra da birlikte devam edeceğiz, bu serüvenin bir parçası olduğun için teşekkür ederiz";
+                        String messageText = u.getName()+", selamlar, Geçen cuma 100 kişiden fazlaydik ve çok eğlendik bu Cuma(25 Ekim'de) Halloween temalı parti yapıyoruz. Özellikle yeni katılan veya " +
+                                " aktif olamayan arkadaşların bizi tanıyıp güve duyması için önemli bir fırsatYalnız Activity Friend kullanıcıları orada oalcak. " +
+                                " kostümün varsa kostümlü gel, yoksa da isteyenlere girişte halloween makyaj yapacağız saat 21'de DJ Akın başlıyor Vee hep birlikte macarena kareografisi yapacağız." +
+                                " Profesyonel fotoğrafçımız gecenin fotoğraflarını çekiyor. Giriş  yalnızca 5TL" +
+                                " Şimdi aktviteme istek at, bunu kaçırma";
 
+//            String messageText = "Merhaba "+ u.getName()+", sınırlara takılamdan aktivite açabilmek ve katılmak istersen premium olabilirsin. Detayları ana sayfada en tepedeki 'premium hakkında" +
+//                    " bilgilendirme' linkine tıklayarak görebilirsin. Premium hesaplar diğer üyelere güven veriyor, bu nedenle açtıkları aktivitelere katılım ve kabul edilme oranları standart " +
+//                    "kullanıcılara göre daha yüksek. İnsanlar premium kullanıcıların platformu daha ciddiye aldığını düşünüyor. Ayrıca yarın ilkini yapacağımız cuma partilerine gold üyeler " +
+//                    "ücretsiz olarak katılabiliecek. Activity Friend projesi sürekli büyüyor ve gelişiyor, fakat aynı şekilde sürekli olarak büyüyen masraflarla karşı karşıyayız. Bu süreçte premium olarak bize destek" +
+//                    " olabilirsin. Teşekkürler";
 
             Message message = new Message();
-                message.setReader(u);
-                message.setWriter(tuuce);
-                message.setMessage(messageText);
-                messageRepository.save(message);
-                userEventService.newMessage(message.getReader());
+            message.setReader(u);
+            message.setWriter(tuuce);
+            message.setMessage(messageText);
+            messageRepository.save(message);
+            userEventService.newMessage(message.getReader());
 
         }
         return new ResponseEntity<>("okk", HttpStatus.OK);
 
+    }
+
+    @GetMapping("deletePartyVotes")
+    public ResponseEntity<?> deletePartyVotes(@Valid DiscoverDto discoverDto) {
+        List<Long> votes = adminService.deletePartyVotes();
+        return new ResponseEntity<>(votes, HttpStatus.OK);
     }
 
 
@@ -134,9 +148,11 @@ public class AdminController {
     }
 
     @GetMapping("allComplaints")
-    public ResponseEntity<?> getAllComplaints(){
-        List<Complain> complainList  =adminService.getAllComplaints();
-        return new ResponseEntity<>(complainList,HttpStatus.OK);
+    public ResponseEntity<?> getAllComplaints() {
+        List<Complain> complainList = adminService.getAllComplaints();
+
+
+        return new ResponseEntity<>(complainList, HttpStatus.OK);
     }
 
 

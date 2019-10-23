@@ -44,6 +44,9 @@ public class User extends BaseEntity implements UserDetails {
     private String email;
 
     @Column
+    private Integer tooNegative;
+
+    @Column
     @NotBlank
     private String phone;
 
@@ -344,5 +347,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setExtraPoint(Integer extraPoint) {
         this.extraPoint = extraPoint;
+    }
+
+    public Integer getTooNegative() {
+        return tooNegative;
+    }
+
+    public void setTooNegative(Integer tooNegative) {
+        this.tooNegative = tooNegative;
     }
 }
