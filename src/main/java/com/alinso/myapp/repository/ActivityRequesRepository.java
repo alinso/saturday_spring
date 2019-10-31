@@ -60,4 +60,15 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
             "and activityRequest.applicant=:user2 " +
             "and activityRequest.activityRequestStatus=:status")
     Integer haveUser1HostUser2AllTimes(@Param("user2") User user2, @Param("user1") User user1, @Param("status") ActivityRequestStatus status);
+
+    @Query("select activityRequest from ActivityRequest  activityRequest"+
+            " where activityRequest.activity.creator=:user" +
+            " and activityRequest.activityRequestStatus=:status" +
+            " and activityRequest.createdAt>:threeMonthsAgo")
+    List<ActivityRequest> last3MonthsIncomingApprovedRequests(@Param("user")User user, @Param("status")ActivityRequestStatus approved, @Param("threeMonthsAgo")Date threeMonthsAgo);
+
+    @Query("select count(activityRequest) from ActivityRequest  activityRequest"+
+            " where activityRequest.applicant=:user" +
+            " and activityRequest.createdAt>:threeMonthsAgo")
+    Integer last3MonthSentRequestsOfUser(@Param("user")User user, @Param("user")Date threeMonthsAgo);
 }

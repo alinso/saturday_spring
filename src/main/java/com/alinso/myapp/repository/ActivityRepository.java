@@ -29,4 +29,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     @Query("select meeting from Activity meeting where meeting.deadLine > :start and meeting.deadLine < :finish and meeting.isCommentNotificationSent=false")
     List<Activity> recentUncommentedActivities(@Param("start")Date start, @Param("finish")Date finish);
 
+
+    @Query("select meeting from Activity meeting where meeting.createdAt > :threeMonthsAgo and meeting.creator:creator ")
+    List<Activity> last3MonthActivitiesOfUser( @Param("threeMonthsAgo")Date threeMonthsAgo, @Param("creator") User creator);
+
 }

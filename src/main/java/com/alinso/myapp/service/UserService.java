@@ -442,56 +442,47 @@ public class UserService {
 //    }
     public Integer calculateUserPoint(User user) {
 
-        Integer oldPoint = user.getPoint();
         Integer point = 0;
 
         /*
-         * send and get request : 1 (max:8 of activity count)
-         * accept a unique request:3(max:6 of activity count)
-         * your request is accepted :2
-         * positive review  : 3
-         * being followed  : 2
-         * being blocked -5
-         * negative review: -5
-         * opening an activity 2
+         * send  request : 1 (max:8 of activity count)
+         * accept a unique request:2(max:6 of activity count)
+         * vote :1
+         * write review  : 2
+         * opening an activity 5
          * complain 2
          * */
 
-        int OPTIMAL_REQUEST_COUNT = 7;
-        int OPTIMAL_APPROVAL_COUNT = 4;
-        int ACCEPT_UNIQUE_REQUEST = 3;
-        int POSITIVE_REVIEW = 2;
-        int NEGATIVE_REVIEW = -2;
-        int POSITIVE_VIBE = 8;
-        int NEGATIVE_VIBE = -10;
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MONTH, -3);
+        Date threeMonthsAgo = cal.getTime();
+
+        int ACCEPT_UNIQUE_REQUEST = 2;
+        int WRITE_REVIEW = 2;
         int VOTE_VIBE = 1;
-        int APPROVED_REQUEST = 2;
-        int BEING_FOLLOWED = 2;
-        int BEING_BLOCKED = -5;
-        int OPENING_ACTIVITY = 2;
+        int SEND_REQUEST=2;
+        int OPENING_ACTIVITY = 5;
         int COMPLAIN = 2;
+        int FOLLOW = 1;
 
 
-        List<Activity> userActivities = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+        List<Activity> userActivities = activityRepository.last3MonthActivitiesOfUser(threeMonthsAgo,user);
         Integer activityCount = userActivities.size();
-
-        //plain incoming requests
-        Integer incomingRequestPoint = activityRequesRepository.incomingRequestCount(user);
-
-        if (incomingRequestPoint > (activityCount * OPTIMAL_REQUEST_COUNT))
-            incomingRequestPoint = activityCount * OPTIMAL_REQUEST_COUNT;
-
-        point = point + incomingRequestPoint; //////// get request
-
 
         //opening an activity
         point = point + (activityCount * OPENING_ACTIVITY);
 
 
-        //approved requests
-        List<ActivityRequest> activityRequestList = activityRequesRepository.incomingApprovedRequests(user, ActivityRequestStatus.APPROVED);
+        //send a request
+        Integer requestCount  = activityRequesRepository.last3MonthSentRequestsOfUser(user,threeMonthsAgo);
+        point  = point+requestCount*SEND_REQUEST;
+
+
+
+
+        //approved unique requests
+        List<ActivityRequest> activityRequestList = activityRequesRepository.last3MonthsIncomingApprovedRequests(user, ActivityRequestStatus.APPROVED,threeMonthsAgo);
         List<Long> userIds = new ArrayList<>();
-        int approvalCount = 0;
         for (ActivityRequest r : activityRequestList) {
 
             if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
@@ -505,34 +496,18 @@ public class UserService {
                 if (uniqueUser) {
                     point = point + ACCEPT_UNIQUE_REQUEST; ////////////// accept a request
                     userIds.add(r.getApplicant().getId()); ////////accept a unique request
-                    approvalCount++;
-                    if (approvalCount > (OPTIMAL_APPROVAL_COUNT * activityCount))
-                        break;
                 }
             }
         }
 
 
-        //positive-negative reviews
-        List<Review> rewiReviewList = reviewRepository.findByReader(user);
-        for (Review r : rewiReviewList) {
-            if (r.getPositive())
-                point = point + POSITIVE_REVIEW;  ////get a posivie review
-            if (!r.getPositive())
-                point = point + NEGATIVE_REVIEW; ////get a negative review
-        }
-
-        List<Vibe> vibeList = vibeRepository.findByReader(user);
-        for (Vibe v : vibeList) {
-            if (v.getVibeType() == VibeType.POSITIVE)
-                point = point + POSITIVE_VIBE;
-            if (v.getVibeType() == VibeType.NEGATIVE)
-                point = point + NEGATIVE_VIBE;
-        }
+        //review count
+        List<Review> rewiReviewList = reviewRepository.last3MonthReviewsOfUser(user,threeMonthsAgo);
+        point = point+(rewiReviewList.size()*WRITE_REVIEW);
 
 
+        //vibe voting
         List<Vibe> vibeListOfWriter = vibeRepository.findByWriter(user);
-
         Integer positiveVibeCount = 0;
         Integer negativeVibeCount = 0;
 
@@ -550,67 +525,200 @@ public class UserService {
             user.setTooNegative(0);
         }
 
-        //send request and being accepted by activity owner
-        List<ActivityRequest> activityRequests = activityRequestService.activityRequesRepository.findByApplicantId(user.getId());
-        for (ActivityRequest a : activityRequests) {
 
-
-            Integer requestResult = a.getResult();
-            if (a.getResult() == null)
-                requestResult = 1;
-
-            if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && requestResult != 0) {
-                point = point + APPROVED_REQUEST;  //////// your request is approved
-            } else if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && requestResult == 0) {
-                point = point - APPROVED_REQUEST;
-            } else if (a.getActivityRequestStatus() == ActivityRequestStatus.WAITING && user.getGender() == Gender.FEMALE) {
-                point = point + 1;
-            }
-        }
-
-        //followed by someone
-        Integer followerCount = followRepository.findFollowerCount(user);
-        point = point + followerCount * BEING_FOLLOWED;
-
-        //blocked by someoneac
-        Integer blockedCount = blockService.blockRepository.blockerCount(user);
-        point = point + (blockedCount * BEING_BLOCKED);  //////////being blocked
+        //follow someone
+        Integer followingCount = followRepository.last3MonthsFollowingCount(user,threeMonthsAgo);
+        point = point + followingCount * FOLLOW ;
 
 
         //complain count
-        Integer complainCount = complainRepository.countOfComplaintsByTheUser(user);
+        Integer complainCount = complainRepository.last3MonthscountOfComplaintsByTheUser(user,threeMonthsAgo);
         point = point + (complainCount * COMPLAIN);
 
 
-        //vibe limits the points
-//        if (vibeList.size() == 0 && point > 20) {
-//            point = 20;
-//        } else if (vibeList.size() > 0 && vibeList.size() < 5 && point > 60) {
-//            point = 50;
-//        } else if (vibeList.size() > 5 && vibeList.size() < 10 && point > 150) {
-//            point = 150;
-//        }
-
-        Integer newPoint = (point * 3) / 4;
-
-        Integer extraPoint = user.getExtraPoint();
-        if (extraPoint == null)
-            extraPoint = 0;
-        newPoint = newPoint + extraPoint;
-
-        if (oldPoint < 10 && newPoint > 10 && user.getGender() == Gender.FEMALE && user.getParent() != null) {
-            User parent = user.getParent();
-            Integer parentPoint = parent.getExtraPoint();
-            if (parentPoint == null)
-                parentPoint = 10;
-
-            parent.setExtraPoint(parentPoint);
-            userRepository.save(parent);
-        }
-
-
-        return newPoint;
+        return point;
     }
+
+    public Integer calculateSocialScore(User user){
+        //your incoming request rate 0-10......1
+        //being in a list 0-max listed.......1
+        //beind blocked 0-max blocked......-2
+        //vibe..............................4
+        //acceptance rate...................1
+        //attendance rate...................1
+    }
+
+//    public Integer calculateUserPoint(User user) {
+//
+//        Integer oldPoint = user.getPoint();
+//        Integer point = 0;
+//
+//        /*
+//         * send and get request : 1 (max:8 of activity count)
+//         * accept a unique request:3(max:6 of activity count)
+//         * your request is accepted :2
+//         * positive review  : 3
+//         * being followed  : 2
+//         * being blocked -5
+//         * negative review: -5
+//         * opening an activity 2
+//         * complain 2
+//         * */
+//
+//        int OPTIMAL_REQUEST_COUNT = 7;
+//        int OPTIMAL_APPROVAL_COUNT = 4;
+//        int ACCEPT_UNIQUE_REQUEST = 3;
+//        int POSITIVE_REVIEW = 2;
+//        int NEGATIVE_REVIEW = -2;
+//        int POSITIVE_VIBE = 8;
+//        int NEGATIVE_VIBE = -10;
+//        int VOTE_VIBE = 1;
+//        int APPROVED_REQUEST = 2;
+//        int BEING_FOLLOWED = 2;
+//        int BEING_BLOCKED = -5;
+//        int OPENING_ACTIVITY = 2;
+//        int COMPLAIN = 2;
+//
+//
+//        List<Activity> userActivities = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+//        Integer activityCount = userActivities.size();
+//
+//        //plain incoming requests
+//        Integer incomingRequestPoint = activityRequesRepository.incomingRequestCount(user);
+//
+//        if (incomingRequestPoint > (activityCount * OPTIMAL_REQUEST_COUNT))
+//            incomingRequestPoint = activityCount * OPTIMAL_REQUEST_COUNT;
+//
+//        point = point + incomingRequestPoint; //////// get request
+//
+//
+//        //opening an activity
+//        point = point + (activityCount * OPENING_ACTIVITY);
+//
+//
+//        //approved requests
+//        List<ActivityRequest> activityRequestList = activityRequesRepository.incomingApprovedRequests(user, ActivityRequestStatus.APPROVED);
+//        List<Long> userIds = new ArrayList<>();
+//        int approvalCount = 0;
+//        for (ActivityRequest r : activityRequestList) {
+//
+//            if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
+//                Boolean uniqueUser = true;
+//                for (Long oldUserId : userIds) {
+//                    if (oldUserId == r.getApplicant().getId()) {
+//                        uniqueUser = false;
+//                        break;
+//                    }
+//                }
+//                if (uniqueUser) {
+//                    point = point + ACCEPT_UNIQUE_REQUEST; ////////////// accept a request
+//                    userIds.add(r.getApplicant().getId()); ////////accept a unique request
+//                    approvalCount++;
+//                    if (approvalCount > (OPTIMAL_APPROVAL_COUNT * activityCount))
+//                        break;
+//                }
+//            }
+//        }
+//
+//
+//        //positive-negative reviews
+//        List<Review> rewiReviewList = reviewRepository.findByReader(user);
+//        for (Review r : rewiReviewList) {
+//            if (r.getPositive())
+//                point = point + POSITIVE_REVIEW;  ////get a posivie review
+//            if (!r.getPositive())
+//                point = point + NEGATIVE_REVIEW; ////get a negative review
+//        }
+//
+//        List<Vibe> vibeList = vibeRepository.findByReader(user);
+//        for (Vibe v : vibeList) {
+//            if (v.getVibeType() == VibeType.POSITIVE)
+//                point = point + POSITIVE_VIBE;
+//            if (v.getVibeType() == VibeType.NEGATIVE)
+//                point = point + NEGATIVE_VIBE;
+//        }
+//
+//
+//        List<Vibe> vibeListOfWriter = vibeRepository.findByWriter(user);
+//
+//        Integer positiveVibeCount = 0;
+//        Integer negativeVibeCount = 0;
+//
+//        for (Vibe v : vibeListOfWriter) {
+//            if (v.getVibeType() == VibeType.POSITIVE)
+//                positiveVibeCount++;
+//            if (v.getVibeType() == VibeType.NEGATIVE)
+//                negativeVibeCount++;
+//        }
+//
+//        if (negativeVibeCount > positiveVibeCount) {
+//            user.setTooNegative(1);
+//        } else {
+//            point = point + vibeListOfWriter.size() * VOTE_VIBE;
+//            user.setTooNegative(0);
+//        }
+//
+//        //send request and being accepted by activity owner
+//        List<ActivityRequest> activityRequests = activityRequestService.activityRequesRepository.findByApplicantId(user.getId());
+//        for (ActivityRequest a : activityRequests) {
+//
+//
+//            Integer requestResult = a.getResult();
+//            if (a.getResult() == null)
+//                requestResult = 1;
+//
+//            if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && requestResult != 0) {
+//                point = point + APPROVED_REQUEST;  //////// your request is approved
+//            } else if (a.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && requestResult == 0) {
+//                point = point - APPROVED_REQUEST;
+//            } else if (a.getActivityRequestStatus() == ActivityRequestStatus.WAITING && user.getGender() == Gender.FEMALE) {
+//                point = point + 1;
+//            }
+//        }
+//
+//        //followed by someone
+//        Integer followerCount = followRepository.findFollowerCount(user);
+//        point = point + followerCount * BEING_FOLLOWED;
+//
+//        //blocked by someoneac
+//        Integer blockedCount = blockService.blockRepository.blockerCount(user);
+//        point = point + (blockedCount * BEING_BLOCKED);  //////////being blocked
+//
+//
+//        //complain count
+//        Integer complainCount = complainRepository.countOfComplaintsByTheUser(user);
+//        point = point + (complainCount * COMPLAIN);
+//
+//
+//        //vibe limits the points
+////        if (vibeList.size() == 0 && point > 20) {
+////            point = 20;
+////        } else if (vibeList.size() > 0 && vibeList.size() < 5 && point > 60) {
+////            point = 50;
+////        } else if (vibeList.size() > 5 && vibeList.size() < 10 && point > 150) {
+////            point = 150;
+////        }
+//
+//        Integer newPoint = (point * 3) / 4;
+//
+//        Integer extraPoint = user.getExtraPoint();
+//        if (extraPoint == null)
+//            extraPoint = 0;
+//        newPoint = newPoint + extraPoint;
+//
+//        if (oldPoint < 10 && newPoint > 10 && user.getGender() == Gender.FEMALE && user.getParent() != null) {
+//            User parent = user.getParent();
+//            Integer parentPoint = parent.getExtraPoint();
+//            if (parentPoint == null)
+//                parentPoint = 10;
+//
+//            parent.setExtraPoint(parentPoint);
+//            userRepository.save(parent);
+//        }
+//
+//
+//        return newPoint;
+//    }
 
     public List<ProfileDto> top100() {
         Pageable pageable = PageRequest.of(0, 100);

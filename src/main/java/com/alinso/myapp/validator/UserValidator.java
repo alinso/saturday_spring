@@ -63,6 +63,9 @@ public class UserValidator implements Validator {
             if (parent == null) {
                 errors.rejectValue("referenceCode", "Match", "Geçersiz Referans Kodu");
             }
+            if (parent.getId() !=3212 && user.getGender()==Gender.MALE) {
+                errors.rejectValue("referenceCode", "Match", "Referanslı erkek alımları doldu, son alımlar instagramdan başvuru ile yapılacak");
+            }
 
 
 //            errors.rejectValue("gender","Match", "Erkek kontenjanımız dolu olduğu için geçici olarak erkek kayıtlarımızı durdurduk." +

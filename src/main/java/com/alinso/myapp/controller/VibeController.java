@@ -2,6 +2,7 @@ package com.alinso.myapp.controller;
 
 
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.vibe.VibeDto;
 import com.alinso.myapp.entity.enums.VibeType;
 import com.alinso.myapp.repository.UserRepository;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("vibe/")
@@ -40,11 +43,20 @@ public class VibeController {
         Integer vibe  =vibeService.calculateVibe(userId);
         return new ResponseEntity<Integer>(vibe,HttpStatus.OK);
     }
+
+
     @GetMapping("vibePercentOfActivityOwner/{activityId}")
     public ResponseEntity<?> vibePercentOfActivityOwner(@PathVariable("activityId") Long activityId){
         Integer vibe  =vibeService.calculateVibeOfActivityOwner(activityId);
         return new ResponseEntity<Integer>(vibe,HttpStatus.OK);
     }
+
+    @GetMapping("usersICanVibe")
+    public ResponseEntity<?> usersICanVibe(){
+        List<ProfileDto> profileDtoList  = vibeService.userICanVibe();
+        return new ResponseEntity<List<ProfileDto>>(profileDtoList,HttpStatus.OK);
+    }
+
 
     @GetMapping("vibePercentOfRequestOwner/{requestId}")
     public ResponseEntity<?> vibePercentOfRequestOwner(@PathVariable("requestId") Long requestId){

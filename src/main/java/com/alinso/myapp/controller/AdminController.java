@@ -78,16 +78,15 @@ public class AdminController {
                 break;
 
 
-//            String messageText = u.getName()+", selamlar, Nelerden hoşlanırsan onunla ilgili bir aktivite oluştur, aktivitene katılmak isteyen kişilerden dilediğini onaylayabilirsin ve" +
-//                    " sonrasında mesajlaşabilirsiniz. Şu an Eskişehir üye sayımız 300'ü geçti(çok büyük çoğunluğu kadın), büyüyoruz. Seninle aynı zevkleri paylaşan insanlarla tanışabilirsin. Nasıl bir aktivite açacağına karar " +
-//                    "veremiyorsan Ankara'da açılmış olanları inceleyebilirsin. Aktiviteler çok eğlenceli geçiyor, merak etme birbirini hiç tanımayan insanlar bir" +
-//                    "aktivite etrafında buluştuğunda çok keyfili olabiliyor. Şimdi her ne yapmak istiyorsan bir aktivite oluştur ve eğlenceye katıl!";
+            String messageText = u.getName()+", selamlarrr, İlk buluşmamızı 38 kişiyle yapmıştık, sayı ve eğlence artarak devam ediyor. Geçen hafta 130+ kişinin katılımıyla harika bir halloween partisi" +
+                    " yaptık. Bu cuma yine saat 20'de Zaytung Zone'da arka bahce'de buluşuyor tanışıyor sonrasında DJ Akın ile dans ve müziğe doyuyoruz. Haftanın stresini atabileceğin kaliteli bir ortam, sınırsız " +
+                    " popcorn ve sınırsız eğlence seni bekliyor. Kimseyi tanımıyor olsan bile orada yalnızca merhaba diyerek onlarca kişiyle tanışabiliyorsun. Bu cuma plan yapma, bizimlesin";
 
-                        String messageText = u.getName()+", selamlar, Geçen cuma 100 kişiden fazlaydik ve çok eğlendik bu Cuma(25 Ekim'de) Halloween temalı parti yapıyoruz. Özellikle yeni katılan veya " +
-                                " aktif olamayan arkadaşların bizi tanıyıp güve duyması için önemli bir fırsatYalnız Activity Friend kullanıcıları orada oalcak. " +
-                                " kostümün varsa kostümlü gel, yoksa da isteyenlere girişte halloween makyaj yapacağız saat 21'de DJ Akın başlıyor Vee hep birlikte macarena kareografisi yapacağız." +
-                                " Profesyonel fotoğrafçımız gecenin fotoğraflarını çekiyor. Giriş  yalnızca 5TL" +
-                                " Şimdi aktviteme istek at, bunu kaçırma";
+//                        String messageText = u.getName()+", selamlar, Geçen cuma 100 kişiden fazlaydik ve çok eğlendik bu Cuma(25 Ekim'de) Halloween temalı parti yapıyoruz. Özellikle yeni katılan veya " +
+//                                " aktif olamayan arkadaşların bizi tanıyıp güve duyması için önemli bir fırsatYalnız Activity Friend kullanıcıları orada oalcak. " +
+//                                " kostümün varsa kostümlü gel, yoksa da isteyenlere girişte halloween makyaj yapacağız saat 21'de DJ Akın başlıyor Vee hep birlikte macarena kareografisi yapacağız." +
+//                                " Profesyonel fotoğrafçımız gecenin fotoğraflarını çekiyor. Giriş  yalnızca 5TL" +
+//                                " Şimdi aktviteme istek at, bunu kaçırma";
 
 //            String messageText = "Merhaba "+ u.getName()+", sınırlara takılamdan aktivite açabilmek ve katılmak istersen premium olabilirsin. Detayları ana sayfada en tepedeki 'premium hakkında" +
 //                    " bilgilendirme' linkine tıklayarak görebilirsin. Premium hesaplar diğer üyelere güven veriyor, bu nedenle açtıkları aktivitelere katılım ve kabul edilme oranları standart " +

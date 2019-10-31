@@ -176,8 +176,10 @@ public class ActivityService {
         //balon futbolu
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if (pageNum == 0 && u.getCity().getId()==1) {
-                   Activity selected = activityRepository.findById(Long.valueOf(5645)).get();
-                   activityDtos.add(toDto(selected));
+                Activity selected = activityRepository.findById(Long.valueOf(5845)).get();
+                Activity selected2 = activityRepository.findById(Long.valueOf(5843)).get();
+                activityDtos.add(toDto(selected));
+                activityDtos.add(toDto(selected2));
             }
 
         for (Activity activity : activities) {

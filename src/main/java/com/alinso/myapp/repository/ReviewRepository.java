@@ -21,4 +21,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("select review from Review review where review.reader=:reader and review.createdAt<:twoDaysAgo")
     List<Review> findByReaderBefore2Days(@Param("reader")User reader, @Param("twoDaysAgo") Date twoDaysAgo);
+
+    @Query("select review from Review review where review.writer=:writer and review.createdAt>:threeMonthsAgo")
+    List<Review> last3MonthReviewsOfUser(@Param("user") User user, @Param("threeMonthsAgo") Date threeMonthsAgo);
 }
