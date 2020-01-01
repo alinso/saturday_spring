@@ -60,7 +60,13 @@ public class UserService {
     ModelMapper modelMapper;
 
     @Autowired
+    BlockRepository blockRepository;
+
+    @Autowired
     ReviewRepository reviewRepository;
+
+    @Autowired
+    VibeService vibeService;
 
     @Autowired
     ActivityRequesRepository activityRequesRepository;
@@ -123,8 +129,10 @@ public class UserService {
 
         //reference code for men
         Integer starterPoint = 0;
-        User parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
-
+        User parent=null;
+        if(newUser.getGender()==Gender.MALE) {
+            parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
+        }
 
         if (newUser.getPhone().length() == 10)
             newUser.setPhone("0" + newUser.getPhone());
@@ -149,7 +157,7 @@ public class UserService {
         User user = userRepository.save(newUser);
 
 
-        if (parent != null) {
+        if (parent != null && parent.getId()!=3212) {
             parent.setReferenceCode(referenceService.makeReferenceCode());
             userRepository.save(parent);
         }
@@ -442,6 +450,10 @@ public class UserService {
 //    }
     public Integer calculateUserPoint(User user) {
 
+        if(user.getId()==3212){
+            return 0;
+        }
+
         Integer point = 0;
 
         /*
@@ -460,13 +472,13 @@ public class UserService {
         int ACCEPT_UNIQUE_REQUEST = 2;
         int WRITE_REVIEW = 2;
         int VOTE_VIBE = 1;
-        int SEND_REQUEST=2;
+        int SEND_REQUEST = 2;
         int OPENING_ACTIVITY = 5;
         int COMPLAIN = 2;
         int FOLLOW = 1;
 
 
-        List<Activity> userActivities = activityRepository.last3MonthActivitiesOfUser(threeMonthsAgo,user);
+        List<Activity> userActivities = activityRepository.last3MonthActivitiesOfUser(threeMonthsAgo, user);
         Integer activityCount = userActivities.size();
 
         //opening an activity
@@ -474,14 +486,12 @@ public class UserService {
 
 
         //send a request
-        Integer requestCount  = activityRequesRepository.last3MonthSentRequestsOfUser(user,threeMonthsAgo);
-        point  = point+requestCount*SEND_REQUEST;
-
-
+        Integer requestCount = activityRequesRepository.last3MonthSentRequestsOfUser(user, threeMonthsAgo);
+        point = point + requestCount * SEND_REQUEST;
 
 
         //approved unique requests
-        List<ActivityRequest> activityRequestList = activityRequesRepository.last3MonthsIncomingApprovedRequests(user, ActivityRequestStatus.APPROVED,threeMonthsAgo);
+        List<ActivityRequest> activityRequestList = activityRequesRepository.last3MonthsIncomingApprovedRequests(user, ActivityRequestStatus.APPROVED, threeMonthsAgo);
         List<Long> userIds = new ArrayList<>();
         for (ActivityRequest r : activityRequestList) {
 
@@ -502,8 +512,8 @@ public class UserService {
 
 
         //review count
-        List<Review> rewiReviewList = reviewRepository.last3MonthReviewsOfUser(user,threeMonthsAgo);
-        point = point+(rewiReviewList.size()*WRITE_REVIEW);
+        List<Review> rewiReviewList = reviewRepository.last3MonthReviewsOfUser(user, threeMonthsAgo);
+        point = point + (rewiReviewList.size() * WRITE_REVIEW);
 
 
         //vibe voting
@@ -518,7 +528,7 @@ public class UserService {
                 negativeVibeCount++;
         }
 
-        if (negativeVibeCount > positiveVibeCount) {
+        if (negativeVibeCount*6 > positiveVibeCount*4) {
             user.setTooNegative(1);
         } else {
             point = point + vibeListOfWriter.size() * VOTE_VIBE;
@@ -527,25 +537,135 @@ public class UserService {
 
 
         //follow someone
-        Integer followingCount = followRepository.last3MonthsFollowingCount(user,threeMonthsAgo);
-        point = point + followingCount * FOLLOW ;
+        Integer followingCount = followRepository.last3MonthsFollowingCount(user, threeMonthsAgo);
+        point = point + followingCount * FOLLOW;
 
 
         //complain count
-        Integer complainCount = complainRepository.last3MonthscountOfComplaintsByTheUser(user,threeMonthsAgo);
+        Integer complainCount = complainRepository.last3MonthscountOfComplaintsByTheUser(user, threeMonthsAgo);
         point = point + (complainCount * COMPLAIN);
 
 
         return point;
     }
 
-    public Integer calculateSocialScore(User user){
-        //your incoming request rate 0-10......1
-        //being in a list 0-max listed.......1
-        //beind blocked 0-max blocked......-2
-        //vibe..............................4
-        //acceptance rate...................1
-        //attendance rate...................1
+    public Integer calculateSocialScore(User user, Integer maximumBlockedCount, Integer maximumFollowedCount) {
+        //being in a list 0-max listed.......2
+        //beind blocked 0-max blocked......-4
+        //vibe..............................11-12-13
+        //acceptance rate...................3
+        //attendance rate...................2
+
+        Integer totalDivider = 0;
+
+
+        //followerRate
+        Integer userFollowerCount = followRepository.findFollowerCount(user);
+
+
+        Integer followerRate = (userFollowerCount * 1000) / maximumFollowedCount;
+
+        //blockedRate
+        Integer userBlockedCount = blockRepository.blockerCount(user);
+        Integer blockRate = 1000 - ((userBlockedCount * 1000) / maximumBlockedCount);
+
+
+        //incoming request rate
+//        Calendar cal = Calendar.getInstance();
+//        cal.add(Calendar.HOUR, -144);
+//        Date fiveDaysAgo = cal.getTime();
+//
+//        List<Activity> activities = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+//        /*List<Activity> calculatedActivities = new ArrayList<>();
+//        if(activities.size()>0) {
+//            for (Activity a : activities) {
+//                Calendar c = Calendar.getInstance();
+//                c.setTime(a.getDeadLine());
+//                c.add(Calendar.HOUR, 6);
+//                Date after24hoursLaterOfCreation = c.getTime();
+//
+//                if (a.getDeadLine().compareTo(fiveDaysAgo) < 0 && a.getDeadLine().compareTo(after24hoursLaterOfCreation) > 0) {
+//                    calculatedActivities.add(a);
+//                }
+//            }
+//        }*/
+//
+//
+//        Integer incomingRequestRate = 0;
+//        Integer incomingRequestWeight = 0;
+//        if (activities.size() == 0) {
+//            incomingRequestRate = 0;
+//            incomingRequestWeight = 0;
+//        } else {
+//            Integer requestCount = activityRequesRepository.incomingRequestCount(user);
+//
+//            Integer avgIncomingRequestCountOfUser = requestCount / activities.size();
+//            if (avgIncomingRequestCountOfUser > 10)
+//                avgIncomingRequestCountOfUser = 10;
+//
+//            incomingRequestRate = (avgIncomingRequestCountOfUser * 1000) / 10;
+//
+//
+//            incomingRequestWeight = 2;
+//        }
+
+
+        //vibe
+        List<Vibe> vibes = vibeRepository.findByReader(user);
+
+        if(vibes.size()<12){
+            return -1;
+        }
+
+        Integer vibe = (vibeService.calculateVibe(user.getId()) * 10);
+
+
+        //attendance rate
+        Integer attendanceRate = (attendanceRate(user.getId()) * 10);
+        if (attendanceRate == 0) {
+            return -1;
+        }
+
+        //acceptance rate
+        Integer acceptanceRate = 0;
+        Integer acceptanceWeight = 0;
+        List<ActivityRequest> usersRequests = activityRequesRepository.findByApplicantId(user.getId());
+        if (usersRequests.size() == 0) {
+            acceptanceRate = 0;
+            acceptanceWeight = 0;
+        } else {
+            Integer findApprovedRequest = activityRequesRepository.findApprovedRequestCountByApplicant(user, ActivityRequestStatus.APPROVED);
+            acceptanceRate = (findApprovedRequest * 1000) / usersRequests.size();
+            acceptanceWeight = 4;
+        }
+        Integer socialScore = ((followerRate * 3) + (blockRate * 4) + (vibe * 12) + (attendanceRate * 3) + (acceptanceRate * acceptanceWeight)) / (21 + acceptanceWeight );
+
+
+        if(user.getCity().getId()==4)
+            socialScore=socialScore-40;
+
+        if(user.getTooNegative()==1)
+            socialScore=(socialScore*95)/100;
+
+        Calendar c2  =Calendar.getInstance();
+        c2.setTime(new Date());
+        c2.add(Calendar.YEAR,-28);
+        Date twentyFiveYearsAgo = c2.getTime();
+
+        if(user.getBirthDate()!=null)
+        if(user.getGender()==Gender.FEMALE && user.getBirthDate().compareTo(twentyFiveYearsAgo)>0)
+            socialScore=(socialScore*100)/99;
+
+        socialScore=socialScore+user.getExtraPoint();
+        if(socialScore>1000)
+            socialScore=1000;
+
+
+
+
+
+        return socialScore;
+
     }
 
 //    public Integer calculateUserPoint(User user) {
@@ -723,6 +843,23 @@ public class UserService {
     public List<ProfileDto> top100() {
         Pageable pageable = PageRequest.of(0, 100);
         List<User> users = userRepository.top100(pageable);
+        List<User> cloned = new ArrayList(users);
+
+        for(User u  : users){
+            Integer vibe = vibeService.calculateVibe(u.getId());
+            if(vibe<85)
+            {
+                cloned.remove(u);
+            }
+        }
+        List<ProfileDto> profileDtos = toProfileDtoList(cloned);
+
+        return profileDtos;
+    }
+
+    public List<ProfileDto> socialScoreTop100() {
+        Pageable pageable = PageRequest.of(0, 100);
+        List<User> users = userRepository.socialScoreTop100(pageable);
 
         List<ProfileDto> profileDtos = toProfileDtoList(users);
         return profileDtos;
@@ -771,7 +908,7 @@ public class UserService {
         profileDto.setAge(UserUtil.calculateAge(user));
         profileDto.setInterests(hashtagService.findByUserStr(user));
         profileDto.setPremiumType(premiumService.userPremiumType(user));
-
+        profileDto.setReferenceCode("");
 
         return profileDto;
     }

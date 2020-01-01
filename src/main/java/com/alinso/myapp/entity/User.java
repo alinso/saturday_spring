@@ -111,6 +111,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String role;
 
+    @Column
+    private Integer socialScore;
+
     public Integer getSmsCode() {
         return smsCode;
     }
@@ -355,5 +358,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setTooNegative(Integer tooNegative) {
         this.tooNegative = tooNegative;
+    }
+
+    public Integer getSocialScore() {
+        return socialScore;
+    }
+
+    public void setSocialScore(Integer socialScore) {
+        this.socialScore = socialScore;
     }
 }

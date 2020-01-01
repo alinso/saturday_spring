@@ -229,12 +229,13 @@ public class MessageService {
                     "\n" +
                     " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
                     "Sorunsuzca aktivite açıp, aktivitelere katılabilceğin bir ortam kurmaya çalışıyoruz. ÖZELLİKLE KADINLARA KARŞI RAHATSIZLIK VERİCİ EN UFAK BİR DURUMA DAHİ TAHAMMÜLÜMÜZ YOK. ISRARCI, RAHATSIZLIK VERİCİ,UYGULAMA AMACI DIŞINDA" +
-                    " YAZAN OLURSA ŞİKAYET ET, BURADA ONLARA ASLA MÜSAMAHA GÖSTERMİYORUZ." +
+                    " YAZAN OLURSA ŞİKAYET ET, BURADA ONLARA ASLA MÜSAMAHA GÖSTERMİYORUZ. " +
                     "\n" +
                     "\n" +
                     " Herhangi biriyle bir şey yapmadan önce o kişi " +
-                    " hakkında olumlu izlenim oranını, katıldığı aktiviteleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
-                    "\n İlk bir ay boyunca uygulamayı silver kullanıcı özelliklerinde kullanıyor olacaksın, bu aramıza yeni katılan arkadaşlar için hoş geldin hediyemiz :)" +
+                    " hakkında olumlu izlenim oranını, katıldığı aktiviteleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir. Ayrıca her cumartesi yaptığımız buluşmalar aramıza yeni " +
+                    "katılalar için harika bir başlangıç ve birçok insanla tanışma fırsatı sunuyor. Şimdilik cumartesi günleri Salsa Ankara'da buluşuyoruz" +
+                    "\n İlk bir ay boyunca uygulamayı silver kullanıcı özelliklerinde kullanıyor olacaksın, bu senin için hoş geldin hediyemiz :)" +
                     "\n Sormak istediğin herhangi bir şey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarım." +
                     "\n" +
                     "İyi eğlenceler:)");

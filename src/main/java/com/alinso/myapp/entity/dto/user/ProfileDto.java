@@ -34,6 +34,8 @@ public class ProfileDto {
 
     private Integer followerCount;
 
+    private Integer socialScore;
+
 
 
     private String premiumType;
@@ -200,6 +202,14 @@ public String getPremiumType() {
 
     public void setFollowerCount(Integer followerCount) {
         this.followerCount = followerCount;
+    }
+
+    public Integer getSocialScore() {
+        return socialScore;
+    }
+
+    public void setSocialScore(Integer socialScore) {
+        this.socialScore = socialScore;
     }
 }
 

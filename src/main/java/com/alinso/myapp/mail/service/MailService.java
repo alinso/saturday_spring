@@ -1,5 +1,6 @@
 package com.alinso.myapp.mail.service;
 
+import com.alinso.myapp.entity.Invitation;
 import com.alinso.myapp.entity.SystemMessage;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.mail.util.SMTPMailUtil;
@@ -124,4 +125,39 @@ public class MailService {
 
     }
 
+    public void sendNewNotificationMail(Invitation invitation,User trigger) {
+        SystemMessage systemMessage = systemMessageRepository.findByMessageCode("NEW_INVITATION");
+        String personLink = applicationUrl + "profile/" + trigger.getId();
+        String activityLink = applicationUrl + "activityDetail/" + invitation.getActivity().getId();
+        String message = systemMessage.getMessageText()
+                .replace("{activityLink}", activityLink)
+                .replace("{personName}", trigger.getName() + " " + trigger.getSurname())
+                .replace("{personLink}", personLink);
+        sendMail(invitation.getReader(), message, systemMessage.getMailSubject());
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

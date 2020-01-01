@@ -61,7 +61,10 @@ public class AdminController {
 //            e.printStackTrace();
 //        }
         City city = cityRepository.findById(Long.valueOf(1)).get();
-        List<User> selectedUsers = userRepository.allOfACity(city);
+        List<User> selectedUsers = userRepository.allAnkaraWomen(city,Gender.FEMALE);
+
+        Activity activity=activityRepository.findById(Long.valueOf(6444)).get();
+        List<User> applicants = activityRequesRepository.applicantsOfActivity(activity);
         if (page == 0)
             page = 1;
 
@@ -71,6 +74,15 @@ public class AdminController {
         for (User u : selectedUsers) {
             i++;
 
+//            Boolean alreadyAttended=false;
+//            for(User applicant:applicants){
+//                if(applicant.getId()==u.getId()){
+//                    alreadyAttended=true;
+//                }
+//            }
+//
+//            if(alreadyAttended)
+//                continue;
 
             if (i < ((page - 1) * 500))
                 continue;
@@ -78,21 +90,16 @@ public class AdminController {
                 break;
 
 
-            String messageText = u.getName()+", selamlarrr, İlk buluşmamızı 38 kişiyle yapmıştık, sayı ve eğlence artarak devam ediyor. Geçen hafta 130+ kişinin katılımıyla harika bir halloween partisi" +
-                    " yaptık. Bu cuma yine saat 20'de Zaytung Zone'da arka bahce'de buluşuyor tanışıyor sonrasında DJ Akın ile dans ve müziğe doyuyoruz. Haftanın stresini atabileceğin kaliteli bir ortam, sınırsız " +
-                    " popcorn ve sınırsız eğlence seni bekliyor. Kimseyi tanımıyor olsan bile orada yalnızca merhaba diyerek onlarca kişiyle tanışabiliyorsun. Bu cuma plan yapma, bizimlesin";
+            String messageText =  u.getName()+" selamlar nasılsın, aktiviteler ve uygulama ile ilgili bazı hatırlatmalar yapmak istiyorum. topluluğumuz ortak ilgi alanındaki kişileri bir araya getirip" +
+                    " 6-8 kişilik aktiviteler yapılması amacıyla kurulmuştur. Sen de herhangi bir aktivite oluşturabilir, dilediğin kişileri onaylayarak aktiviteni gerçekleştirebilirsin. Sadece onayladığın kişiler" +
+                    " sana mesaj gönderebilir. Karmaşık, ilgi çekici, kalabalıklara hitap eden aktiviteler yapmak zorunda değilsin, sadece yürüyüş yapmak, bir kitap hakkında konusmak veya konsere gitmek gibi" +
+                    " birkaç kişinin katılımı ile gerçekleşen aktiviteler açabilirsin. katılımcı sayısı 6-8 kişiden fazla olduğunda organize etmek çok zorlaşır ve katılımcılar birbiriyle fazla iletişim kuramaz, kaynaşamaz" +
+                    " Aktivite sonrası mutlaka katılımcılar ile ilgili olumlu-olumsuz oy ver, gelmeyenleri yoklamada işaretle. Bu şekilde kullanıcı kitlemiz her zaman belirli bir kalitenin üzerinde kalacak." +
+                    " Herhangi bir aktiviteye istek atarken veya aktivitene kabul ederken ilgili profilin olumlu izlenim oranını dikkate almalısın. Olumlu izlenim oranı düşük profiller katıldıkları aktivitelerde diğer" +
+                    " kulanıcılar tarafından olumsuz olarak değerlendirilmiştir. Aklına takılan birsey olursa mutlaka bize sor, problemli bir durumla karşılaşır veya şüphe duyarsan bize bildir. Activity Friend güvenli," +
+                    " kaliteli ve temiz kalsın. Bunu ancak toplu şekilde hareket ederek başarabiliriz. Farkında mısın, Ankara'da gerçekten birşeyleri değiştirdik ve bunu birlikte yaptık";
 
-//                        String messageText = u.getName()+", selamlar, Geçen cuma 100 kişiden fazlaydik ve çok eğlendik bu Cuma(25 Ekim'de) Halloween temalı parti yapıyoruz. Özellikle yeni katılan veya " +
-//                                " aktif olamayan arkadaşların bizi tanıyıp güve duyması için önemli bir fırsatYalnız Activity Friend kullanıcıları orada oalcak. " +
-//                                " kostümün varsa kostümlü gel, yoksa da isteyenlere girişte halloween makyaj yapacağız saat 21'de DJ Akın başlıyor Vee hep birlikte macarena kareografisi yapacağız." +
-//                                " Profesyonel fotoğrafçımız gecenin fotoğraflarını çekiyor. Giriş  yalnızca 5TL" +
-//                                " Şimdi aktviteme istek at, bunu kaçırma";
-
-//            String messageText = "Merhaba "+ u.getName()+", sınırlara takılamdan aktivite açabilmek ve katılmak istersen premium olabilirsin. Detayları ana sayfada en tepedeki 'premium hakkında" +
-//                    " bilgilendirme' linkine tıklayarak görebilirsin. Premium hesaplar diğer üyelere güven veriyor, bu nedenle açtıkları aktivitelere katılım ve kabul edilme oranları standart " +
-//                    "kullanıcılara göre daha yüksek. İnsanlar premium kullanıcıların platformu daha ciddiye aldığını düşünüyor. Ayrıca yarın ilkini yapacağımız cuma partilerine gold üyeler " +
-//                    "ücretsiz olarak katılabiliecek. Activity Friend projesi sürekli büyüyor ve gelişiyor, fakat aynı şekilde sürekli olarak büyüyen masraflarla karşı karşıyayız. Bu süreçte premium olarak bize destek" +
-//                    " olabilirsin. Teşekkürler";
+//
 
             Message message = new Message();
             message.setReader(u);

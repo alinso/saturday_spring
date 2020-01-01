@@ -26,6 +26,9 @@ public interface FollowRepository extends JpaRepository<Follow,Long> {
             "where follow.leader=:user")
     Integer findFollowerCount(@Param("user") User user);
 
-    @Query("select coun(follow) from  Follow follow where follow.follower=:follower and follow.createdAt>:threeMonthsAgo")
+    @Query("select count(follow) from  Follow follow where follow.follower=:follower and follow.createdAt>:threeMonthsAgo")
     Integer last3MonthsFollowingCount(@Param("follower")User user, @Param("threeMonthsAgo")Date threeMonthsAgo);
+
+    @Query("select follow.leader from Follow follow group by follow.leader having count(follow)>100 order by count(follow) desc")
+    List<User> maxFollowedUsers();
 }

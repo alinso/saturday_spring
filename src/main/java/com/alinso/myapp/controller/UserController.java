@@ -139,7 +139,7 @@ public class UserController {
         user.setPassword(user.getPassword());
         User newUser = userService.register(user);
 
-        return new ResponseEntity<User>(newUser, HttpStatus.CREATED);
+        return new ResponseEntity<String>("Created", HttpStatus.CREATED);
     }
 
     @GetMapping("/myProfile")
@@ -180,9 +180,15 @@ public class UserController {
         return new ResponseEntity<ChangePasswordDto>(changePasswordDto, HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("top100")
-    public ResponseEntity<?> top100(){
+    @GetMapping("activityTop100")
+    public ResponseEntity<?> activityTop100(){
         List<ProfileDto> profileDtos  =userService.top100();
+        return new ResponseEntity<List<ProfileDto>>(profileDtos,HttpStatus.OK);
+    }
+
+    @GetMapping("socialScoreTop100")
+    public ResponseEntity<?> socialScoreactivityTop100(){
+        List<ProfileDto> profileDtos  =userService.socialScoreTop100();
         return new ResponseEntity<List<ProfileDto>>(profileDtos,HttpStatus.OK);
     }
 

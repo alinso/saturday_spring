@@ -1,6 +1,7 @@
 package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.Activity;
+import com.alinso.myapp.entity.Invitation;
 import com.alinso.myapp.entity.Notification;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.notification.NotificationDto;
@@ -266,6 +267,26 @@ public class NotificationService {
         if(!androidPushNotificationsService.newMessage(user,target)) {
             mailService.sendNewMessageMail(target, user);
         }
+    }
+
+    public void newInvitation(Invitation invitation) {
+        User trigger  =(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long triggerId= trigger.getId();
+
+        Notification notification = new Notification();
+        notification.setNotificationType(NotificationType.INVITATION);
+        notification.setTarget(invitation.getReader());
+        notification.setMessage(triggerId.toString());
+        notification.setTrigger(trigger);
+        notification.setRead(false);
+        notificationRepository.save(notification);
+
+
+        if(!androidPushNotificationsService.newInvitation(trigger,invitation.getReader())) {
+            mailService.sendNewNotificationMail(invitation, trigger);
+
+        }
+
     }
 }
 

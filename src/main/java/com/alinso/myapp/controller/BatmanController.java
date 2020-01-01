@@ -2,6 +2,8 @@ package com.alinso.myapp.controller;
 
 
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.repository.BlockRepository;
+import com.alinso.myapp.repository.FollowRepository;
 import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.service.AdminService;
 import com.alinso.myapp.service.UserService;
@@ -30,6 +32,12 @@ public class BatmanController  {
     @Autowired
     AdminService adminService;
 
+    @Autowired
+    FollowRepository followRepository;
+
+    @Autowired
+    BlockRepository blockRepository;
+
 
     @GetMapping("updatePoint/")
     public ResponseEntity<?> updatePoint() {
@@ -41,6 +49,34 @@ public class BatmanController  {
         for (User u : all) {
             Integer p = userService.calculateUserPoint(u);
             u.setPoint(p);
+            toBeSaved.add(u);
+            i++;
+            if (i % 50 == 0   ||  (i+1)==all.size()) {
+                userRepository.saveAll(toBeSaved);
+                toBeSaved.clear();
+            }
+        }
+        return new ResponseEntity<String>("guncelendi " + i, HttpStatus.OK);
+    }
+
+    @GetMapping("updateScore/")
+    public ResponseEntity<?> updateScore() {
+
+        List<User> all = userRepository.findAll();
+        List<User> toBeSaved = new ArrayList<>();
+        List<User> maximumFollowerUsers = followRepository.maxFollowedUsers();
+        Integer maximumFollowerCount = followRepository.findFollowerCount(maximumFollowerUsers.get(0));
+        List<User> maximumBlockedUsers = blockRepository.maxBlockedUsers();
+        Integer maximumBlockedCount = blockRepository.blockerCount(maximumBlockedUsers.get(0));
+        int i = 0;
+        for (User u : all) {
+            if(u.getId()==3212){
+                u.setSocialScore(-1);
+                continue;
+            }
+
+            Integer p = userService.calculateSocialScore(u,maximumBlockedCount,maximumFollowerCount);
+            u.setSocialScore(p);
             toBeSaved.add(u);
             i++;
             if (i % 50 == 0   ||  (i+1)==all.size()) {

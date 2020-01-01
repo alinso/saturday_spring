@@ -82,7 +82,7 @@ public class ActivityService {
 
         if (activityRequestService.isThisUserApprovedAllTimes(activity)) { //only attedndats cann see attendants
             for (ActivityRequest activityRequest : activityRequests) {
-                if (activityRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) { //only approved users should be seen
+                if ((activityRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) ) { //only approved users should be seen
                     ActivityRequestDto activityRequestDto = new ActivityRequestDto();
                     activityRequestDto.setProfileDto(userService.toProfileDto(activityRequest.getApplicant()));
                     activityRequestDto.setActivityRequestStatus(activityRequest.getActivityRequestStatus());
@@ -174,13 +174,13 @@ public class ActivityService {
         List<ActivityDto> activityDtos = new ArrayList<>();
 
         //balon futbolu
-        User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (pageNum == 0 && u.getCity().getId()==1) {
-                Activity selected = activityRepository.findById(Long.valueOf(5845)).get();
-                Activity selected2 = activityRepository.findById(Long.valueOf(5843)).get();
+      //  User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (pageNum == 0) {
+                Activity selected = activityRepository.findById(Long.valueOf(7481)).get();
+                 //Activity selected2 = activityRepository.findById(Long.valueOf(7353)).get();
                 activityDtos.add(toDto(selected));
-                activityDtos.add(toDto(selected2));
-            }
+                //activityDtos.add(toDto(selected2));
+                }
 
         for (Activity activity : activities) {
 
@@ -232,10 +232,8 @@ public class ActivityService {
 
         if (
                 activityInDb.getDeadLine().compareTo(DateUtil.xHoursLater(2)) < 0
-                        &&
-                        activityInDb.getDeadLine().compareTo(new Date()) > 0
         )
-            throw new UserWarningException("Son 2 saatte  aktiviteyi silemez/değiştiremezsin");
+            throw new UserWarningException("Aktivite tarihine 2 saatten  az kaldığında veya tarihi geçtiğinde aktiviteyi silemez/değiştiremezsin");
     }
 
     public List<ActivityDto> activitiesOfUser(Long id) {

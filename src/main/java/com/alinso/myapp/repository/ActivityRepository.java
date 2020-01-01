@@ -30,7 +30,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> recentUncommentedActivities(@Param("start")Date start, @Param("finish")Date finish);
 
 
-    @Query("select meeting from Activity meeting where meeting.createdAt > :threeMonthsAgo and meeting.creator:creator ")
-    List<Activity> last3MonthActivitiesOfUser( @Param("threeMonthsAgo")Date threeMonthsAgo, @Param("creator") User creator);
+    @Query("select meeting from Activity meeting where meeting.createdAt > :threeMonthsAgo and meeting.creator=:creator ")
+    List<Activity> last3MonthActivitiesOfUser(@Param("threeMonthsAgo")Date threeMonthsAgo, @Param("creator") User creator);
 
 }

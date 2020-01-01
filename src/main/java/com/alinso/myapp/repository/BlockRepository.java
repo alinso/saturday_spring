@@ -20,4 +20,7 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
 
     @Query("select count(block) from Block  block where block.blocked=:user")
     Integer blockerCount(@Param("user") User user);
+
+    @Query("select block.blocked from Block block group by block.blocked having count(block)>3 order by count(block) desc ")
+    List<User> maxBlockedUsers();
 }

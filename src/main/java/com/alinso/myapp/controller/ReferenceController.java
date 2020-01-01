@@ -32,14 +32,9 @@ public class ReferenceController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(user.getReferenceCode().equals("") || user.getReferenceCode()==null)
             user.setReferenceCode(referenceService.makeReferenceCode());
-
         userRepository.save(user);
 
         String referenceCode = user.getReferenceCode();
-        if(user.getGender()== Gender.MALE && user.getPoint()<50)
-            referenceCode="Referans olabilmek için yeterli puana(50) sahip değilsin";
-        if(user.getGender()== Gender.FEMALE && user.getPoint()<20)
-            referenceCode="Referans olabilmek için yeterli puana(20) sahip değilsin";
 
         return new ResponseEntity<>(referenceCode,HttpStatus.OK);
     }

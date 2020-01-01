@@ -56,23 +56,28 @@ public class UserValidator implements Validator {
         }
 
 
-        if (user.getReferenceCode().equals("")) {
-            errors.rejectValue("referenceCode", "Match", "Referans kodu olmadan kaydolamazsın, referans kodunu üyeler verebilir");
-        } else {
-            User parent = referenceService.findByCode(user.getReferenceCode());
-            if (parent == null) {
-                errors.rejectValue("referenceCode", "Match", "Geçersiz Referans Kodu");
-            }
-            if (parent.getId() !=3212 && user.getGender()==Gender.MALE) {
-                errors.rejectValue("referenceCode", "Match", "Referanslı erkek alımları doldu, son alımlar instagramdan başvuru ile yapılacak");
-            }
+        if(user.getGender()==Gender.MALE){
+            if (user.getReferenceCode().equals("")) {
+                errors.rejectValue("referenceCode", "Match", "Referans kodu olmadan kaydolamazsın, referans kodunu üyeler verebilir");
+            } else if(!user.getReferenceCode().equals("")) {
+
+                User parent = referenceService.findByCode(user.getReferenceCode());
+                if (parent == null) {
+                    errors.rejectValue("referenceCode", "Match", "Geçersiz Referans Kodu");
+                }
+                if(parent!=null)
+                    if (parent.getId() !=3212) {
+                        errors.rejectValue("referenceCode", "Match", "Erkek kontenjanı tamamen dolmuştur. Bir süre erkek alımı yapmayacağız");
+                    }
 
 
 //            errors.rejectValue("gender","Match", "Erkek kontenjanımız dolu olduğu için geçici olarak erkek kayıtlarımızı durdurduk." +
 //                    " Bir cinsiyetin oranı diğerine karşı dengesiz bir üstünlük sağladığında ancak bu şekilde dengeyi sağlayabiliyoruz:( Anlayışla karşılayacağını " +
 //                    "umuyoruz. İnstagram hesabımızı takipte kalırsan " +
 //                    " açıldığında Instagramdan duyurusunu yapacağız, teşekkür ederiz");
-    }
+            }
+        }
+
 
 
 //        if (!user.getReferenceCode().equals("")) {

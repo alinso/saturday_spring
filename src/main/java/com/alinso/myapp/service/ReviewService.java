@@ -43,7 +43,13 @@ public class ReviewService {
     UserService userService;
 
     @Autowired
+    ActivityRequestService activityRequestService;
+
+    @Autowired
     BlockService blockService;
+
+    @Autowired
+    NotificationService notificationService;
 
     private final Integer DAYS_TO_WRITE_REVIEW = -5;
     private final Integer HOURS_TO_WRITE_REVIEW = -1;
@@ -126,7 +132,8 @@ public class ReviewService {
         User reader = userService.findEntityById(reviewDto.getReader().getId());
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Boolean haveUsersMeetRecently = haveUsersMeetRecently(writer, reader);
+        // Boolean haveUsersMeetRecently = haveUsersMeetRecently(writer, reader);
+         Boolean haveUsersMeetRecently = activityRequestService.haveTheseUsersMeetAllTimes(writer.getId(),reader.getId());
 
 //        if (blockService.isThereABlock(reader.getId()))
 //            throw new UserWarningException("Erişim Yok");
@@ -146,10 +153,23 @@ public class ReviewService {
         if(haveUsersMeetRecently)
             review.setReviewType(ReviewType.MEETING);
 
-
         reviewRepository.save(review);
-    //    userEventService.reviewWritten(reader, review);
+        notificationService.newReview(reader,review.getId());
 
+        //    userEventService.reviewWritten(reader, review);
+
+    }
+
+    public void deleteReview(Long reviewId){
+        Review review = reviewRepository.findById(reviewId).get();
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(loggedUser.getId() == review.getReader().getId() || review.getWriter().getId()==loggedUser.getId()){
+            reviewRepository.delete(review);
+        }
+        else{
+            throw new UserWarningException("Bunu silme yetkin yok");
+        }
     }
 
 
@@ -172,11 +192,7 @@ public class ReviewService {
             throw new UserWarningException("Erişim Yok");
 
 
-        Calendar twoDaysAgo = Calendar.getInstance();
-        twoDaysAgo.setTime(new Date());
-        twoDaysAgo.add(Calendar.DATE, DAYS_TO_WRITE_REVIEW);
-
-        List<Review> reviews = reviewRepository.findByReaderBefore2Days(user,twoDaysAgo.getTime());
+        List<Review> reviews = reviewRepository.findByReader(user);
 
         List<ReviewDto> reviewDtos = new ArrayList<>();
         for (Review review : reviews) {
@@ -201,8 +217,9 @@ public class ReviewService {
 
     public Boolean haveIMeetThisUserRecently(Long otherUserId) {
         User me  = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User other  =userService.findEntityById(otherUserId);
+       // User other  =userService.findEntityById(otherUserId);
 
-        return  haveUsersMeetRecently(me,other);
+        return activityRequestService.haveTheseUsersMeetAllTimes(me.getId(),otherUserId);
+        //return  haveUsersMeetRecently(me,other);
     }
 }

@@ -97,7 +97,7 @@ public class ActivityRequestService {
 
                         maleCount++;
                 }
-                if (loggedUser.getGender() == Gender.MALE && maleCount > 4 && activity.getCreator().getGender() == Gender.FEMALE && !requestSenderpremiumType.equals("GOLD") && !activityCreatorpremiumType.equals("GOLD"))
+                if (loggedUser.getGender() == Gender.MALE && maleCount > 3 && activity.getCreator().getGender() == Gender.FEMALE && !requestSenderpremiumType.equals("GOLD") )
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
             }
@@ -164,6 +164,9 @@ public class ActivityRequestService {
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (activity.getCreator().getId() == loggedUser.getId())
+            return true;
+
+        if(premiumService.userPremiumType(loggedUser)=="GOLD")
             return true;
 
         Boolean isThisUserApproved = false;

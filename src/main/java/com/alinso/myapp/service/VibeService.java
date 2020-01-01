@@ -78,7 +78,7 @@ public class VibeService {
         List<ActivityRequest> activitiesIAttend = activityRequesRepository.findByApplicantId(u.getId());
         for (ActivityRequest r : activitiesIAttend) {
 
-            if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && r.getActivity().getCreator().getId()!=3212) {
+            if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && r.getActivity().getCreator().getId() != 3212) {
                 List<ActivityRequest> otherApprovedRequests = activityRequesRepository.findByActivityId(r.getActivity().getId());
                 for (ActivityRequest otherApprovedRequest : otherApprovedRequests) {
                     if (otherApprovedRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && otherApprovedRequest.getApplicant().getId() != u.getId()) {
@@ -89,9 +89,14 @@ public class VibeService {
         }
 
 
+        User me = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<User> usersICanVibe = new ArrayList<>();
         for (User userIcanVibe : myActivityAttendants) {
-            usersICanVibe.add(userIcanVibe);
+            //check if i voted that user before,if i already voted did not add to the list
+            Vibe v = vibeRepository.findByWriterAndReader(me, userIcanVibe);
+            if (v == null) {
+                usersICanVibe.add(userIcanVibe);
+            }
         }
 
 
@@ -115,7 +120,7 @@ public class VibeService {
 
         List<Vibe> allVibes = vibeRepository.findByReader(reader);
 
-        if (allVibes.size() < 5)
+        if (allVibes.size() < 10)
             return 0;
 
         Integer negativeVibeCount = 0;

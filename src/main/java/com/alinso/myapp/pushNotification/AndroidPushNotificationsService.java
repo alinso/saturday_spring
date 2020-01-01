@@ -149,4 +149,15 @@ public class AndroidPushNotificationsService {
         }
     }
 
+    public boolean newInvitation(User trigger, User reader) {
+        String message =  trigger.getName() + " " + trigger.getSurname() + " seni aktivitesine davet ediyor";
+        send("Yeni davet", reader.getFirebaseId(), message);
+        if(reader.getFirebaseId()==null){
+            return false;
+        }
+        else{
+            return true;
+        }
+
+    }
 }
