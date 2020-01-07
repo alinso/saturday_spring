@@ -123,7 +123,7 @@ public class UserService {
     //this the registration without mail verification
     public User register(User newUser) {
 
-        //City ankara = cityService.findById(Long.valueOf(1));
+        City ankara = cityService.findById(Long.valueOf(1));
         String referenceCode = referenceService.makeReferenceCode();
 
 
@@ -144,7 +144,7 @@ public class UserService {
         newUser.setPoint(0);
         newUser.setTooNegative(0);
         newUser.setExtraPoint(starterPoint);
-        // newUser.setCity(ankara);
+        newUser.setCity(ankara);
         newUser.setActivityCount(0);
         newUser.setReferenceCode(referenceCode);
         newUser.setEnabled(false);
@@ -186,7 +186,13 @@ public class UserService {
 
         Premium premium = new Premium();
         premium.setStartDate(new Date());
-        premium.setDuration(PremiumDuration.SONE_MONTH);
+
+
+        if(user.getGender()==Gender.FEMALE)
+            premium.setDuration(PremiumDuration.GTHREE_MONTHS);
+        if(user.getGender()==Gender.MALE)
+            premium.setDuration(PremiumDuration.GONE_MONTH);
+
         premiumService.saveGift(premium, user);
 
 
@@ -425,6 +431,7 @@ public class UserService {
     public List<ProfileDto> searchUser(String searchText, Integer pageNum) {
 
         Pageable pageable = PageRequest.of(pageNum, 20);
+        searchText.replaceAll("\\s+","");
         List<User> users = userRepository.searchUser(searchText, pageable);
         List<ProfileDto> profileDtos = new ArrayList<>();
         for (User user : users) {

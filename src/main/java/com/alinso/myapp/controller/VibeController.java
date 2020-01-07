@@ -63,6 +63,11 @@ public class VibeController {
         Integer vibe  =vibeService.vibePercentOfRequestOwner(requestId);
         return new ResponseEntity<Integer>(vibe,HttpStatus.OK);
     }
+    @GetMapping("vibeCountOfUser/{userId}")
+    public ResponseEntity<?> vibeCountOfUser(@PathVariable("userId") Long userId){
+        Integer vibe  =vibeService.vibeCountOfUser(userId);
+        return new ResponseEntity<Integer>(vibe,HttpStatus.OK);
+    }
 
 
     @GetMapping("myVibeOfThisUser/{userId}")

@@ -88,7 +88,7 @@ public class DayActionService {
         Premium premium = premiumService.isUserPremium(user);
         Integer vibe  =vibeService.calculateVibe(user.getId());
 
-        if(vibe<75 && vibe>1 && premium!=null && user.getGender()==Gender.MALE){
+        if(vibe<75 && vibe>1 && premium==null && user.getGender()==Gender.MALE){
             throw new UserWarningException("Olumlu izlenim oranı %75 altı olan hesaplar aktivite açamaz");
         }
 
@@ -123,6 +123,14 @@ public class DayActionService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
 
+        Premium premium = premiumService.isUserPremium(user);
+        Integer vibe  =vibeService.calculateVibe(user.getId());
+
+        if(vibe<75 && vibe>1 && premium==null && user.getGender()==Gender.MALE){
+            throw new UserWarningException("Olumlu izlenim oranı %75 altı olan hesaplar istek gönderemez");
+        }
+
+
 
         Integer limit = NEW_USER_REQUEST_LIMIT;
         String warning = "Günde en fazla " + limit + " istek gönderebilirsin!(ve +1 gold kullanıcılara)";
@@ -141,7 +149,6 @@ public class DayActionService {
             }
         }
 
-        Premium premium = premiumService.isUserPremium(user);
         if(premium!=null){
 
             if(premium.getDuration()== PremiumDuration.SONE_MONTH || premium.getDuration()==PremiumDuration.STHREE_MONTHS || premium.getDuration()==PremiumDuration.SSIX_MONTHS){

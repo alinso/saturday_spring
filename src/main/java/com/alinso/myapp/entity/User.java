@@ -54,6 +54,11 @@ public class User extends BaseEntity implements UserDetails {
     @Temporal(TemporalType.DATE)
     private Date birthDate;
 
+    @Column
+    @Temporal(TemporalType.DATE)
+    private Date lastLogin;
+
+
     @NotBlank(message = "Şifre boş olamaz")
     private String password;
 
@@ -366,5 +371,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setSocialScore(Integer socialScore) {
         this.socialScore = socialScore;
+    }
+
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
     }
 }

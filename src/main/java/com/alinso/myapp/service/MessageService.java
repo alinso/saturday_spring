@@ -233,10 +233,10 @@ public class MessageService {
                     "\n" +
                     "\n" +
                     " Herhangi biriyle bir şey yapmadan önce o kişi " +
-                    " hakkında olumlu izlenim oranını, katıldığı aktiviteleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir. Ayrıca her cumartesi yaptığımız buluşmalar aramıza yeni " +
-                    "katılalar için harika bir başlangıç ve birçok insanla tanışma fırsatı sunuyor. Şimdilik cumartesi günleri Salsa Ankara'da buluşuyoruz" +
-                    "\n İlk bir ay boyunca uygulamayı silver kullanıcı özelliklerinde kullanıyor olacaksın, bu senin için hoş geldin hediyemiz :)" +
-                    "\n Sormak istediğin herhangi bir şey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarım." +
+                    " hakkında olumlu izlenim oranını, katıldığı aktiviteleri görebilirsin. Bunlar kişininin güvenirliği hakkında fikir verir. Ayrıca her cumartesi yaptığımız buluşmalar aramıza yeni " +
+                    " katılalar için harika bir başlangıç ve birçok insanla tanışma fırsatı sunuyor. Şimdilik cumartesi günleri Salsa Ankara'da buluşuyoruz" +
+                    "\n İlk üç ay boyunca uygulamayı Gold kullanıcı özelliklerinde kullanıyor olacaksın, bu senin için hoş geldin hediyemiz :) Sonrasında standart kullanıcı olarak devam edebilirisn" +
+                    "\n Sormak veya söylemek istediğin herhangi bir şey olursa buradan yazabilirsin,lütfen çekinme, yardımcı olmaktan mutluluk duyarım." +
                     "\n" +
                     "İyi eğlenceler:)");
         }
@@ -247,14 +247,14 @@ public class MessageService {
                     " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
                     " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
                     "\n" +
+                    "\n  İlk ay 30 TL değerinde gold üyelik paketi ile uygulamayı kullanıyor olacaksın, dilersen ilerleyen zamanlarda tekrar gold kullanıcı olabilir veya standart kullancı olarak devam edebilirsin"+
                     "\n" +
                     " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
-                    " RAHATSIZLIK VERİCİ,ISRARCI,UYUGLAMAYI AMACI DIŞINDA KULLANAN PROFİLLERİ SİLİYOR VE MÜSAMAHA GÖSTERMİYORUZ." +
+                    " RAHATSIZLIK VERİCİ,ISRARCI,UYGLAMAYI AMACI DIŞINDA KULLANAN PROFİLLERİ SİLİYOR VE MÜSAMAHA GÖSTERMİYORUZ." +
                     "\n" +
                     "\n" +
                     " Herhangi biriyle bir şey yapmadan önce o kişi " +
-                    " hakkında yazılanları okuyabilir, katıldığı aktiviteleri görebilirsin. Ayrıca kişinin puanı da güvenilirliği hakkında fikir verebilir." +
-                    "\n İlk bir ay boyunca uygulamayı silver kullanıcı özelliklerinde kullanıyor olacaksın, bu aramıza yeni katılan arkadaşlar için hoş geldin hediyemiz :)" +
+                    " hakkında yazılanları okuyabilir, katıldığı aktiviteleri görebilirsin. Bunlar güvenilirliği hakkında fikir verebilir." +
                     "\n Sormak istediğin herhangi bir şey olursa buradan yazabilirsin, yardımcı olmaktan mutluluk duyarım." +
                     "\n" +
                     "İyi eğlenceler:)");

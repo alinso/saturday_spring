@@ -68,7 +68,12 @@ public class VibeService {
         for (Activity a : myActivities) {
             List<ActivityRequest> requests = activityRequesRepository.findByActivityId(a.getId());
             for (ActivityRequest r : requests) {
-                if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED) {
+
+                Integer result = r.getResult();
+                if(result==null)
+                    result=1;
+
+                if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && result==1) {
                     myActivityAttendants.add(r.getApplicant());
                 }
             }
@@ -81,7 +86,13 @@ public class VibeService {
             if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && r.getActivity().getCreator().getId() != 3212) {
                 List<ActivityRequest> otherApprovedRequests = activityRequesRepository.findByActivityId(r.getActivity().getId());
                 for (ActivityRequest otherApprovedRequest : otherApprovedRequests) {
-                    if (otherApprovedRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && otherApprovedRequest.getApplicant().getId() != u.getId()) {
+
+                    Integer result = r.getResult();
+                    if(result==null)
+                        result=1;
+
+
+                    if (otherApprovedRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && otherApprovedRequest.getApplicant().getId() != u.getId() &&  result==1) {
                         myActivityAttendants.add(otherApprovedRequest.getApplicant());
                     }
                 }
@@ -89,27 +100,27 @@ public class VibeService {
         }
 
 
-        User me = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<User> usersICanVibe = new ArrayList<>();
+        List<ProfileDto> profilesICanVibe = new ArrayList<>();
         for (User userIcanVibe : myActivityAttendants) {
-            //check if i voted that user before,if i already voted did not add to the list
-            Vibe v = vibeRepository.findByWriterAndReader(me, userIcanVibe);
-            if (v == null) {
-                usersICanVibe.add(userIcanVibe);
-            }
+
+
+                VibeType myVibe = myVibeOfThisUser(userIcanVibe.getId());
+                ProfileDto profileICanvie  =userService.toProfileDto(userIcanVibe);
+                profileICanvie.setMyVibe(myVibe);
+                profilesICanVibe.add(profileICanvie);
         }
 
 
-        Collections.sort(usersICanVibe, new Comparator<User>() {
+        Collections.sort(profilesICanVibe, new Comparator<ProfileDto>() {
             @Override
-            public int compare(User lhs, User rhs) {
+            public int compare(ProfileDto lhs, ProfileDto rhs) {
                 // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
                 return lhs.getId() > rhs.getId() ? -1 : (lhs.getId() < rhs.getId()) ? 1 : 0;
             }
         });
 
 
-        return userService.toProfileDtoList(usersICanVibe);
+        return profilesICanVibe;
 
     }
 
@@ -120,7 +131,7 @@ public class VibeService {
 
         List<Vibe> allVibes = vibeRepository.findByReader(reader);
 
-        if (allVibes.size() < 10)
+        if (allVibes.size() < 15)
             return 0;
 
         Integer negativeVibeCount = 0;
@@ -173,5 +184,12 @@ public class VibeService {
     public Integer vibePercentOfRequestOwner(Long requestId) {
         ActivityRequest activityRequest = activityRequesRepository.findById(requestId).get();
         return calculateVibe(activityRequest.getApplicant().getId());
+    }
+
+    public Integer vibeCountOfUser(Long userId) {
+
+        User reader=  userRepository.findById(userId).get();
+        List<Vibe> vibeCount = vibeRepository.findByReader(reader);
+        return vibeCount.size();
     }
 }

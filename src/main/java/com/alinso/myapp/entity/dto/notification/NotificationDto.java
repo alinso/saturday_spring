@@ -8,6 +8,8 @@ import javax.persistence.Enumerated;
 
 public class NotificationDto {
 
+    private Long id;
+
     private ProfileDto trigger;
 
     private ProfileDto target;
@@ -67,5 +69,13 @@ public class NotificationDto {
 
     public void setCreatedAtString(String createdAtString) {
         this.createdAtString = createdAtString;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

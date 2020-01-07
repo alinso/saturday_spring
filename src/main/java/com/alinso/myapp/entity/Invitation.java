@@ -1,11 +1,20 @@
 package com.alinso.myapp.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Invitation extends BaseEntity {
 
+
+    @ManyToOne
+    @NotNull
     private Activity activity;
+
+
+    @ManyToOne
+    @NotNull
     private  User reader;
 
     public Activity getActivity() {

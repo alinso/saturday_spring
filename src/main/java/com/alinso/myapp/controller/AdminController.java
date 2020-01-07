@@ -3,9 +3,12 @@ package com.alinso.myapp.controller;
 import com.alinso.myapp.entity.*;
 import com.alinso.myapp.entity.dto.discover.DiscoverDto;
 import com.alinso.myapp.entity.enums.Gender;
+import com.alinso.myapp.entity.enums.PremiumDuration;
+import com.alinso.myapp.entity.enums.PremiumType;
 import com.alinso.myapp.repository.*;
 import com.alinso.myapp.service.AdminService;
 import com.alinso.myapp.service.DiscoverService;
+import com.alinso.myapp.service.PremiumService;
 import com.alinso.myapp.service.UserEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 
 @RequestMapping("lkaldjfnuterhjbsfsdf")
@@ -24,6 +28,12 @@ public class AdminController {
 
     @Autowired
     ActivityRequesRepository activityRequesRepository;
+
+    @Autowired
+    PremiumService premiumService;
+
+    @Autowired
+    PremiumRepository premiumRepository;
 
     @Autowired
     UserEventService userEventService;
@@ -53,36 +63,19 @@ public class AdminController {
     public ResponseEntity<?> autoMessage(@PathVariable("page") Integer page) {
 
 
-//        String sDate1="08/08/2019";
-//        Date date1= null;
-//        try {
-//            date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-        City city = cityRepository.findById(Long.valueOf(1)).get();
-        List<User> selectedUsers = userRepository.allAnkaraWomen(city,Gender.FEMALE);
 
-        Activity activity=activityRepository.findById(Long.valueOf(6444)).get();
-        List<User> applicants = activityRequesRepository.applicantsOfActivity(activity);
+        City city = cityRepository.findById(Long.valueOf(1)).get();
+        List<User> selectedUsers = userRepository.allOfACity(city);
+
         if (page == 0)
             page = 1;
 
         User tuuce = userRepository.getOne(Long.valueOf(3212));
-        // List<Message> toBeSaved = new ArrayList<>();
         int i = 0;
         for (User u : selectedUsers) {
             i++;
 
-//            Boolean alreadyAttended=false;
-//            for(User applicant:applicants){
-//                if(applicant.getId()==u.getId()){
-//                    alreadyAttended=true;
-//                }
-//            }
-//
-//            if(alreadyAttended)
-//                continue;
+
 
             if (i < ((page - 1) * 500))
                 continue;
@@ -90,16 +83,14 @@ public class AdminController {
                 break;
 
 
-            String messageText =  u.getName()+" selamlar nasılsın, aktiviteler ve uygulama ile ilgili bazı hatırlatmalar yapmak istiyorum. topluluğumuz ortak ilgi alanındaki kişileri bir araya getirip" +
-                    " 6-8 kişilik aktiviteler yapılması amacıyla kurulmuştur. Sen de herhangi bir aktivite oluşturabilir, dilediğin kişileri onaylayarak aktiviteni gerçekleştirebilirsin. Sadece onayladığın kişiler" +
-                    " sana mesaj gönderebilir. Karmaşık, ilgi çekici, kalabalıklara hitap eden aktiviteler yapmak zorunda değilsin, sadece yürüyüş yapmak, bir kitap hakkında konusmak veya konsere gitmek gibi" +
-                    " birkaç kişinin katılımı ile gerçekleşen aktiviteler açabilirsin. katılımcı sayısı 6-8 kişiden fazla olduğunda organize etmek çok zorlaşır ve katılımcılar birbiriyle fazla iletişim kuramaz, kaynaşamaz" +
-                    " Aktivite sonrası mutlaka katılımcılar ile ilgili olumlu-olumsuz oy ver, gelmeyenleri yoklamada işaretle. Bu şekilde kullanıcı kitlemiz her zaman belirli bir kalitenin üzerinde kalacak." +
-                    " Herhangi bir aktiviteye istek atarken veya aktivitene kabul ederken ilgili profilin olumlu izlenim oranını dikkate almalısın. Olumlu izlenim oranı düşük profiller katıldıkları aktivitelerde diğer" +
-                    " kulanıcılar tarafından olumsuz olarak değerlendirilmiştir. Aklına takılan birsey olursa mutlaka bize sor, problemli bir durumla karşılaşır veya şüphe duyarsan bize bildir. Activity Friend güvenli," +
-                    " kaliteli ve temiz kalsın. Bunu ancak toplu şekilde hareket ederek başarabiliriz. Farkında mısın, Ankara'da gerçekten birşeyleri değiştirdik ve bunu birlikte yaptık";
+            String messageText =  u.getName()+" merhaba, Bu cumartesi Salsa Ankara'nın harika manzaralı kapalı terasında sıcacık sobamızın başında sakin ve dinlendirici müzikler eşliğinde şarap gecesi yapıyoruz. Herkesin şarabını alıp geleceği" +
+                    " tanışıp sohbet edeceğimiz, birbirimize şarap ikram edip sosyalleşeceğimiz kaliteli, masalsı bir atmosfer yaratıyoruz. Özellikle aramıza yeni katılmış veya aktif olamamış " +
+                    " arkadaşlarımız için ortamımızı görmeleri adına çok güzel bir fırsat. Eğer yalnız gelirsen birçok güzel insanla tanışacaksın, Activity Friend samimi ve nezih bir topluluk" +
+                    " Şarap sevmiyorsan başka içecekler de getirebilirsin. Saat 19:00-20:30 arasında tanışıp sohbet edecek, sonrasında ise DJ Akın ile dans müziğe" +
+                    " doyacağız. Eve erken dönmesi gereken arkadaşlarımız da dans edebilesin diye DJ performans saat 20:30'da başlıyor. Bu cumartesi en çok biz eğleneceğiz, bunu kaçırma! Katılım için aktiviteme istek atman yeterli" +
+                    " Kadın-erkek sayısı dengeli olması kaydıyla üye olmayan arkadşlarınla da grup olarak gelebilirsin. Aklına takılan olursa lütfen sormaktan çekinme." +
+                    " Başlangıç:19:00, Giriş 20 TL(Gold üyeler 10 TL)";
 
-//
 
             Message message = new Message();
             message.setReader(u);

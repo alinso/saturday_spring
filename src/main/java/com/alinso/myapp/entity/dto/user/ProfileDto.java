@@ -2,6 +2,7 @@ package com.alinso.myapp.entity.dto.user;
 
 import com.alinso.myapp.entity.Premium;
 import com.alinso.myapp.entity.enums.Gender;
+import com.alinso.myapp.entity.enums.VibeType;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EnumType;
@@ -36,7 +37,7 @@ public class ProfileDto {
 
     private Integer socialScore;
 
-
+    private VibeType myVibe;
 
     private String premiumType;
 
@@ -210,6 +211,14 @@ public String getPremiumType() {
 
     public void setSocialScore(Integer socialScore) {
         this.socialScore = socialScore;
+    }
+
+    public VibeType getMyVibe() {
+        return myVibe;
+    }
+
+    public void setMyVibe(VibeType myVibe) {
+        this.myVibe = myVibe;
     }
 }
 

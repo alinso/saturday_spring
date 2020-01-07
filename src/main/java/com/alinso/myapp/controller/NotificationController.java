@@ -31,6 +31,12 @@ public class NotificationController {
         return  new ResponseEntity<>(notificationDtoList, HttpStatus.OK);
     }
 
+    @GetMapping("delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id){
+
+        notificationService.deleteById(id);
+        return  new ResponseEntity<>("OK", HttpStatus.OK);
+    }
 
     @GetMapping("read/{id}")
     public void read(@PathVariable("id") Long id){

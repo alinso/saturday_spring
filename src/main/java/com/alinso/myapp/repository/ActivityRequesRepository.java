@@ -27,7 +27,7 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
     Integer countOfAprrovedForThisActivity(@Param("activity") Activity activity, @Param("status") ActivityRequestStatus status);
 
     @Query("select activityRequest.activity from ActivityRequest activityRequest " +
-            "where  activityRequest.activityRequestStatus=:status and activityRequest.applicant=:user")
+            "where  activityRequest.activityRequestStatus=:status and activityRequest.applicant=:user and activityRequest.result!=0")
     List<Activity> activitiesAttendedByUser(@Param("user") User user, @Param("status") ActivityRequestStatus status);
 
     @Query("select activityRequest.applicant from ActivityRequest activityRequest where activityRequest.activity=:activity and activityRequest.activityRequestStatus=:status")
@@ -58,6 +58,7 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
     @Query("select count(activityRequest) from ActivityRequest activityRequest " +
             "where activityRequest.activity.creator = :user1 " +
             "and activityRequest.applicant=:user2 " +
+            "and activityRequest.result!=0 "+
             "and activityRequest.activityRequestStatus=:status")
     Integer haveUser1HostUser2AllTimes(@Param("user2") User user2, @Param("user1") User user1, @Param("status") ActivityRequestStatus status);
 

@@ -63,6 +63,17 @@ public class NotificationService {
     @Autowired
     UserService userService;
 
+
+    public void deleteById(Long id){
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Notification n  = notificationRepository.findById(id).get();
+
+        if(n.getTarget().getId()==loggedUser.getId()){
+            notificationRepository.deleteById(id);
+        }
+    }
+
+
     private void createNotification(User target,User trigger,NotificationType notificationType,String message){
 
 
@@ -271,12 +282,12 @@ public class NotificationService {
 
     public void newInvitation(Invitation invitation) {
         User trigger  =(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long triggerId= trigger.getId();
+
 
         Notification notification = new Notification();
         notification.setNotificationType(NotificationType.INVITATION);
         notification.setTarget(invitation.getReader());
-        notification.setMessage(triggerId.toString());
+        notification.setMessage(((Long)invitation.getActivity().getId()).toString());
         notification.setTrigger(trigger);
         notification.setRead(false);
         notificationRepository.save(notification);

@@ -97,7 +97,7 @@ public class ActivityRequestService {
 
                         maleCount++;
                 }
-                if (loggedUser.getGender() == Gender.MALE && maleCount > 3 && activity.getCreator().getGender() == Gender.FEMALE && !requestSenderpremiumType.equals("GOLD") )
+                if (loggedUser.getGender() == Gender.MALE && maleCount > 3 && activity.getCreator().getGender() == Gender.FEMALE && !requestSenderpremiumType.equals("GOLD") && !activityCreatorpremiumType.equals("GOLD") )
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
             }

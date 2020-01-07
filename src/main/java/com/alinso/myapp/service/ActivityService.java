@@ -11,6 +11,7 @@ import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.ActivityRepository;
 import com.alinso.myapp.repository.ActivityRequesRepository;
+import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.util.UserUtil;
@@ -65,6 +66,8 @@ public class ActivityService {
     @Autowired
     AdminService adminService;
 
+    @Autowired
+    UserRepository userRepository;
 
     public ActivityDto findById(Long id) {
         Activity activity = null;
@@ -169,6 +172,10 @@ public class ActivityService {
     public List<ActivityDto> findAllNonExpiredByCityId(Long cityId, Integer pageNum) {
 
 
+
+
+
+
         Pageable pageable = PageRequest.of(pageNum, 10);
         List<Activity> activities = activityRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId), pageable);
         List<ActivityDto> activityDtos = new ArrayList<>();
@@ -176,6 +183,13 @@ public class ActivityService {
         //balon futbolu
       //  User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if (pageNum == 0) {
+
+                User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+                user.setLastLogin(new Date());
+                userRepository.save(user);
+
+
                 Activity selected = activityRepository.findById(Long.valueOf(7481)).get();
                  //Activity selected2 = activityRepository.findById(Long.valueOf(7353)).get();
                 activityDtos.add(toDto(selected));
