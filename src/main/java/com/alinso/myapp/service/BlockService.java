@@ -45,7 +45,7 @@ public class BlockService {
         return isBlocked;
     }
 
-    private Boolean isBlockedByIt(Long blockerId) {
+    public Boolean isBlockedByIt(Long blockerId) {
 
         User blocked  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User blocker =userService.findEntityById(blockerId);
@@ -58,7 +58,7 @@ public class BlockService {
     }
 
 
-    private Boolean isBlockedIt(Long blockedId) {
+    public Boolean isBlockedIt(Long blockedId) {
 
         User blocker  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User blocked =userService.findEntityById(blockedId);

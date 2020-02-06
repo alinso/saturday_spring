@@ -62,7 +62,7 @@ public class AdminService {
     /////////////////////admin////////////////////////////////////////////////////////////////////////////////
     public List<Complain> getAllComplaints() {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (loggedUser.getId() != 3211)
+        if (loggedUser.getId() != 3212)
             return null;
 
         return complainRepository.findAll();
@@ -80,7 +80,7 @@ public class AdminService {
 
 
             User currentBatman = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if (currentBatman.getId() != 3211)
+            if (currentBatman.getId() != 3212)
                 throw new UserWarningException("Erişim Yok!");
 
 

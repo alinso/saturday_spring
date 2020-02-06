@@ -70,9 +70,8 @@ public class VibeService {
             for (ActivityRequest r : requests) {
 
                 Integer result = r.getResult();
-                if(result==null)
-                    result=1;
 
+                if(result!=null)
                 if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && result==1) {
                     myActivityAttendants.add(r.getApplicant());
                 }
@@ -88,10 +87,7 @@ public class VibeService {
                 for (ActivityRequest otherApprovedRequest : otherApprovedRequests) {
 
                     Integer result = r.getResult();
-                    if(result==null)
-                        result=1;
-
-
+                    if(result!=null)
                     if (otherApprovedRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && otherApprovedRequest.getApplicant().getId() != u.getId() &&  result==1) {
                         myActivityAttendants.add(otherApprovedRequest.getApplicant());
                     }

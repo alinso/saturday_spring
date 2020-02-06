@@ -39,6 +39,12 @@ public class User extends BaseEntity implements UserDetails {
     private String surname;
 
     @Column
+    private String title;//profsyonel kullanıcılar iin tanımlayıcı
+
+    @Column
+    private Integer trialUser;
+
+    @Column
     @Email(message = "Geçerli bir email adresi giriniz")
     @NotBlank(message = "Email adresi boş olamaz")
     private String email;
@@ -379,5 +385,21 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setLastLogin(Date lastLogin) {
         this.lastLogin = lastLogin;
+    }
+
+    public Integer getTrialUser() {
+        return trialUser;
+    }
+
+    public void setTrialUser(Integer trialUser) {
+        this.trialUser = trialUser;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

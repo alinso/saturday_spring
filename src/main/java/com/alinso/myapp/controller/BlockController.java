@@ -26,9 +26,14 @@ public class BlockController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("isBlocked/{oppositId}")
+    @GetMapping("isBlockedByIt/{oppositId}")
     public ResponseEntity<?> isFollowing(@PathVariable("oppositId") Long oppositId){
-        Boolean result = blockService.isThereABlock(oppositId);
+        Boolean result = blockService.isBlockedByIt(oppositId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    @GetMapping("isBlockedIt/{oppositId}")
+    public ResponseEntity<?> icBlockedIt(@PathVariable("oppositId") Long oppositId){
+        Boolean result = blockService.isBlockedIt(oppositId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

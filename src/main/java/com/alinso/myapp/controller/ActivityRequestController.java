@@ -20,7 +20,7 @@ public class ActivityRequestController {
     @GetMapping("sendRequest/{id}")
     public ResponseEntity<?> join(@PathVariable("id") Long id){
 
-        Boolean isThisUserJoins = activityRequestService.sendRequest(id);
+        Integer isThisUserJoins = activityRequestService.sendRequest(id);
 
         return new ResponseEntity<>(isThisUserJoins, HttpStatus.OK);
     }

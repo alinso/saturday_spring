@@ -207,4 +207,8 @@ public class UserEventService {
     public void newMessageActivity(User reader, Activity triggerActivity){
         notificationService.newMessageActivity(reader,triggerActivity);
     }
+
+    public void newPremiumMessage(User reader,User writer) {
+        notificationService.newPremiumMessage(reader,writer);
+    }
 }

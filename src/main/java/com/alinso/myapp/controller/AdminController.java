@@ -65,7 +65,7 @@ public class AdminController {
 
 
         City city = cityRepository.findById(Long.valueOf(1)).get();
-        List<User> selectedUsers = userRepository.allOfACity(city);
+        List<User> selectedUsers = userRepository.allAnkaraWomen(city,Gender.FEMALE);
 
         if (page == 0)
             page = 1;
@@ -83,13 +83,14 @@ public class AdminController {
                 break;
 
 
-            String messageText =  u.getName()+" merhaba, Bu cumartesi Salsa Ankara'nın harika manzaralı kapalı terasında sıcacık sobamızın başında sakin ve dinlendirici müzikler eşliğinde şarap gecesi yapıyoruz. Herkesin şarabını alıp geleceği" +
-                    " tanışıp sohbet edeceğimiz, birbirimize şarap ikram edip sosyalleşeceğimiz kaliteli, masalsı bir atmosfer yaratıyoruz. Özellikle aramıza yeni katılmış veya aktif olamamış " +
-                    " arkadaşlarımız için ortamımızı görmeleri adına çok güzel bir fırsat. Eğer yalnız gelirsen birçok güzel insanla tanışacaksın, Activity Friend samimi ve nezih bir topluluk" +
-                    " Şarap sevmiyorsan başka içecekler de getirebilirsin. Saat 19:00-20:30 arasında tanışıp sohbet edecek, sonrasında ise DJ Akın ile dans müziğe" +
-                    " doyacağız. Eve erken dönmesi gereken arkadaşlarımız da dans edebilesin diye DJ performans saat 20:30'da başlıyor. Bu cumartesi en çok biz eğleneceğiz, bunu kaçırma! Katılım için aktiviteme istek atman yeterli" +
-                    " Kadın-erkek sayısı dengeli olması kaydıyla üye olmayan arkadşlarınla da grup olarak gelebilirsin. Aklına takılan olursa lütfen sormaktan çekinme." +
-                    " Başlangıç:19:00, Giriş 20 TL(Gold üyeler 10 TL)";
+            String messageText =  u.getName()+", Sephora'dan 100 TL'lik hediye çeki kazanmak ister misin? Tek yapman gereken her neyden hoşlanıyor, neye ilgi duyuyorsan onunla ilgili bir aktivite" +
+                    " açmak ve gerçekleştirdiğin aktiviteden bir fotoğraf bize yollamak. Çekiliş sonrası 2 aktivite sahibine 100'er TL'lik hediye çeki vereceğiz. Kazanma şansın hiç az değil ve birden fazla " +
+                    " aktivite gerçekleştirerek şansını arttırabilirsin. Her aktivite bir katılım hakkı demek." +
+                    "\n"+
+                    " Çekiliş, 31 Ocak cuma günü 20:00'da olacak ve bu akşamdan itibaren gerçekleştirdiğin aktivitelerle katılabilirsin. " +
+                    " Şimdi bir aktivite aç, hem harika insanlarla kendi kuralların, kendi ilgi alanın çerçevesinde güzel bir gün geçir, hem de Sephoa'dan hediye çeki kazanma şansı yakala!" +
+                    "\n" +
+                    " Sephora'ya destekleri için teşekkür ederiz :)";
 
 
             Message message = new Message();

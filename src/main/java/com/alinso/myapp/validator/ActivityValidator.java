@@ -32,8 +32,8 @@ public class ActivityValidator implements Validator {
             errors.rejectValue("file","","Max dosya boyutu 2 MB olabilir");
         }
 
-        if(activityDto.getDetail().length()>340){
-            errors.rejectValue("detail","","Maksimum 340 karakter girebilirsiniz");
+        if(activityDto.getDetail().length()>500){
+            errors.rejectValue("detail","","Maksimum 500 karakter girebilirsiniz");
 
         }
 

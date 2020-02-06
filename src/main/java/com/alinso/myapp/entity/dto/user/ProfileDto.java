@@ -26,6 +26,7 @@ public class ProfileDto {
     private String surname;
 
     private String about = "";
+    private String title="";
 
     private String bDateString;
 
@@ -219,6 +220,14 @@ public String getPremiumType() {
 
     public void setMyVibe(VibeType myVibe) {
         this.myVibe = myVibe;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
 

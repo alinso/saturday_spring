@@ -2,13 +2,16 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.Premium;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.PremiumDuration;
 import com.alinso.myapp.entity.enums.PremiumType;
 import com.alinso.myapp.repository.PremiumRepository;
+import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,14 +28,18 @@ public class PremiumService {
     @Autowired
     UserService userService;
 
+    @Autowired
+    UserRepository userRepository;
 
 
     public void save(Premium premium, Long userId) {
-        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        if(loggedUser.getId()!=3211)
-//            return;
 
         User toBePremium  =userService.findEntityById(userId);
+
+        if(toBePremium.getTrialUser()==100 || toBePremium.getTrialUser()==99) {
+            toBePremium.setTrialUser(101);
+            userRepository.save(toBePremium);
+        }
 
         //check if already premium
         //if already premium set created at last day of current premium
@@ -84,7 +91,7 @@ public class PremiumService {
         Calendar premiumFinish = Calendar.getInstance();
         premiumFinish.setTime(latestPremium.getStartDate());
 
-        if (latestPremium.getDuration() == PremiumDuration.SONE_MONTH || latestPremium.getDuration() == PremiumDuration.GONE_MONTH) {
+        if (latestPremium.getDuration() == PremiumDuration.SONE_MONTH || latestPremium.getDuration() == PremiumDuration.GONE_MONTH || latestPremium.getDuration()==PremiumDuration.ORGANIZATOR) {
             premiumFinish.add(Calendar.DATE, 30);
         }
         if (latestPremium.getDuration() == PremiumDuration.STHREE_MONTHS || latestPremium.getDuration() == PremiumDuration.GTHREE_MONTHS) {
@@ -136,7 +143,24 @@ public class PremiumService {
         if(latestPremium.getDuration()==PremiumDuration.SONE_MONTH || latestPremium.getDuration()==PremiumDuration.STHREE_MONTHS || latestPremium.getDuration()==PremiumDuration.SSIX_MONTHS){
             return "SILVER";
         }
+        if(latestPremium.getDuration()==PremiumDuration.ORGANIZATOR){
+            return "ORGANIZATOR";
+        }
         return null;
     }
 
+    public List<ProfileDto> findProfessionals() {
+        Calendar aMonthAgo = Calendar.getInstance();
+        aMonthAgo.add(Calendar.DATE,-30);
+
+        List<User> premimUserList = new ArrayList<>();
+        List<Premium> premiums = premiumRepository.findByDuration(PremiumDuration.ORGANIZATOR);
+
+        for(Premium p:premiums){
+               if(p.getCreatedAt().compareTo(aMonthAgo.getTime())<0){
+                   premimUserList.add(p.getUser());
+               }
+        }
+        return userService.toProfileDtoList(premimUserList);
+    }
 }

@@ -27,7 +27,7 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
     Integer countOfAprrovedForThisActivity(@Param("activity") Activity activity, @Param("status") ActivityRequestStatus status);
 
     @Query("select activityRequest.activity from ActivityRequest activityRequest " +
-            "where  activityRequest.activityRequestStatus=:status and activityRequest.applicant=:user and activityRequest.result!=0")
+            "where  activityRequest.activityRequestStatus=:status and activityRequest.applicant=:user and activityRequest.result=1")
     List<Activity> activitiesAttendedByUser(@Param("user") User user, @Param("status") ActivityRequestStatus status);
 
     @Query("select activityRequest.applicant from ActivityRequest activityRequest where activityRequest.activity=:activity and activityRequest.activityRequestStatus=:status")
@@ -58,20 +58,18 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
     @Query("select count(activityRequest) from ActivityRequest activityRequest " +
             "where activityRequest.activity.creator = :user1 " +
             "and activityRequest.applicant=:user2 " +
-            "and activityRequest.result!=0 "+
+            " and activityRequest.result=1 "+
             "and activityRequest.activityRequestStatus=:status")
     Integer haveUser1HostUser2AllTimes(@Param("user2") User user2, @Param("user1") User user1, @Param("status") ActivityRequestStatus status);
 
     @Query("select activityRequest from ActivityRequest  activityRequest"+
             " where activityRequest.activity.creator=:user" +
-            " and activityRequest.activityRequestStatus=:status" +
-            " and activityRequest.createdAt>:threeMonthsAgo")
-    List<ActivityRequest> last3MonthsIncomingApprovedRequests(@Param("user")User user, @Param("status")ActivityRequestStatus approved, @Param("threeMonthsAgo")Date threeMonthsAgo);
+            " and activityRequest.activityRequestStatus=:status" )
+    List<ActivityRequest> last3MonthsIncomingApprovedRequests(@Param("user")User user, @Param("status")ActivityRequestStatus approved);
 
     @Query("select count(activityRequest) from ActivityRequest  activityRequest"+
-            " where activityRequest.applicant=:user" +
-            " and activityRequest.createdAt>:threeMonthsAgo")
-    Integer last3MonthSentRequestsOfUser(@Param("user")User user, @Param("threeMonthsAgo")Date threeMonthsAgo);
+            " where activityRequest.applicant=:user" )
+    Integer last3MonthSentRequestsOfUser(@Param("user")User user);
 
     @Query("select count(activityRequest) from ActivityRequest activityRequest where activityRequest.applicant=:user and activityRequest.activityRequestStatus=:approved")
     Integer findApprovedRequestCountByApplicant(@Param("user") User user, @Param("approved")ActivityRequestStatus approved);

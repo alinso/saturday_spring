@@ -17,16 +17,19 @@ import org.springframework.stereotype.Service;
 public class DayActionService {
 
 
-    private Integer NEW_USER_REQUEST_LIMIT=1;
-    private Integer OLD_USER_REQUEST_LIMIT=1;
-    private Integer SILVER_USER_REQUEST_LIMIT=7;
-    private Integer GOLD_USER_REQUEST_LIMIT=20;
+    private Integer MALE_USER_REQUEST_LIMIT=1;
+    private Integer FEMALE_USER_REQUEST_LIMIT=15;
+    private Integer SILVER_USER_REQUEST_LIMIT=50;
+    private Integer GOLD_USER_REQUEST_LIMIT=80;
 
 
-    private Integer NEW_USER_ACTIVITY_LIMIT=2;
-    private Integer OLD_USER_ACTIVITY_LIMIT=2;
+    private Integer MALE_USER_ACTIVITY_LIMIT=1;
+    private Integer FEMALE_USER_ACTIVITY_LIMIT=2;
     private Integer SILVER_USER_ACTIVITY_LIMIT=5;
     private Integer GOLD_USER_ACTIVITY_LIMIT=10;
+
+    private Integer ORGANIZATOR_USER_ACTIVITY_LIMIT=3;
+    private  Integer ORGANIZATOR_USER_REQUEST_LIMIT=80;
 
 
     @Autowired
@@ -84,6 +87,10 @@ public class DayActionService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
 
+        if(user.getTrialUser()==100)
+        {
+            throw new UserWarningException("Hesabınızın deneme süresi doldu, aktifleştirmek için bir defaya mahsus gold üye olmalısınız");
+        }
 
         Premium premium = premiumService.isUserPremium(user);
         Integer vibe  =vibeService.calculateVibe(user.getId());
@@ -92,12 +99,11 @@ public class DayActionService {
             throw new UserWarningException("Olumlu izlenim oranı %75 altı olan hesaplar aktivite açamaz");
         }
 
-        Integer limit = NEW_USER_ACTIVITY_LIMIT;
+        Integer limit =MALE_USER_ACTIVITY_LIMIT;
         String warning  ="Haftada en fazla " + limit + " aktivite açabilirsin!";
-
-        if (user.getPoint() > 50) {
-            limit = OLD_USER_ACTIVITY_LIMIT;
-            warning = "Haftada en fazla " + limit + " aktivite açabilirsin!";
+        if(user.getGender()==Gender.FEMALE){
+             limit =FEMALE_USER_ACTIVITY_LIMIT;
+             warning  ="Haftada en fazla " + limit + " aktivite açabilirsin!";
         }
 
 ;
@@ -111,6 +117,10 @@ public class DayActionService {
                  limit = GOLD_USER_ACTIVITY_LIMIT;
                  warning = "Gold kullanıcılar haftada en fazla " + limit + " aktivite açabilir!";
              }
+             if(premium.getDuration()==PremiumDuration.ORGANIZATOR){
+                 limit = ORGANIZATOR_USER_ACTIVITY_LIMIT;
+                 warning = "Profesyoneller kullanıcılar haftada en fazla " + limit + " aktivite açabilir!";
+             }
         }
 
         if (dayAction != null)
@@ -123,6 +133,11 @@ public class DayActionService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
 
+        if(user.getTrialUser()==100)
+        {
+            throw new UserWarningException("Hesabınızın deneme süresi doldu, aktifleştirmek için bir defaya mahsus gold üye olmalısınız");
+        }
+
         Premium premium = premiumService.isUserPremium(user);
         Integer vibe  =vibeService.calculateVibe(user.getId());
 
@@ -132,22 +147,22 @@ public class DayActionService {
 
 
 
-        Integer limit = NEW_USER_REQUEST_LIMIT;
-        String warning = "Günde en fazla " + limit + " istek gönderebilirsin!(ve +1 gold kullanıcılara)";
-        if (user.getPoint() > 50) {
-            limit = OLD_USER_REQUEST_LIMIT;
-            warning="Günde en fazla " + limit + " istek gönderebilirsin!(ve +1 gold kullanıcılara)";
+        Integer limit = MALE_USER_REQUEST_LIMIT;
+        String warning = "Haftada en fazla " + limit + " istek gönderebilirsin!";
+        if (user.getGender() == Gender.FEMALE) {
+            limit = FEMALE_USER_REQUEST_LIMIT;
+            warning="Haftada en fazla " + limit + " istek gönderebilirsin!";
         }
 
         //if the activity owner is premium, request limit should be 2
-        Premium ownerPremium = premiumService.isUserPremium(activity.getCreator());
-
-        if(ownerPremium!=null){
-            if(ownerPremium.getDuration()== PremiumDuration.GONE_MONTH || ownerPremium.getDuration()==PremiumDuration.GTHREE_MONTHS || ownerPremium.getDuration()==PremiumDuration.GSIX_MONTHS){
-                limit = 2;
-                warning="Günde en fazla " + limit + " istek gönderebilirsin!";
-            }
-        }
+//        Premium ownerPremium = premiumService.isUserPremium(activity.getCreator());
+//
+//        if(ownerPremium!=null){
+//            if(ownerPremium.getDuration()== PremiumDuration.GONE_MONTH || ownerPremium.getDuration()==PremiumDuration.GTHREE_MONTHS || ownerPremium.getDuration()==PremiumDuration.GSIX_MONTHS){
+//                limit = 2;
+//                warning="Günde en fazla " + limit + " istek gönderebilirsin!";
+//            }
+//        }
 
         if(premium!=null){
 
@@ -158,6 +173,10 @@ public class DayActionService {
             if(premium.getDuration()== PremiumDuration.GONE_MONTH || premium.getDuration()==PremiumDuration.GTHREE_MONTHS || premium.getDuration()==PremiumDuration.GSIX_MONTHS){
                 limit = GOLD_USER_REQUEST_LIMIT;
                 warning = "Gold kullanıcılar günde en fazla " + limit + " istek gönderebilir!";
+            }
+            if(premium.getDuration()==PremiumDuration.ORGANIZATOR){
+                limit = ORGANIZATOR_USER_REQUEST_LIMIT;
+                warning = "Profesyonel kullanıcılar günde en fazla " + limit + " istek gönderebilir!";
             }
         }
 
@@ -173,7 +192,7 @@ public class DayActionService {
         dayActionRepository.clearActivity();
     }
 
-    @Scheduled(cron = "0 1 1 * * ?")
+    @Scheduled(cron = "0 0 1 * * MON")
     private void clearRequest() {
         dayActionRepository.clearRequest();
     }

@@ -16,6 +16,6 @@ public interface ComplainRepository extends JpaRepository<Complain,Long> {
     @Query("select count(c) from Complain c where c.reporter=:user")
     Integer countOfComplaintsByTheUser(@Param("user") User user);
 
-    @Query("select count(c) from Complain c where c.reporter=:user and c.createdAt>:threeMonthsAgo")
-    Integer last3MonthscountOfComplaintsByTheUser(@Param("user")User user, @Param("threeMonthsAgo")Date threeMonthsAgo);
+    @Query("select count(c) from Complain c where c.reporter=:user ")
+    Integer last3MonthscountOfComplaintsByTheUser(@Param("user")User user);
 }

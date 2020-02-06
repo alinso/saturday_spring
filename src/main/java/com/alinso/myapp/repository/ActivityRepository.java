@@ -3,6 +3,7 @@ package com.alinso.myapp.repository;
 import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.enums.Gender;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,7 +31,10 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> recentUncommentedActivities(@Param("start")Date start, @Param("finish")Date finish);
 
 
-    @Query("select meeting from Activity meeting where meeting.createdAt > :threeMonthsAgo and meeting.creator=:creator ")
-    List<Activity> last3MonthActivitiesOfUser(@Param("threeMonthsAgo")Date threeMonthsAgo, @Param("creator") User creator);
+    @Query("select meeting from Activity meeting where  meeting.creator=:creator ")
+    List<Activity> last3MonthActivitiesOfUser( @Param("creator") User creator);
+
+    @Query("select count(meeting) from Activity meeting where  meeting.creator.gender=:gender and meeting.deadLine>:now ")
+    Integer aasByGender(@Param("gender")Gender gender, @Param("now")Date now);
 
 }

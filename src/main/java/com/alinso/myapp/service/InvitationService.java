@@ -42,7 +42,7 @@ public class InvitationService {
 
 
         Integer vibeOfCreator = vibeService.calculateVibe(creator.getId());
-        if(vibeOfCreator<85){
+        if(vibeOfCreator<85 && !premiumService.userPremiumType(creator).equals("ORGANIZATOR")){
             throw  new UserWarningException("Olumlu izlenim oranı %85 üzeri kullanıcılar davet gönderebilir");
         }
 
@@ -59,6 +59,9 @@ public class InvitationService {
 
             if (invitationList.size() > 25 && premiumService.userPremiumType(creator).equals("GOLD")) {
                 throw new UserWarningException("Gold kullanıcılar 25 davet gönderebilir");
+            }
+            if (invitationList.size() > 100 && premiumService.userPremiumType(creator).equals("ORGANIZATOR")) {
+                throw new UserWarningException("Profesyonel kullanıcılar 100 davet gönderebilir");
             }
         }
 

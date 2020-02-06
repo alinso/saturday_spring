@@ -61,7 +61,7 @@ public class ActivityRequestService {
     }
 
 
-    public Boolean sendRequest(Long id) {
+    public Integer sendRequest(Long id) {
 
         Activity activity = activityService.findEntityById(id);
         if (activity.getDeadLine().compareTo(new Date()) < 0)
@@ -73,8 +73,8 @@ public class ActivityRequestService {
             throw new UserWarningException("Erişim Yok");
 
 
-        Boolean isThisUserJoined = isThisUserJoined(activity.getId());
-        if (!isThisUserJoined) {
+        Integer isThisUserJoined = isThisUserJoined(activity.getId());
+        if (isThisUserJoined==0) {
 
 
             if (activity.getCreator().getId() != 3212 && activity.getCreator().getId() != 448) {
@@ -86,9 +86,9 @@ public class ActivityRequestService {
 
                 //check activity req limit
                 List<ActivityRequest> allRequests = activityRequesRepository.findByActivityId(id);
-                if (allRequests.size() > 14 && !activityCreatorpremiumType.equals("GOLD") && !requestSenderpremiumType.equals("GOLD"))
-                    throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
+                if (allRequests.size() > 14 && !activityCreatorpremiumType.equals("GOLD") && !requestSenderpremiumType.equals("GOLD") && !activityCreatorpremiumType.equals("ORGANIZATOR"))
+                    throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
                 //check male limit
                 Integer maleCount = 0;
@@ -97,9 +97,9 @@ public class ActivityRequestService {
 
                         maleCount++;
                 }
-                if (loggedUser.getGender() == Gender.MALE && maleCount > 3 && activity.getCreator().getGender() == Gender.FEMALE && !requestSenderpremiumType.equals("GOLD") && !activityCreatorpremiumType.equals("GOLD") )
+                if (loggedUser.getGender() == Gender.MALE && maleCount > 3 && activity.getCreator().getGender() == Gender.FEMALE && !requestSenderpremiumType.equals("GOLD") && !activityCreatorpremiumType.equals("GOLD") &&
+                        !activityCreatorpremiumType.equals("ORGANIZATOR") )
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
-
             }
 
             //check if user reached the limit
@@ -113,7 +113,9 @@ public class ActivityRequestService {
             activityRequesRepository.save(newActivityRequest);
             userEventService.newRequest(activity.getCreator(), activity.getId());
             dayActionService.addRequest();
-        } else {
+            isThisUserJoined=1;
+
+        } else if(isThisUserJoined==1 || isThisUserJoined==2){
             ActivityRequest activityRequest = activityRequesRepository.findByActivityAndApplicant(loggedUser, activity);
             //delete points if this activity request was approved
             //    userEventService.removeApprovedRequestPoints(activityRequest);
@@ -124,11 +126,12 @@ public class ActivityRequestService {
 
             activityRequesRepository.delete(activityRequest);
             dayActionService.removeRequest();
+            isThisUserJoined=0;
         }
 
         //we have changed the status in above if-else condition
         //so we need to return opposite of initial value
-        return !isThisUserJoined;
+       return isThisUserJoined;
     }
 
 
@@ -166,7 +169,7 @@ public class ActivityRequestService {
         if (activity.getCreator().getId() == loggedUser.getId())
             return true;
 
-        if(premiumService.userPremiumType(loggedUser)=="GOLD")
+        if(premiumService.userPremiumType(loggedUser)=="GOLD" || premiumService.userPremiumType(loggedUser)=="ORGANIZATOR")
             return true;
 
         Boolean isThisUserApproved = false;
@@ -199,9 +202,11 @@ public class ActivityRequestService {
         if (activityRequest.getActivityRequestStatus() == ActivityRequestStatus.WAITING) {
             checkMaxApproveCountExceeded(activityRequest.getActivity());
             activityRequest.setActivityRequestStatus(ActivityRequestStatus.APPROVED);
+            activityRequest.setResult(1);
             activityRequesRepository.save(activityRequest);
             userEventService.newApproval(activityRequest.getApplicant(), activityRequest.getActivity());
         } else {
+            activityRequest.setResult(null);
             activityRequest.setActivityRequestStatus(ActivityRequestStatus.WAITING);
             activityRequesRepository.save(activityRequest);
             //   userEventService.cancelApproval(activityRequest.getApplicant(),activityRequest.getActivity());
@@ -211,14 +216,19 @@ public class ActivityRequestService {
     }
 
 
-    public Boolean isThisUserJoined(Long meetingId) {
+    public Integer isThisUserJoined(Long meetingId) {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Boolean isThisUserJoined = false;
+        Integer isThisUserJoined = 0;
         List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(meetingId);
         for (ActivityRequest activityRequest : activityRequests) {
             if (activityRequest.getApplicant().getId() == loggedUser.getId()) {
-                isThisUserJoined = true;
+                isThisUserJoined = 1;
+                if(activityRequest.getActivityRequestStatus()==ActivityRequestStatus.APPROVED) {
+                    isThisUserJoined = 2;
+                }
+                break;
             }
+
         }
         return isThisUserJoined;
     }
@@ -230,19 +240,10 @@ public class ActivityRequestService {
         }
 
         Integer c = activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED);
-        Integer limit = 4;
         User user = activity.getCreator();
 
 
-        if (user.getPoint() > 20 && user.getPoint() < 60) {
-            limit = 6;
-        } else if (user.getPoint() > 60 && user.getPoint() < 100) {
-            limit = 8;
-        } else if (user.getPoint() > 100 && user.getPoint() < 200) {
-            limit = 12;
-        } else if (user.getPoint() > 200) {
-            limit = 15;
-        }
+        Integer limit=8;
 
         String premiumType = premiumService.userPremiumType(user);
         if (premiumType.equals("GOLD")) {
@@ -250,6 +251,9 @@ public class ActivityRequestService {
         }
         if (premiumType.equals("SILVER")) {
             limit = 15;
+        }
+        if (premiumType.equals("ORGANIZATOR")) {
+            limit = 9999;
         }
 
 

@@ -79,6 +79,13 @@ public class MessageService {
         return messageDto;
     }
 
+    public void sendPremiumMessage(Message message) {
+
+        messageRepository.save(message);
+        userEventService.newPremiumMessage(message.getReader(),message.getWriter());
+
+    }
+
 
     public List<MessageDto> getMessagesForReader(Long readerId) {
 
@@ -247,7 +254,9 @@ public class MessageService {
                     " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
                     " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
                     "\n" +
-                    "\n  İlk ay 30 TL değerinde gold üyelik paketi ile uygulamayı kullanıyor olacaksın, dilersen ilerleyen zamanlarda tekrar gold kullanıcı olabilir veya standart kullancı olarak devam edebilirsin"+
+                    "\n  ilk 7 gün uygulamamızı test etmen ve görmen için starndart kullanıcı olarak hesabını açtık. Sonrasında devam kullanmaya devam etmek istersen 1 aylık Gold paket alman " +
+                    "gerekecek. Dilersen ilerleyen zamanlarda tekrar gold kullanıcı olabilir veya standart kullancı olarak devam edebilirsin. Fakat 7 günlük deneme süresi sonrası devam etmek isteyen " +
+                    " kullanıcılardan bunu istiyoruz"+
                     "\n" +
                     " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
                     " RAHATSIZLIK VERİCİ,ISRARCI,UYGLAMAYI AMACI DIŞINDA KULLANAN PROFİLLERİ SİLİYOR VE MÜSAMAHA GÖSTERMİYORUZ." +

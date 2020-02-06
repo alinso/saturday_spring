@@ -299,6 +299,14 @@ public class NotificationService {
         }
 
     }
+
+    public void newPremiumMessage(User reader,User writer) {
+        createNotification(reader,writer,NotificationType.MESSAGE,null);
+        if(!androidPushNotificationsService.newMessage(writer,reader)) {
+            mailService.sendNewMessageMail(reader, writer);
+        }
+
+    }
 }
 
 

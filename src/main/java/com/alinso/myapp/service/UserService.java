@@ -180,7 +180,7 @@ public class UserService {
 
 
         user.setEnabled(true);
-        userRepository.save(user);
+        user.setSmsCode(null);
         userEventService.newUserRegistered(user);
 
 
@@ -188,13 +188,16 @@ public class UserService {
         premium.setStartDate(new Date());
 
 
-        if(user.getGender()==Gender.FEMALE)
+        if(user.getGender()==Gender.FEMALE) {
             premium.setDuration(PremiumDuration.GTHREE_MONTHS);
-        if(user.getGender()==Gender.MALE)
-            premium.setDuration(PremiumDuration.GONE_MONTH);
+            premiumService.saveGift(premium, user);
+            user.setTrialUser(0);
 
-        premiumService.saveGift(premium, user);
-
+        }
+        if(user.getGender()==Gender.MALE) {
+            user.setTrialUser(99);
+        }
+        userRepository.save(user);
 
         return user;
     }
@@ -481,11 +484,14 @@ public class UserService {
         int VOTE_VIBE = 1;
         int SEND_REQUEST = 2;
         int OPENING_ACTIVITY = 5;
-        int COMPLAIN = 2;
+
+        if(user.getGender()==Gender.FEMALE)
+            OPENING_ACTIVITY=10;
+
         int FOLLOW = 1;
 
 
-        List<Activity> userActivities = activityRepository.last3MonthActivitiesOfUser(threeMonthsAgo, user);
+        List<Activity> userActivities = activityRepository.last3MonthActivitiesOfUser( user);
         Integer activityCount = userActivities.size();
 
         //opening an activity
@@ -493,12 +499,12 @@ public class UserService {
 
 
         //send a request
-        Integer requestCount = activityRequesRepository.last3MonthSentRequestsOfUser(user, threeMonthsAgo);
+        Integer requestCount = activityRequesRepository.last3MonthSentRequestsOfUser(user);
         point = point + requestCount * SEND_REQUEST;
 
 
         //approved unique requests
-        List<ActivityRequest> activityRequestList = activityRequesRepository.last3MonthsIncomingApprovedRequests(user, ActivityRequestStatus.APPROVED, threeMonthsAgo);
+        List<ActivityRequest> activityRequestList = activityRequesRepository.last3MonthsIncomingApprovedRequests(user, ActivityRequestStatus.APPROVED);
         List<Long> userIds = new ArrayList<>();
         for (ActivityRequest r : activityRequestList) {
 
@@ -519,7 +525,7 @@ public class UserService {
 
 
         //review count
-        List<Review> rewiReviewList = reviewRepository.last3MonthReviewsOfUser(user, threeMonthsAgo);
+        List<Review> rewiReviewList = reviewRepository.last3MonthReviewsOfUser(user);
         point = point + (rewiReviewList.size() * WRITE_REVIEW);
 
 
@@ -544,13 +550,13 @@ public class UserService {
 
 
         //follow someone
-        Integer followingCount = followRepository.last3MonthsFollowingCount(user, threeMonthsAgo);
-        point = point + followingCount * FOLLOW;
+        //Integer followingCount = followRepository.last3MonthsFollowingCount(user);
+        //point = point + followingCount * FOLLOW;
 
 
         //complain count
-        Integer complainCount = complainRepository.last3MonthscountOfComplaintsByTheUser(user, threeMonthsAgo);
-        point = point + (complainCount * COMPLAIN);
+       // Integer complainCount = complainRepository.last3MonthscountOfComplaintsByTheUser(user, threeMonthsAgo);
+       // point = point + (complainCount * COMPLAIN);
 
 
         return point;
@@ -929,25 +935,20 @@ public class UserService {
         return dtos;
     }
 
+    @Scheduled(cron = "0 1 1 * * ?")
+    private void disableTestUser() {
 
-//    @Scheduled(fixedRate = 60*60 * 1000, initialDelay = 60 * 1000)
-//    public void deleteTestUser() {
-//        try {
-//            User test = userRepository.findByEmail("ankaratangoclub@gmail.com").get();
-//            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
-//            delete_user_sp.setParameter("userId", test.getId());
-//            delete_user_sp.execute();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            User test2 = userRepository.findByEmail("cincihocam@hotmail.com").get();
-//            StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
-//            delete_user_sp.setParameter("userId", test2.getId());
-//            delete_user_sp.execute();
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-//    }
+
+        List<User> users= userRepository.findMaleTrialUsers(99);
+        long DAY_IN_MS = 1000 * 60 * 60 * 24;
+        Date svenDaysAgo = new Date(System.currentTimeMillis() - (7 * DAY_IN_MS));
+        for(User user:users){
+
+            if(svenDaysAgo.compareTo(user.getCreatedAt()) > 0){
+                user.setTrialUser(100);
+                userRepository.save(user);
+            }
+        }
+    }
+
 }

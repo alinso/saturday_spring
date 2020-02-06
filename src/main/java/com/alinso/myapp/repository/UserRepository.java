@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Date;
 import java.util.List;
@@ -75,4 +76,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select user from User user where user.city=:city and user.point>=:point")
     List<User> findAbovePoint(@Param("point") int point, @Param("city") City city);
+
+    @Query("select user from User user where user.trialUser=:trial")
+    List<User> findMaleTrialUsers(@Param("trial") Integer trial);
+
+    @Query("select count(user) from User user where user.gender=:gender and user.createdAt>:start and user.createdAt<:finish")
+    Integer userCountCreatedGivenDate(@PathVariable("gender") Gender gender, @Param("start")Date start, @Param("finish") Date finish);
+
+    @Query("select count(user) from User user where user.gender=:gender and user.city=:city and user.point>:point")
+    Integer userCountByGenderCityPoint(@Param("gender")Gender gender, @Param("city")City ankara, @Param("point")int point);
 }

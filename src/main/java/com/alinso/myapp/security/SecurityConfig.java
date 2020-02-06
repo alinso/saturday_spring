@@ -117,6 +117,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/lkaldjfnuterhjbsfsdf/**").hasRole("ADMIN")
                 .antMatchers("/xbatmany/**").hasRole("ADMIN")
                 .antMatchers("/infoPage/update/**").hasRole("ADMIN")
+                .antMatchers("/statistics/**").hasRole("ADMIN")
                 .antMatchers("/infoPage/findById/**").permitAll()
 
                 .antMatchers(SecurityConstants.H2_URL).permitAll()

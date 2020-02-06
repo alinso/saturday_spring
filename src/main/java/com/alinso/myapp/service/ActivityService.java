@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +45,9 @@ public class ActivityService {
 
     @Autowired
     FileStorageUtil fileStorageUtil;
+
+    @Autowired
+    ActivityPhotoService activityPhotoService;
 
     @Autowired
     UserEventService userEventService;
@@ -171,9 +175,7 @@ public class ActivityService {
 
     public List<ActivityDto> findAllNonExpiredByCityId(Long cityId, Integer pageNum) {
 
-
-
-
+        User user=(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 
         Pageable pageable = PageRequest.of(pageNum, 10);
@@ -184,15 +186,13 @@ public class ActivityService {
       //  User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if (pageNum == 0) {
 
-                User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
                 user.setLastLogin(new Date());
                 userRepository.save(user);
 
 
-                Activity selected = activityRepository.findById(Long.valueOf(7481)).get();
+                //Activity selected = activityRepository.findById(Long.valueOf(8152)).get();
                  //Activity selected2 = activityRepository.findById(Long.valueOf(7353)).get();
-                activityDtos.add(toDto(selected));
+               // activityDtos.add(toDto(selected));
                 //activityDtos.add(toDto(selected2));
                 }
 
@@ -234,6 +234,9 @@ public class ActivityService {
 
         //delete dayAction
         dayActionService.removeActivity();
+
+        //delete activity Album
+        activityPhotoService.deleteByActivity(activityInDb);
 
         activityRepository.deleteById(id);
     }

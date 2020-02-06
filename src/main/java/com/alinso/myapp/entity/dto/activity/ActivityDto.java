@@ -17,7 +17,7 @@ public class ActivityDto {
     private MultipartFile file;
     private List<ProfileDto> attendants;
     private List<ActivityRequestDto> requests;
-    private Boolean isThisUserJoined;
+    private Integer thisUserJoined;
     private Boolean isExpired;
     private City city;
     private Long cityId;
@@ -75,13 +75,7 @@ public class ActivityDto {
         this.attendants = attendants;
     }
 
-    public Boolean getThisUserJoined() {
-        return isThisUserJoined;
-    }
 
-    public void setThisUserJoined(Boolean thisUserJoins) {
-        isThisUserJoined = thisUserJoins;
-    }
 
     public List<ActivityRequestDto> getRequests() {
         return requests;
@@ -131,4 +125,12 @@ public class ActivityDto {
         this.hashtagListString = hashtagListString;
     }
 
+
+    public Integer getThisUserJoined() {
+        return thisUserJoined;
+    }
+
+    public void setThisUserJoined(Integer thisUserJoined) {
+        this.thisUserJoined = thisUserJoined;
+    }
 }
