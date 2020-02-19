@@ -85,4 +85,24 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select count(user) from User user where user.gender=:gender and user.city=:city and user.point>:point")
     Integer userCountByGenderCityPoint(@Param("gender")Gender gender, @Param("city")City ankara, @Param("point")int point);
+
+    @Query("select count(user) from User user where user.gender=:gender and user.createdAt>:start")
+    Integer userCountCreatedToday(@Param("gender") Gender gender, @Param("start")Date start);
+
+
+    @Query("select count(user) from User user where user.gender=:gender and user.city=:city")
+    Integer getUserCountGende(@Param("city")City city, @Param("gender")Gender gender);
+
+
 }
+
+
+
+
+
+
+
+
+
+
+

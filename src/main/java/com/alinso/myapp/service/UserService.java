@@ -203,8 +203,13 @@ public class UserService {
     }
 
 
-    public Integer getUserCount() {
-        return userRepository.getUserCount();
+    public Integer getMaleCount() {
+        City city=cityService.findById(Long.valueOf(1));
+        return userRepository.getUserCountGende(city,Gender.MALE);
+    }
+    public Integer getFemaleCount() {
+        City city=cityService.findById(Long.valueOf(1));
+        return userRepository.getUserCountGende(city,Gender.FEMALE);
     }
 
 
@@ -951,4 +956,24 @@ public class UserService {
         }
     }
 
+    public Integer attendanceRateOfRequestOwner(Long id) {
+        ActivityRequest r = activityRequesRepository.findById(id).get();
+        User user = r.getApplicant();
+
+        return attendanceRate(user.getId());
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -157,7 +157,7 @@ public class PremiumService {
         List<Premium> premiums = premiumRepository.findByDuration(PremiumDuration.ORGANIZATOR);
 
         for(Premium p:premiums){
-               if(p.getCreatedAt().compareTo(aMonthAgo.getTime())<0){
+               if(p.getCreatedAt().compareTo(aMonthAgo.getTime())>0){
                    premimUserList.add(p.getUser());
                }
         }

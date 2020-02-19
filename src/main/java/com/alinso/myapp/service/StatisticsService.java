@@ -42,6 +42,9 @@ public class StatisticsService {
         current.set(current.get(Calendar.YEAR),current.get(Calendar.MONTH),current.get(Calendar.DATE),0,0,0);
         List<Integer> womanList=new ArrayList<>();
 
+        Integer countToday  =userRepository.userCountCreatedToday(Gender.FEMALE,current.getTime());
+        womanList.add(countToday);
+
         for(int i =0;i<30;i++){
             Date finish=current.getTime();
             current.add(Calendar.DATE,-1);

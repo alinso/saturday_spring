@@ -127,7 +127,7 @@ public class VibeService {
 
         List<Vibe> allVibes = vibeRepository.findByReader(reader);
 
-        if (allVibes.size() < 15)
+        if (allVibes.size() < 8)
             return 0;
 
         Integer negativeVibeCount = 0;

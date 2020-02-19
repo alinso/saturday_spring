@@ -190,9 +190,9 @@ public class ActivityService {
                 userRepository.save(user);
 
 
-                //Activity selected = activityRepository.findById(Long.valueOf(8152)).get();
-                 //Activity selected2 = activityRepository.findById(Long.valueOf(7353)).get();
-               // activityDtos.add(toDto(selected));
+                Activity selected = activityRepository.findById(Long.valueOf(8424)).get();
+                 //Activity selected2 = activityRepository.findById(Long.valueOf(8502)).get();
+                activityDtos.add(toDto(selected));
                 //activityDtos.add(toDto(selected2));
                 }
 

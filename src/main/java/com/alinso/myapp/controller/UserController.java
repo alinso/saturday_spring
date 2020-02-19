@@ -63,6 +63,25 @@ public class UserController {
         return new ResponseEntity<>("okkey",HttpStatus.OK);
     }
 
+
+    @GetMapping("maleCount")
+    public ResponseEntity<?> maleCount(){
+
+        Integer maleCount = userService.getMaleCount();
+
+        return new ResponseEntity<>(maleCount,HttpStatus.OK);
+    }
+
+    @GetMapping("femaleCount")
+    public ResponseEntity<?> femaleCount(){
+
+        Integer maleCount = userService.getFemaleCount();
+
+        return new ResponseEntity<>(maleCount,HttpStatus.OK);
+    }
+
+
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result) {
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
@@ -99,10 +118,10 @@ public class UserController {
         return new ResponseEntity<String>("verified", HttpStatus.OK);
     }
 
-    @GetMapping("userCount")
-    public ResponseEntity<?> userCount(){
-        return new ResponseEntity<>(userService.getUserCount(),HttpStatus.OK);
-    }
+//    @GetMapping("userCount")
+//    public ResponseEntity<?> userCount(){
+//        return new ResponseEntity<>(userService.getUserCount(),HttpStatus.OK);
+//    }
 
 //    @GetMapping("/verifyMail/{token}")
 //    public ResponseEntity<?> verifyMail(@PathVariable("token") String token) {
@@ -227,6 +246,17 @@ public class UserController {
         //TODO: references and reviews will be loaded too..
 
         return new ResponseEntity<>(profileDto, HttpStatus.OK);
+    }
+
+    @GetMapping("attendanceRate/{id}")
+    public ResponseEntity<?> attendanceRate(@PathVariable("id") Long id){
+        Integer rate  = userService.attendanceRateOfRequestOwner(id);
+        return new ResponseEntity<>(rate,HttpStatus.OK);
+    }
+    @GetMapping("userAttendanceRate/{id}")
+    public ResponseEntity<?> userAttendanceRate(@PathVariable("id") Long id){
+        Integer rate  = userService.attendanceRate(id);
+        return new ResponseEntity<>(rate,HttpStatus.OK);
     }
 
 }

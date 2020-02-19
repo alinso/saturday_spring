@@ -1,10 +1,11 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.entity.*;
+import com.alinso.myapp.entity.City;
+import com.alinso.myapp.entity.Complain;
+import com.alinso.myapp.entity.Message;
+import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.discover.DiscoverDto;
 import com.alinso.myapp.entity.enums.Gender;
-import com.alinso.myapp.entity.enums.PremiumDuration;
-import com.alinso.myapp.entity.enums.PremiumType;
 import com.alinso.myapp.repository.*;
 import com.alinso.myapp.service.AdminService;
 import com.alinso.myapp.service.DiscoverService;
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
 
 @RequestMapping("lkaldjfnuterhjbsfsdf")
@@ -65,7 +65,7 @@ public class AdminController {
 
 
         City city = cityRepository.findById(Long.valueOf(1)).get();
-        List<User> selectedUsers = userRepository.allAnkaraWomen(city,Gender.FEMALE);
+        List<User> selectedUsers = userRepository.allOfACity(city);
 
         if (page == 0)
             page = 1;
@@ -83,14 +83,12 @@ public class AdminController {
                 break;
 
 
-            String messageText =  u.getName()+", Sephora'dan 100 TL'lik hediye çeki kazanmak ister misin? Tek yapman gereken her neyden hoşlanıyor, neye ilgi duyuyorsan onunla ilgili bir aktivite" +
-                    " açmak ve gerçekleştirdiğin aktiviteden bir fotoğraf bize yollamak. Çekiliş sonrası 2 aktivite sahibine 100'er TL'lik hediye çeki vereceğiz. Kazanma şansın hiç az değil ve birden fazla " +
-                    " aktivite gerçekleştirerek şansını arttırabilirsin. Her aktivite bir katılım hakkı demek." +
-                    "\n"+
-                    " Çekiliş, 31 Ocak cuma günü 20:00'da olacak ve bu akşamdan itibaren gerçekleştirdiğin aktivitelerle katılabilirsin. " +
-                    " Şimdi bir aktivite aç, hem harika insanlarla kendi kuralların, kendi ilgi alanın çerçevesinde güzel bir gün geçir, hem de Sephoa'dan hediye çeki kazanma şansı yakala!" +
-                    "\n" +
-                    " Sephora'ya destekleri için teşekkür ederiz :)";
+            String messageText =  u.getName()+", yardımına ihtiyacımız var. Biliyorsun kadın-erkek dengesini koruyarak büyüyor ve kadınların azınlıkta kalmasını istemiyoruz. Her 4 yeni kadın üye alımı" +
+                    " sonrası özenle seçerek bir erkek üye alımı yapıyoruz. Kadı nüye sayısı erkeğin 4 katı olduğunda aktivitelerde dengeli bir sayı elde edilebiliyor. Şu an üye olmak için bekleyen çok sayıda erkek " +
+                    " var. Fakat sayısal dengeyi bozmak istemediğimiz için alamıyoruz. Sağlıklı bir şekilde büyüyebilmek için yeni kadın üyelere ihtiyacımız var. Activuss'a DEĞER KATABİLECEK kadın " +
+                    " arkadaşlarına anlatıp onların da topluluğumuza katılmasını sağlarsan Acttivuss'u bozmadan büyütme şansımız olur. Daha büyük Activuss demek, daha fazla ve çeşitli aktiviteler, " +
+                    " daha fazla fırsat, daha fazla çevre ve eğlence demek. Bu hepimiz için çok faydalı olur. Yaşadığımız şehirde hepimiz geniş bir çevre, yeni dostluklar ve deneyimler edindik." +
+                    " Sadece birkaç arkadaşına bile anlatsan çok şey değişir.";
 
 
             Message message = new Message();
