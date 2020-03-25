@@ -74,7 +74,7 @@ public class PremiumService {
 //            premium.setStartDate(getPremiumLastDate(user));
 //        else
 //            premium.setStartDate(new Date());
-//        premium.setUser(user);
+//        premium.setWriter(user);
 //        premiumRepository.save(premium);
 //
 //    }

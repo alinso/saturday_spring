@@ -93,6 +93,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select count(user) from User user where user.gender=:gender and user.city=:city")
     Integer getUserCountGende(@Param("city")City city, @Param("gender")Gender gender);
 
+    @Query("select user from User user where user.gender=:gender and user.city=:city and user.trialUser=:trialUser")
+    List<User> findtrialUsers(@Param("trialUser") int trialUser, @Param("city")City city, @Param("gender")Gender male);
 
 }
 

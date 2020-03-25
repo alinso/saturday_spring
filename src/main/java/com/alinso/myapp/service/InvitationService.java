@@ -51,7 +51,7 @@ public class InvitationService {
             throw  new UserWarningException("Bu kullanıcıyı zaten davet etmiştin");
         }
 
-        if(creator.getId()!=172 && creator.getId()!=58 && creator.getId()!=1 ) {
+        if(creator.getId()!=1 ) {
             List<Invitation> invitationList = invitationRepository.findByActivity(activity);
             if (invitationList.size() > 3 && !premiumService.userPremiumType(creator).equals("GOLD") &&!premiumService.userPremiumType(creator).equals("ORGANIZATOR")) {
                 throw new UserWarningException("Gold kullanıcılar 25, standart kullanıcılar 3 davet gönderebilir");

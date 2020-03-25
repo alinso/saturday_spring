@@ -305,7 +305,10 @@ public class NotificationService {
         if(!androidPushNotificationsService.newMessage(writer,reader)) {
             mailService.sendNewMessageMail(reader, writer);
         }
+    }
 
+    public void newGhostMessage(User reader) {
+        androidPushNotificationsService.newGhostMessage(reader);
     }
 }
 

@@ -3,6 +3,7 @@ package com.alinso.myapp.service;
 import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.ActivityRequest;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.Vibe;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
@@ -49,14 +50,25 @@ public class ActivityRequestService {
     PremiumService premiumService;
 
 
+    @Autowired
+    VibeService vibeService;
+
     public void saveResult(Long requestId, Integer result) {
 
-            User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         ActivityRequest activityRequest = activityRequesRepository.findById(requestId).get();
         if (activityRequest.getActivity().getCreator().getId() == loggedUser.getId()) {
+
             activityRequest.setResult(result);
             activityRequesRepository.save(activityRequest);
+
+            if(result==0){
+                vibeService.deleteVotesOfNonComingUser(activityRequest.getActivity(),activityRequest.getApplicant());
+            }
+            if(result==1) {
+                vibeService.recoverVibesOfApplicant(activityRequest.getApplicant());
+            }
         }
     }
 
@@ -127,6 +139,9 @@ public class ActivityRequestService {
             activityRequesRepository.delete(activityRequest);
             dayActionService.removeRequest();
             isThisUserJoined=0;
+
+
+            vibeService.deleteVotesOfNonComingUser(activityRequest.getActivity(),loggedUser);
         }
 
         //we have changed the status in above if-else condition
@@ -209,7 +224,7 @@ public class ActivityRequestService {
             activityRequest.setResult(null);
             activityRequest.setActivityRequestStatus(ActivityRequestStatus.WAITING);
             activityRequesRepository.save(activityRequest);
-            //   userEventService.cancelApproval(activityRequest.getApplicant(),activityRequest.getActivity());
+            vibeService.deleteVotesOfNonComingUser(activityRequest.getActivity(),activityRequest.getApplicant());
         }
 
         return activityRequest.getActivityRequestStatus();
@@ -308,7 +323,7 @@ public class ActivityRequestService {
             return true;
 
 
-        if (id2 == 3211 || id2 == 5633 || id2 == 5634 || id2 == 5635 || id2 == 5516)
+        if (id2 == 3211 )
             return true;
 
 

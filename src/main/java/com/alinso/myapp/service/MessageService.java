@@ -256,7 +256,7 @@ public class MessageService {
                     "\n" +
                     "\n  ilk 7 gün uygulamamızı test etmen ve görmen için starndart kullanıcı olarak hesabını açtık. Sonrasında devam kullanmaya devam etmek istersen 1 aylık Gold paket alman " +
                     "gerekecek. Dilersen ilerleyen zamanlarda tekrar gold kullanıcı olabilir veya standart kullancı olarak devam edebilirsin. Fakat 7 günlük deneme süresi sonrası devam etmek isteyen " +
-                    " kullanıcılardan bunu istiyoruz"+
+                    " kullanıcılardan bunu istiyoruz. Eğer devam etmek istemezseniz de yeni kullanıcılara yer açabilemk adına hesabınız silinecek."+
                     "\n" +
                     " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
                     " RAHATSIZLIK VERİCİ,ISRARCI,UYGLAMAYI AMACI DIŞINDA KULLANAN PROFİLLERİ SİLİYOR VE MÜSAMAHA GÖSTERMİYORUZ." +

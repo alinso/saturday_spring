@@ -37,23 +37,30 @@ public class VibeService {
     @Autowired
     UserService userService;
 
+    @Autowired
+    ActivityRequestService activityRequestService;
+
 
     public void save(VibeDto vibeDto) {
 
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User reader = userRepository.findById(vibeDto.getReaderId()).get();
 
-        Vibe vibe = vibeRepository.findByWriterAndReader(writer, reader);
-        if (vibe == null) {
-            vibe = new Vibe();
+
+        if(activityRequestService.haveTheseUsersMeetAllTimes(writer.getId(),reader.getId())) {
+
+            Vibe vibe = vibeRepository.findByWriterAndReader(writer, reader);
+            if (vibe == null) {
+                vibe = new Vibe();
+            }
+
+            vibe.setReader(reader);
+            vibe.setWriter(writer);
+            vibe.setDeleted(0);
+            vibe.setVibeType(vibeDto.getVibeType());
+
+            vibeRepository.save(vibe);
         }
-
-        vibe.setReader(reader);
-        vibe.setWriter(writer);
-        vibe.setDeleted(0);
-        vibe.setVibeType(vibeDto.getVibeType());
-
-        vibeRepository.save(vibe);
 
     }
 
@@ -63,6 +70,7 @@ public class VibeService {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 
+        //benim aktiviteme katılanlar
         List<Activity> myActivities = activityRepository.findByCreatorOrderByDeadLineDesc(u);
         Set<User> myActivityAttendants = new HashSet<>();
         for (Activity a : myActivities) {
@@ -82,17 +90,24 @@ public class VibeService {
         List<ActivityRequest> activitiesIAttend = activityRequesRepository.findByApplicantId(u.getId());
         for (ActivityRequest r : activitiesIAttend) {
 
-            if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && r.getActivity().getCreator().getId() != 3212) {
+
+            //only add if I attended it
+            Integer result = r.getResult();
+            if(result!=null)
+            if (r.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && r.getActivity().getCreator().getId() != 3212 &&  result==1) {
+
+                //add other attendants
                 List<ActivityRequest> otherApprovedRequests = activityRequesRepository.findByActivityId(r.getActivity().getId());
                 for (ActivityRequest otherApprovedRequest : otherApprovedRequests) {
 
-                    Integer result = r.getResult();
-                    if(result!=null)
-                    if (otherApprovedRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && otherApprovedRequest.getApplicant().getId() != u.getId() &&  result==1) {
+                    if (otherApprovedRequest.getActivityRequestStatus() == ActivityRequestStatus.APPROVED && otherApprovedRequest.getApplicant().getId() != u.getId()) {
                         myActivityAttendants.add(otherApprovedRequest.getApplicant());
                     }
                 }
             }
+
+            //add activity owner
+            myActivityAttendants.add(r.getActivity().getCreator());
         }
 
 
@@ -125,7 +140,7 @@ public class VibeService {
         User reader = userRepository.findById(readerId).get();
 
 
-        List<Vibe> allVibes = vibeRepository.findByReader(reader);
+        List<Vibe> allVibes = vibeRepository.findByReaderNonDeleted(reader);
 
         if (allVibes.size() < 8)
             return 0;
@@ -134,6 +149,7 @@ public class VibeService {
         Integer haterUserCount = 0;
 
         for (Vibe v : allVibes) {
+
 
             Boolean isHater = false;
 
@@ -172,6 +188,8 @@ public class VibeService {
         return vibe.getVibeType();
     }
 
+
+
     public Integer calculateVibeOfActivityOwner(Long activityId) {
         Activity activity = activityRepository.findById(activityId).get();
         return calculateVibe(activity.getCreator().getId());
@@ -185,7 +203,72 @@ public class VibeService {
     public Integer vibeCountOfUser(Long userId) {
 
         User reader=  userRepository.findById(userId).get();
-        List<Vibe> vibeCount = vibeRepository.findByReader(reader);
+        List<Vibe> vibeCount = vibeRepository.findByReaderNonDeleted(reader);
         return vibeCount.size();
     }
+
+    public void deleteVotesOfNonComingUser(Activity activity, User nonComingUser) {
+
+        List<User> attendants = activityRequestService.findAttendantEntities(activity);
+
+        attendants.add(activity.getCreator());
+        for(User u:attendants){
+            if(!activityRequestService.haveTheseUsersMeetAllTimes(u.getId(),nonComingUser.getId())){
+                Vibe v = vibeRepository.findByWriterAndReader(u,nonComingUser);
+                if(v!=null) {
+                    v.setDeleted(1);
+                    vibeRepository.save(v);
+                }
+                Vibe v2 = vibeRepository.findByWriterAndReader(nonComingUser,u);
+                if(v2!=null) {
+                    v2.setDeleted(1);
+                    vibeRepository.save(v2);
+                }
+            }
+        }
+
+
+
+    }
+
+    public void recoverVibesOfApplicant(User applicant) {
+
+        //votes applicant has given to others
+        List<Vibe> deletedVibesOfApplicant = vibeRepository.findByWriterOnlyDeleted(applicant);
+
+        //votes given to the applicant
+        List<Vibe> deletedVibesOfApplicant2 = vibeRepository.findByReaderOnlyDeleted(applicant);
+        deletedVibesOfApplicant.addAll(deletedVibesOfApplicant2);
+
+        for (Vibe v : deletedVibesOfApplicant) {
+            if(activityRequestService.haveTheseUsersMeetAllTimes(v.getWriter().getId(),v.getReader().getId())){
+                v.setDeleted(0);
+                vibeRepository.save(v);
+            }
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

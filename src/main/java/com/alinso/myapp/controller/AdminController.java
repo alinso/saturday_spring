@@ -1,11 +1,9 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.entity.City;
-import com.alinso.myapp.entity.Complain;
-import com.alinso.myapp.entity.Message;
-import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.*;
 import com.alinso.myapp.entity.dto.discover.DiscoverDto;
 import com.alinso.myapp.entity.enums.Gender;
+import com.alinso.myapp.entity.enums.PremiumDuration;
 import com.alinso.myapp.repository.*;
 import com.alinso.myapp.service.AdminService;
 import com.alinso.myapp.service.DiscoverService;
@@ -65,7 +63,7 @@ public class AdminController {
 
 
         City city = cityRepository.findById(Long.valueOf(1)).get();
-        List<User> selectedUsers = userRepository.allOfACity(city);
+        List<User> selectedUsers = userRepository.findAllWomen(Gender.FEMALE);
 
         if (page == 0)
             page = 1;
@@ -83,12 +81,15 @@ public class AdminController {
                 break;
 
 
-            String messageText =  u.getName()+", yardımına ihtiyacımız var. Biliyorsun kadın-erkek dengesini koruyarak büyüyor ve kadınların azınlıkta kalmasını istemiyoruz. Her 4 yeni kadın üye alımı" +
-                    " sonrası özenle seçerek bir erkek üye alımı yapıyoruz. Kadı nüye sayısı erkeğin 4 katı olduğunda aktivitelerde dengeli bir sayı elde edilebiliyor. Şu an üye olmak için bekleyen çok sayıda erkek " +
-                    " var. Fakat sayısal dengeyi bozmak istemediğimiz için alamıyoruz. Sağlıklı bir şekilde büyüyebilmek için yeni kadın üyelere ihtiyacımız var. Activuss'a DEĞER KATABİLECEK kadın " +
-                    " arkadaşlarına anlatıp onların da topluluğumuza katılmasını sağlarsan Acttivuss'u bozmadan büyütme şansımız olur. Daha büyük Activuss demek, daha fazla ve çeşitli aktiviteler, " +
-                    " daha fazla fırsat, daha fazla çevre ve eğlence demek. Bu hepimiz için çok faydalı olur. Yaşadığımız şehirde hepimiz geniş bir çevre, yeni dostluklar ve deneyimler edindik." +
-                    " Sadece birkaç arkadaşına bile anlatsan çok şey değişir.";
+            Premium premium  = new Premium();
+            premium.setDuration(PremiumDuration.GONE_MONTH);
+
+            premiumService.saveGift(premium,u);
+
+
+            String messageText = u.getName()+" merhaba, Activuss kadınların güçlü ve çoğunlukta olduğu bir platform. Burada sizleri rahatsız edebilecek durumların olmaması ve topluluğumuzu eviniz" +
+                    " gibi hissetmeniz için elimizden geleni yapıyoruz. Sen de aktivite açarak veya katılım sağlayarak şehrimizdeki güçlü kadınlar misyonumuzda bize" +
+                    " destek olabilirsin. Ne kadar aktif olurak o kadar güçlü oluruz. Aklına gelen veya takılan bir şey olursa bize yazmaktan çekinme. ";
 
 
             Message message = new Message();

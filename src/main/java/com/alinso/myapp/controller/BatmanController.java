@@ -59,33 +59,33 @@ public class BatmanController  {
         return new ResponseEntity<String>("guncelendi " + i, HttpStatus.OK);
     }
 
-    @GetMapping("updateScore/")
-    public ResponseEntity<?> updateScore() {
-
-        List<User> all = userRepository.findAll();
-        List<User> toBeSaved = new ArrayList<>();
-        List<User> maximumFollowerUsers = followRepository.maxFollowedUsers();
-        Integer maximumFollowerCount = followRepository.findFollowerCount(maximumFollowerUsers.get(0));
-        List<User> maximumBlockedUsers = blockRepository.maxBlockedUsers();
-        Integer maximumBlockedCount = blockRepository.blockerCount(maximumBlockedUsers.get(0));
-        int i = 0;
-        for (User u : all) {
-            if(u.getId()==3212){
-                u.setSocialScore(-1);
-                continue;
-            }
-
-            Integer p = userService.calculateSocialScore(u,maximumBlockedCount,maximumFollowerCount);
-            u.setSocialScore(p);
-            toBeSaved.add(u);
-            i++;
-            if (i % 50 == 0   ||  (i+1)==all.size()) {
-                userRepository.saveAll(toBeSaved);
-                toBeSaved.clear();
-            }
-        }
-        return new ResponseEntity<String>("guncelendi " + i, HttpStatus.OK);
-    }
+//    @GetMapping("updateScore/")
+//    public ResponseEntity<?> updateScore() {
+//
+//        List<User> all = userRepository.findAll();
+//        List<User> toBeSaved = new ArrayList<>();
+//        List<User> maximumFollowerUsers = followRepository.maxFollowedUsers();
+//        Integer maximumFollowerCount = followRepository.findFollowerCount(maximumFollowerUsers.get(0));
+//        List<User> maximumBlockedUsers = blockRepository.maxBlockedUsers();
+//        Integer maximumBlockedCount = blockRepository.blockerCount(maximumBlockedUsers.get(0));
+//        int i = 0;
+//        for (User u : all) {
+//            if(u.getId()==3212){
+//                u.setSocialScore(-1);
+//                continue;
+//            }
+//
+//            Integer p = userService.calculateSocialScore(u,maximumBlockedCount,maximumFollowerCount);
+//            u.setSocialScore(p);
+//            toBeSaved.add(u);
+//            i++;
+//            if (i % 50 == 0   ||  (i+1)==all.size()) {
+//                userRepository.saveAll(toBeSaved);
+//                toBeSaved.clear();
+//            }
+//        }
+//        return new ResponseEntity<String>("guncelendi " + i, HttpStatus.OK);
+//    }
 
     @GetMapping("updateInvalidUserName/{id}")
     public ResponseEntity<String> updateUSer(@PathVariable("id") Long id) {

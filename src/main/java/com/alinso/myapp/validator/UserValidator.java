@@ -66,7 +66,7 @@ public class UserValidator implements Validator {
                     errors.rejectValue("referenceCode", "Match", "Geçersiz Referans Kodu");
                 }
                 if(parent!=null)
-                    if (parent.getId() !=3212) {
+                    if (parent.getId() !=3212 && parent.getId()!=9096) {
                         errors.rejectValue("referenceCode", "Match", "Yalnız instagram hesabından alınan referans kodları geçerlidi(instagram:activityfriend)");
                     }
 
@@ -75,6 +75,17 @@ public class UserValidator implements Validator {
 //                    " Bir cinsiyetin oranı diğerine karşı dengesiz bir üstünlük sağladığında ancak bu şekilde dengeyi sağlayabiliyoruz:( Anlayışla karşılayacağını " +
 //                    "umuyoruz. İnstagram hesabımızı takipte kalırsan " +
 //                    " açıldığında Instagramdan duyurusunu yapacağız, teşekkür ederiz");
+            }
+        }
+
+
+        if(user.getGender()==Gender.FEMALE){
+            if(!user.getReferenceCode().equals("")) {
+
+                User parent = referenceService.findByCode(user.getReferenceCode());
+                if (parent == null) {
+                    errors.rejectValue("referenceCode", "Match", "Geçersiz Referans Kodu");
+                }
             }
         }
 
