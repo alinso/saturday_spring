@@ -1,6 +1,7 @@
 package com.alinso.myapp.repository;
 
 import com.alinso.myapp.entity.Activity;
+import com.alinso.myapp.entity.Category;
 import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.Gender;
@@ -36,5 +37,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
     @Query("select count(meeting) from Activity meeting where  meeting.creator.gender=:gender and meeting.deadLine>:now ")
     Integer aasByGender(@Param("gender")Gender gender, @Param("now")Date now);
+
+    @Query("select a from Activity a where a.creator=:creator order by a.deadLine desc")
+    List<Activity> findByCreatorOrderByDeadLineDescPaged(@Param("creator") User creator, Pageable pageable);
 
 }

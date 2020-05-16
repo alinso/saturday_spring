@@ -171,7 +171,6 @@ public class VibeService {
         Integer positivePercent = (posivitiveVibeCount * 100) / allVibesCount;
 
         return positivePercent;
-
     }
 
 
@@ -226,9 +225,6 @@ public class VibeService {
                 }
             }
         }
-
-
-
     }
 
     public void recoverVibesOfApplicant(User applicant) {

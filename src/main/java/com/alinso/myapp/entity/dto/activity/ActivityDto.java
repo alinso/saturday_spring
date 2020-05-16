@@ -1,11 +1,13 @@
 package com.alinso.myapp.entity.dto.activity;
 
+import com.alinso.myapp.entity.Category;
 import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Set;
 
 public class ActivityDto {
     private Long id;
@@ -20,12 +22,39 @@ public class ActivityDto {
     private Integer thisUserJoined;
     private Boolean isExpired;
     private City city;
+    private Boolean isSecret;
     private Long cityId;
-    private String hashtagListString;
+    private Set<Category> categories;
+    private Set<Long> selectedCategoryIds;
 
     @NotBlank(message="İleri bir zaman seçmelisiniz(10 dk sonra, 1 saat sonra...)")
     private String deadLineString;
 
+
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
+
+    public Boolean getSecret() {
+        return isSecret;
+    }
+
+    public void setSecret(Boolean secret) {
+        isSecret = secret;
+    }
+
+    public Set<Long> getSelectedCategoryIds() {
+        return selectedCategoryIds;
+    }
+
+    public void setSelectedCategoryIds(Set<Long> selectedCategoryIds) {
+        this.selectedCategoryIds = selectedCategoryIds;
+    }
 
     public Long getId() {
         return id;
@@ -115,14 +144,6 @@ public class ActivityDto {
 
     public void setCityId(Long cityId) {
         this.cityId = cityId;
-    }
-
-    public String getHashtagListString() {
-        return hashtagListString;
-    }
-
-    public void setHashtagListString(String hashtagListString) {
-        this.hashtagListString = hashtagListString;
     }
 
 

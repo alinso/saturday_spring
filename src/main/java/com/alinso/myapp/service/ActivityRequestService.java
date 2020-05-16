@@ -106,10 +106,9 @@ public class ActivityRequestService {
                 Integer maleCount = 0;
                 for (ActivityRequest r : allRequests) {
                     if (r.getApplicant().getGender() == Gender.MALE)
-
                         maleCount++;
                 }
-                if (loggedUser.getGender() == Gender.MALE && maleCount > 3 && activity.getCreator().getGender() == Gender.FEMALE && !requestSenderpremiumType.equals("GOLD") && !activityCreatorpremiumType.equals("GOLD") &&
+                if (loggedUser.getGender() == Gender.MALE && maleCount > 4 && activity.getCreator().getGender() == Gender.FEMALE && !requestSenderpremiumType.equals("GOLD")  &&
                         !activityCreatorpremiumType.equals("ORGANIZATOR") )
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
             }
@@ -129,7 +128,6 @@ public class ActivityRequestService {
 
         } else if(isThisUserJoined==1 || isThisUserJoined==2){
             ActivityRequest activityRequest = activityRequesRepository.findByActivityAndApplicant(loggedUser, activity);
-            //delete points if this activity request was approved
             //    userEventService.removeApprovedRequestPoints(activityRequest);
 
 
@@ -137,19 +135,17 @@ public class ActivityRequestService {
                 throw new UserWarningException("Son 2 saatte isteği iptal edemezsin");
 
             activityRequesRepository.delete(activityRequest);
-            dayActionService.removeRequest();
             isThisUserJoined=0;
 
-
+            //delete points if this activity request was approved
             vibeService.deleteVotesOfNonComingUser(activityRequest.getActivity(),loggedUser);
         }
 
-        //we have changed the status in above if-else condition
-        //so we need to return opposite of initial value
        return isThisUserJoined;
     }
 
 
+    //this is used for messaging anc message_activity
     public Boolean isThisUserApprovedTwoDaysLimit(Activity activity) {
 
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -273,7 +269,7 @@ public class ActivityRequestService {
 
 
         if (c == limit) {
-            throw new UserWarningException("Her aktivite için en fazla " + limit + " kişi onaylayabilirsiniz");
+            throw new UserWarningException("Her aktivite için en fazla " + limit + " kişi onaylayabilirsin");
         }
     }
 

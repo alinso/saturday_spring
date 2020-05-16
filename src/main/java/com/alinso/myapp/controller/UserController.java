@@ -1,16 +1,20 @@
 package com.alinso.myapp.controller;
 
+import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
 import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
+import com.alinso.myapp.repository.CityRepository;
+import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.security.JwtTokenProvider;
 import com.alinso.myapp.security.SecurityConstants;
 import com.alinso.myapp.security.payload.JWTLoginSucessReponse;
 import com.alinso.myapp.security.payload.LoginRequest;
 import com.alinso.myapp.service.UserService;
+import com.alinso.myapp.service.VibeService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.validator.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -40,6 +45,10 @@ public class UserController {
     @Autowired
     PhotoValidator profilePicValidator;
 
+
+    @Autowired
+    VibeService vibeService;
+
     @Autowired
     UserUpdateValidator userUpdateValidator;
 
@@ -48,6 +57,12 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    CityRepository cityRepository;
 
     @Autowired
     private JwtTokenProvider tokenProvider;
@@ -135,17 +150,17 @@ public class UserController {
         return new ResponseEntity<>("mail sent", HttpStatus.OK);
     }
 
-    @PostMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDto resetPassword, BindingResult result) {
-        resetPasswordValidator.validate(resetPassword, result);
-
-        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
-        if (errorMap != null) return errorMap;
-
-        userService.resetPassword(resetPassword);
-        return new ResponseEntity<>("password reset", HttpStatus.OK);
-
-    }
+//    @PostMapping("/resetPassword")
+//    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDto resetPassword, BindingResult result) {
+//        resetPasswordValidator.validate(resetPassword, result);
+//
+//        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
+//        if (errorMap != null) return errorMap;
+//
+//        userService.resetPassword(resetPassword);
+//        return new ResponseEntity<>("password reset", HttpStatus.OK);
+//
+//    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody User user, BindingResult result) {
@@ -188,7 +203,7 @@ public class UserController {
 
     @PostMapping("/updatePassword")
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto, BindingResult result) {
-/*/*/
+
         changePasswordValidator.validate(changePasswordDto, result);
 
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
@@ -199,17 +214,48 @@ public class UserController {
         return new ResponseEntity<ChangePasswordDto>(changePasswordDto, HttpStatus.ACCEPTED);
     }
 
+
+
     @GetMapping("activityTop100")
     public ResponseEntity<?> activityTop100(){
         List<ProfileDto> profileDtos  =userService.top100();
         return new ResponseEntity<List<ProfileDto>>(profileDtos,HttpStatus.OK);
     }
 
-    @GetMapping("socialScoreTop100")
-    public ResponseEntity<?> socialScoreactivityTop100(){
-        List<ProfileDto> profileDtos  =userService.socialScoreTop100();
-        return new ResponseEntity<List<ProfileDto>>(profileDtos,HttpStatus.OK);
+//    @GetMapping("socialScoreTop100")
+//    public ResponseEntity<?> socialScoreactivityTop100(){
+//        List<ProfileDto> profileDtos  =userService.socialScoreTop100();
+//        return new ResponseEntity<List<ProfileDto>>(profileDtos,HttpStatus.OK);
+//    }
+
+
+    @GetMapping("calculatePercent")
+    public ResponseEntity<?> calculatePercent(){
+        City city =  cityRepository.findById(Long.valueOf(1)).get();
+        List<User> users  =userRepository.findAbovePoint(20,city);
+        List<User>  newUsers = new ArrayList<>();
+
+        int i=0;
+        for(User u:users){
+            i++;
+
+            Integer vibe = vibeService.calculateVibe(u.getId());
+            u.setPercent(vibe);
+            newUsers.add(u);
+            if(i%100==0){
+                userRepository.saveAll(newUsers);
+                newUsers=new ArrayList<>();
+            }
+        }
+        userRepository.saveAll(newUsers);
+
+
+        return new ResponseEntity<>("ok",HttpStatus.OK);
     }
+
+
+
+
 
     @PostMapping("/updateProfilePic")
     public ResponseEntity<?> changeProfilePic(SinglePhotoUploadDto singlePhotoUploadDto, BindingResult result) {

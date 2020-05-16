@@ -56,6 +56,8 @@ public class UserEventService {
     public void newActivity(User user, Activity activity) {
         //user.setPoint((user.getPoint() + NEW_ACTIVITY_POINT));
         //user.setActivityCount((user.getActivityCount() + 1));
+
+        if(!activity.getSecret())
         for(User follower:followRepository.findFollowersOfUser(user)){
             if(!blockService.isThereABlock(follower.getId()))
             notificationService.newMeeting(follower, activity.getId());

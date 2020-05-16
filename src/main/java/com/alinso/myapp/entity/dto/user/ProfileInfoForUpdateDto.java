@@ -20,6 +20,8 @@ public class ProfileInfoForUpdateDto {
 
     private String profilePicName;
 
+    private String nick;
+
     @NotBlank(message = "İsim boş olamaz")
     private String name;
 
@@ -152,5 +154,13 @@ public class ProfileInfoForUpdateDto {
 
     public void setInterests(String interests) {
         this.interests = interests;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
     }
 }

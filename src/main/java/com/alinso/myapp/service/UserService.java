@@ -37,8 +37,6 @@ import java.util.*;
 @Service
 public class UserService {
 
-    @Autowired
-    HashtagService hashtagService;
 
     @Autowired
     ReviewService reviewService;
@@ -163,7 +161,7 @@ public class UserService {
         //}
 
 
-        SendSms.send("Activity Friend kaydı tamamlamak için sms onay kodu : " + code.toString(), newUser.getPhone());
+        SendSms.send("Activuss kaydı tamamlamak için sms onay kodu : " + code.toString(), newUser.getPhone());
         //String token = mailVerificationTokenService.saveToken(user);
         //mailService.sendMailVerificationMail(user, token);
         // userEventService.setReferenceChain(user);
@@ -240,7 +238,6 @@ public class UserService {
         if (user.getName().equals("silinen"))
             throw new UserWarningException("Bu numara ile kayıtlı kullanıcı bulunamadı");
 
-
         Random rnd = new Random();
         Integer pureRand = rnd.nextInt(999999);
         Integer pass = pureRand + 100000;
@@ -268,18 +265,18 @@ public class UserService {
 //
 //    }
 
-    public void resetPassword(ResetPasswordDto resetPasswordDto) {
-        if (resetPasswordDto.getToken() == null) {
-            throw new RecordNotFound404Exception("Geçersiz link");
-        }
-
-        ForgottenPasswordToken token = forgottenPasswordTokenService.findByToken(resetPasswordDto.getToken());
-
-        User user = userRepository.findById(token.getUser().getId()).get();
-        user.setPassword(bCryptPasswordEncoder.encode(resetPasswordDto.getPassword()));
-        forgottenPasswordTokenService.delete(token);
-        userRepository.save(user);
-    }
+//    public void resetPassword(ResetPasswordDto resetPasswordDto) {
+//        if (resetPasswordDto.getToken() == null) {
+//            throw new RecordNotFound404Exception("Geçersiz link");
+//        }
+//
+//        ForgottenPasswordToken token = forgottenPasswordTokenService.findByToken(resetPasswordDto.getToken());
+//
+//        User user = userRepository.findById(token.getUser().getId()).get();
+//        user.setPassword(bCryptPasswordEncoder.encode(resetPasswordDto.getPassword()));
+//        forgottenPasswordTokenService.delete(token);
+//        userRepository.save(user);
+//    }
 
     public User findEntityById(Long id) {
         try {
@@ -300,10 +297,11 @@ public class UserService {
         loggedUser.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(), "dd/MM/yyyy"));
         loggedUser.setMotivation(profileInfoForUpdateDto.getMotivation());
         loggedUser.setAbout(profileInfoForUpdateDto.getAbout());
+        loggedUser.setNick(profileInfoForUpdateDto.getNick());
         //loggedUser.setGender(profileInfoForUpdateDto.getGender());
         //loggedUser.setInterests(profileInfoForUpdateDto.getInterests());
         //loggedUser.setReferenceCode(profileInfoForUpdateDto.getReferenceCode());
-        hashtagService.saveUserHashtag(loggedUser, profileInfoForUpdateDto.getInterests());
+       // hashtagService.saveUserHashtag(loggedUser, profileInfoForUpdateDto.getInterests());
 
         userRepository.save(loggedUser);
         return profileInfoForUpdateDto;
@@ -328,7 +326,7 @@ public class UserService {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             profileInfoForUpdateDto.setbDateString(DateUtil.dateToString(user.getBirthDate(), "dd/MM/yyyy"));
-            profileInfoForUpdateDto.setInterests(hashtagService.findByUserStr(user));
+           // profileInfoForUpdateDto.setInterests(hashtagService.findByUserStr(user));
 
             profileInfoForUpdateDto.setReferenceCode("");
 
@@ -875,13 +873,13 @@ public class UserService {
         return profileDtos;
     }
 
-    public List<ProfileDto> socialScoreTop100() {
-        Pageable pageable = PageRequest.of(0, 100);
-        List<User> users = userRepository.socialScoreTop100(pageable);
-
-        List<ProfileDto> profileDtos = toProfileDtoList(users);
-        return profileDtos;
-    }
+//    public List<ProfileDto> socialScoreTop100() {
+//        Pageable pageable = PageRequest.of(0, 100);
+//        List<User> users = userRepository.socialScoreTop100(pageable);
+//
+//        List<ProfileDto> profileDtos = toProfileDtoList(users);
+//        return profileDtos;
+//    }
 
 
     public Integer followerCount(Long userId) {
@@ -924,7 +922,7 @@ public class UserService {
     public ProfileDto toProfileDto(User user) {
         ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
         profileDto.setAge(UserUtil.calculateAge(user));
-        profileDto.setInterests(hashtagService.findByUserStr(user));
+        //profileDto.setInterests(hashtagService.findByUserStr(user));
         profileDto.setPremiumType(premiumService.userPremiumType(user));
         profileDto.setReferenceCode("");
 
@@ -940,21 +938,21 @@ public class UserService {
         return dtos;
     }
 
-    @Scheduled(cron = "0 1 1 * * ?")
-    private void disableTestUser() {
-
-
-        List<User> users= userRepository.findMaleTrialUsers(99);
-        long DAY_IN_MS = 1000 * 60 * 60 * 24;
-        Date svenDaysAgo = new Date(System.currentTimeMillis() - (7 * DAY_IN_MS));
-        for(User user:users){
-
-            if(svenDaysAgo.compareTo(user.getCreatedAt()) > 0){
-                user.setTrialUser(100);
-                userRepository.save(user);
-            }
-        }
-    }
+//    @Scheduled(cron = "0 1 1 * * ?")
+//    private void disableTestUser() {
+//
+//
+//        List<User> users= userRepository.findMaleTrialUsers(99);
+//        long DAY_IN_MS = 1000 * 60 * 60 * 24;
+//        Date svenDaysAgo = new Date(System.currentTimeMillis() - (7 * DAY_IN_MS));
+//        for(User user:users){
+//
+//            if(svenDaysAgo.compareTo(user.getCreatedAt()) > 0){
+//                user.setTrialUser(100);
+//                userRepository.save(user);
+//            }
+//        }
+//    }
 
     public Integer attendanceRateOfRequestOwner(Long id) {
         ActivityRequest r = activityRequesRepository.findById(id).get();

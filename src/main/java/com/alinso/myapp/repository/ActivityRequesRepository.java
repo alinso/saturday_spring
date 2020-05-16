@@ -4,6 +4,7 @@ import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.ActivityRequest;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.ActivityRequestStatus;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -76,4 +77,8 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
 
     @Query("select activityRequest.applicant from ActivityRequest activityRequest where activityRequest.activity=:activity")
     List<User> applicantsOfActivity(@Param("activity") Activity activity);
+
+    @Query("select activityRequest.activity from ActivityRequest activityRequest " +
+            "where  activityRequest.activityRequestStatus=:status and activityRequest.applicant=:user and activityRequest.result=1")
+    List<Activity> activitiesAttendedByUserPaged(@Param("user")User user, @Param("status")ActivityRequestStatus status, Pageable pageable);
 }

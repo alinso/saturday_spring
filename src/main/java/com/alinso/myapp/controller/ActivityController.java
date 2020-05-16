@@ -46,6 +46,12 @@ public class ActivityController {
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }
+    @GetMapping("findByCategoriesByCityId/{cityId}/{pageNum}")
+    public ResponseEntity<?> findByCategoriesByCityId(@PathVariable("cityId") Long cityId, @PathVariable("pageNum") Integer pageNum){
+        List<ActivityDto>  meetings = activityService.findAllNonExpiredByCategoriesByCityId(cityId,pageNum);
+
+        return new ResponseEntity<>(meetings,HttpStatus.OK);
+    }
 
     @GetMapping("activityWithRequests/{id}")
     public ResponseEntity<?> meetingWithRequests(@PathVariable("id") Long id){
@@ -54,12 +60,20 @@ public class ActivityController {
     }
 
 
-    @GetMapping("findByUserId/{id}")
-    public ResponseEntity<?> findByUserId(@PathVariable("id") Long id){
-        List<ActivityDto>  meetings = activityService.activitiesOfUser(id);
+    @GetMapping("findByUserId/{id}/{pageNum}/{type}")
+    public ResponseEntity<?> findByUserId(@PathVariable("id") Long id,@PathVariable("pageNum") Integer pageNum, @PathVariable("type") String type){
+        List<ActivityDto>  meetings = activityService.activitiesOfUser(id,pageNum,type);
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }
+
+    @GetMapping("createdAndJoinedCount/{id}")
+    public ResponseEntity<?> createdAndJoinedCount(@PathVariable("id") Long id){
+        List<Integer> meetingCounts = activityService.activityCountsOfUser(id);
+        return new ResponseEntity<>(meetingCounts,HttpStatus.OK);
+    }
+
+
 
 
     @GetMapping("delete/{id}")

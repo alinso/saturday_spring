@@ -1,6 +1,6 @@
 package com.alinso.myapp.entity.dto.user;
 
-import com.alinso.myapp.entity.Premium;
+import com.alinso.myapp.entity.Category;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.entity.enums.VibeType;
 import org.springframework.stereotype.Component;
@@ -9,6 +9,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class ProfileDto {
@@ -34,6 +36,8 @@ public class ProfileDto {
 
     private Integer attendPercent;
 
+    private Set<Category> categories;
+
     private Integer followerCount;
 
     private Integer socialScore;
@@ -52,7 +56,6 @@ public class ProfileDto {
     private Integer reviewCount;
     private Integer photoCount;
     private Integer point;
-    private String interests;
     private String referenceCode;
 
 
@@ -61,6 +64,14 @@ public class ProfileDto {
 public String getPremiumType() {
     return premiumType;
 }
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
 
     public void setPremiumType(String premiumType) {
         this.premiumType = premiumType;
@@ -174,13 +185,6 @@ public String getPremiumType() {
         this.bDateString = bDateString;
     }
 
-    public String getInterests() {
-        return interests;
-    }
-
-    public void setInterests(String interests) {
-        this.interests = interests;
-    }
 
     public String getReferenceCode() {
         return referenceCode;

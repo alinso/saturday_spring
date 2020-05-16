@@ -205,7 +205,7 @@ public class NotificationService {
 
     public void readExceptMessages() {
         User target = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Notification> notifications = notificationRepository.findByTarget(target);
+        List<Notification> notifications = notificationRepository.findTargetNotReadedNotifications(target);
 
 
         for(Notification notification : notifications){
@@ -240,8 +240,7 @@ public class NotificationService {
 
     public void readMessages() {
         User target = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Notification> notifications = notificationRepository.findByTarget(target);
-
+        List<Notification> notifications = notificationRepository.findTargetNotReadedNotifications(target);
 
         for(Notification notification : notifications){
             if(notification.getNotificationType()==NotificationType.MESSAGE){

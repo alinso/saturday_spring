@@ -1,17 +1,18 @@
 package com.alinso.myapp.entity.dto;
 
-import com.alinso.myapp.entity.dto.user.ProfileDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public class GhostMessageDto {
 
+    private Long id;
+
     @NotBlank(message = "Mesaj boş olamaz")
     private String message;
 
     @NotNull
-    private ProfileDto writer;
+    private Integer delete;
 
     private String createdAt;
 
@@ -24,13 +25,6 @@ public class GhostMessageDto {
         this.message = message;
     }
 
-    public ProfileDto getWriter() {
-        return writer;
-    }
-
-    public void setWriter(ProfileDto writer) {
-        this.writer = writer;
-    }
 
     public String getCreatedAt() {
         return createdAt;
@@ -38,5 +32,22 @@ public class GhostMessageDto {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+
+    public Integer getDelete() {
+        return delete;
+    }
+
+    public void setDelete(Integer delete) {
+        this.delete = delete;
     }
 }

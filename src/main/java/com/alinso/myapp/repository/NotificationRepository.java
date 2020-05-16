@@ -20,4 +20,5 @@ NotificationRepository extends JpaRepository<Notification,Long> {
     List<Notification> findByTarget(User target);
 
     List<Notification> findByTargetOrderByCreatedAtDesc(User target, Pageable pageable);
+
 }

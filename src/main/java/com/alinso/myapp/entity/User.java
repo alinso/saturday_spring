@@ -11,10 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @NamedStoredProcedureQuery(
@@ -37,6 +34,12 @@ public class User extends BaseEntity implements UserDetails {
     @NotBlank(message = "Soyisim boş olamaz")
     @Column
     private String surname;
+
+    @Column
+    private Integer percent;
+
+    @Column
+    private String nick;
 
     @Column
     private String title;//profsyonel kullanıcılar iin tanımlayıcı
@@ -64,6 +67,8 @@ public class User extends BaseEntity implements UserDetails {
     @Temporal(TemporalType.DATE)
     private Date lastLogin;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Category> categories;
 
     @NotBlank(message = "Şifre boş olamaz")
     private String password;
@@ -136,7 +141,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private Integer smsCode;
 
-//
+
+
+    //
 //    @Column
 //    private String interests;
 
@@ -401,5 +408,29 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    public Integer getPercent() {
+        return percent;
+    }
+
+    public void setPercent(Integer percent) {
+        this.percent = percent;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
     }
 }

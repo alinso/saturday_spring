@@ -1,5 +1,6 @@
 package com.alinso.myapp.controller;
 
+import com.alinso.myapp.entity.dto.GhostMessageDto;
 import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.service.GhostMessageService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
@@ -49,7 +50,13 @@ public class GhostMessageController {
     @GetMapping("all")
     public ResponseEntity<?> getAll() {
 
-        List<String> messages = ghostMessageService.getAllMessages();
+        List<GhostMessageDto> messages = ghostMessageService.getAllMessages();
+        return new ResponseEntity<>(messages, HttpStatus.OK);
+    }
+    @GetMapping("allPC")
+    public ResponseEntity<?> getAllPC() {
+
+        List<GhostMessageDto> messages = ghostMessageService.getAllMessagesPC();
         return new ResponseEntity<>(messages, HttpStatus.OK);
     }
 
@@ -63,6 +70,12 @@ public class GhostMessageController {
     ResponseEntity<?> isReceivingNotification() {
        Boolean res =  ghostMessageService.isReceivingNotification();
         return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @GetMapping("delete/{messageId}")
+    ResponseEntity<?> delete(@PathVariable("messageId") Long messageId) {
+        ghostMessageService.deleteMessage(messageId);
+        return new ResponseEntity<>("OK", HttpStatus.OK);
     }
 
 }

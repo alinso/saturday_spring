@@ -68,4 +68,9 @@ public class FollowService {
         return profileDtos;
     }
 
+    public List<User> findFollowingsOfUser(User user) {
+        List<User> followingUsers = followRepository.findUsersFollowedByTheUser(user);
+
+        return followingUsers;
+    }
 }
