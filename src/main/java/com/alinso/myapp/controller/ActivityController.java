@@ -1,6 +1,7 @@
 package com.alinso.myapp.controller;
 
 
+import com.alinso.myapp.entity.Activity;
 import com.alinso.myapp.entity.dto.activity.ActivityDto;
 import com.alinso.myapp.service.ActivityService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
@@ -61,8 +62,14 @@ public class ActivityController {
 
 
     @GetMapping("findByUserId/{id}/{pageNum}/{type}")
-    public ResponseEntity<?> findByUserId(@PathVariable("id") Long id,@PathVariable("pageNum") Integer pageNum, @PathVariable("type") String type){
+    public ResponseEntity<?> findByUserIdType(@PathVariable("id") Long id,@PathVariable("pageNum") Integer pageNum, @PathVariable("type") String type){
         List<ActivityDto>  meetings = activityService.activitiesOfUser(id,pageNum,type);
+
+        return new ResponseEntity<>(meetings,HttpStatus.OK);
+    }
+    @GetMapping("findByUserId/{id}")
+    public ResponseEntity<?> findByUserId(@PathVariable("id") Long id){
+        List<ActivityDto>  meetings = activityService.allActivitiesOfUser(id);
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }
@@ -72,8 +79,11 @@ public class ActivityController {
         List<Integer> meetingCounts = activityService.activityCountsOfUser(id);
         return new ResponseEntity<>(meetingCounts,HttpStatus.OK);
     }
-
-
+    @GetMapping("all/{pageNum}")
+    public ResponseEntity<?> all(@PathVariable("pageNum") Integer pageNum){
+        List<ActivityDto> activityDtos = activityService.all(pageNum);
+        return new ResponseEntity<>(activityDtos,HttpStatus.OK);
+    }
 
 
     @GetMapping("delete/{id}")

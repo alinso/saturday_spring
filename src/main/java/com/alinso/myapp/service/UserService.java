@@ -278,6 +278,12 @@ public class UserService {
 //        userRepository.save(user);
 //    }
 
+
+    public void setLastLogin(){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        user.setLastLogin(new Date());
+        userRepository.save(user);
+    }
     public User findEntityById(Long id) {
         try {
             return userRepository.findById(id).get();

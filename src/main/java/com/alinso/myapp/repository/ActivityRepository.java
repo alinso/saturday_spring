@@ -41,4 +41,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     @Query("select a from Activity a where a.creator=:creator order by a.deadLine desc")
     List<Activity> findByCreatorOrderByDeadLineDescPaged(@Param("creator") User creator, Pageable pageable);
 
+    List<Activity> findByCategoriesOrderByDeadLine(@Param("category")Category category, Pageable pageable);
+
+    @Query("select a from Activity a where a.deadLine>:now order by a.deadLine asc")
+    List<Activity> findAllOrderByDeadLineAsc(@Param("now") Date now, Pageable pageable);
 }

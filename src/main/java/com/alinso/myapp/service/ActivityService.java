@@ -75,12 +75,19 @@ public class ActivityService {
     FollowService followService;
 
     public ActivityDto findById(Long id) {
+
         Activity activity = null;
         try {
             activity = activityRepository.findById(id).get();
         } catch (NoSuchElementException e) {
             throw new UserWarningException("Aktivite Bulunamadı");
         }
+
+        if(blockService.isThereABlock(activity.getCreator().getId()))
+            throw new UserWarningException("Erişim Yok");
+        if(!canSeeListActivity(activity))
+            throw new UserWarningException("Erişim Yok");
+
 
         ActivityDto activityDto = toDto(activity);
 
@@ -378,18 +385,29 @@ public class ActivityService {
     }
 
     public List<ActivityDto> findAllNonExpiredByCategoriesByCityId(Long cityId, Integer pageNum) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Pageable pageable = PageRequest.of(pageNum, 10);
         List<Activity> activities = activityRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId), pageable);
+
+        userService.setLastLogin();
+
+        return filterActivities(activities,true);
+    }
+
+
+    public List<ActivityDto> all(Integer pageNum) {
+        Pageable pageable = PageRequest.of(pageNum, 10);
+        List<Activity> activities = activityRepository.findAllOrderByDeadLineAsc(new Date(),pageable);
+
+        return filterActivities(activities,false);
+    }
+
+
+    public List<ActivityDto> filterActivities(List<Activity> activityList, Boolean filterCategory){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
         List<ActivityDto> activityDtos = new ArrayList<>();
-
-        if (pageNum == 0) {
-            user.setLastLogin(new Date());
-            userRepository.save(user);
-        }
-
-        for (Activity activity : activities) {
+        for (Activity activity : activityList) {
 
             if (blockService.isThereABlock(activity.getCreator().getId()))
                 continue;
@@ -397,23 +415,42 @@ public class ActivityService {
             if (!canSeeListActivity(activity))
                 continue;
 
-            Boolean inCategory = false;
-            for(Category userCategory:user.getCategories()){
-                for(Category activityCategory:activity.getCategories()){
-                    if(activityCategory.getId()==userCategory.getId()){
-                        inCategory=true;
-                        break;
+            if(filterCategory) {
+                Boolean inCategory = false;
+                for (Category userCategory : user.getCategories()) {
+                    for (Category activityCategory : activity.getCategories()) {
+                        if (activityCategory.getId() == userCategory.getId()) {
+                            inCategory = true;
+                            break;
+                        }
                     }
                 }
+                if(!inCategory)
+                    continue;
             }
 
-            if(!inCategory)
-                continue;
+
 
             ActivityDto activityDto = toDto(activity);
             activityDtos.add(activityDto);
         }
         return activityDtos;
+    }
+
+    public List<ActivityDto> allActivitiesOfUser(Long id) {
+        User user = userService.findEntityById(id);
+
+
+        if (blockService.isThereABlock(id))
+            throw new UserWarningException("Erişim Yok");
+
+
+        List<Activity> activities = new ArrayList<>();
+            activities.addAll(activityRepository.findByCreatorOrderByDeadLineDesc(user));
+            activities.addAll(activityRequesRepository.activitiesAttendedByUser(user, ActivityRequestStatus.APPROVED));
+
+
+        return filterActivities(activities,false);
     }
 }
 

@@ -28,6 +28,13 @@ public class ActivityValidator implements Validator {
         }
 
 
+        if(activityDto.getSelectedCategoryIds().size()>5){
+            errors.rejectValue("selectedCategoryIds","","Bir aktivite en fazla 5 kategoriye sahip olabilir");
+        }
+        if(activityDto.getSelectedCategoryIds().size()<2){
+            errors.rejectValue("selectedCategoryIds","","Bir aktivitenin en az 2 kategorisi olmalıdır");
+        }
+
         if(file!=null && file.getSize()>2097152){ //2 MB
             errors.rejectValue("file","","Max dosya boyutu 2 MB olabilir");
         }
@@ -36,7 +43,5 @@ public class ActivityValidator implements Validator {
             errors.rejectValue("detail","","Maksimum 500 karakter girebilirsiniz");
 
         }
-
-
     }
 }

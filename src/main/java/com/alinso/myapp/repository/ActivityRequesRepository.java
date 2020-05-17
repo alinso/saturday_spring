@@ -72,7 +72,7 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
             " where activityRequest.applicant=:user" )
     Integer last3MonthSentRequestsOfUser(@Param("user")User user);
 
-    @Query("select count(activityRequest) from ActivityRequest activityRequest where activityRequest.applicant=:user and activityRequest.activityRequestStatus=:approved")
+    @Query("select count(activityRequest) from ActivityRequest activityRequest where activityRequest.applicant=:user and activityRequest.activityRequestStatus=:approved and activityRequest.result=1")
     Integer findApprovedRequestCountByApplicant(@Param("user") User user, @Param("approved")ActivityRequestStatus approved);
 
     @Query("select activityRequest.applicant from ActivityRequest activityRequest where activityRequest.activity=:activity")

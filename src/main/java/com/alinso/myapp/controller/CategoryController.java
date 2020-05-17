@@ -1,6 +1,7 @@
 package com.alinso.myapp.controller;
 
 import com.alinso.myapp.entity.Category;
+import com.alinso.myapp.entity.dto.activity.ActivityDto;
 import com.alinso.myapp.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,12 @@ public class CategoryController {
     public ResponseEntity<?> myCategories() {
         Set<Category> categories = categoryService.myCategories();
         return new ResponseEntity<>(categories, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/activities/{id}/{pageNum}")
+    public ResponseEntity<?> activities(@PathVariable("id") Long id, @PathVariable("pageNum") Integer pageNum) {
+        List<ActivityDto> activityList = categoryService.activitiesByCategoryId(id,pageNum);
+        return new ResponseEntity<>(activityList, HttpStatus.ACCEPTED);
     }
 
 
