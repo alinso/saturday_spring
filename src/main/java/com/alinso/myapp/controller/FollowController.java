@@ -39,6 +39,13 @@ public class FollowController {
         return new ResponseEntity<>(profileDtoList,HttpStatus.OK);
     }
 
+    @GetMapping("myFollowers/{pageNum}")
+    public ResponseEntity<?> myFollowers(@PathVariable("pageNum") Integer pageNum){
+
+        List<ProfileDto> profileDtoList =followService.findMyFollowers(pageNum);
+        return new ResponseEntity<>(profileDtoList,HttpStatus.OK);
+    }
+
 
 
 }

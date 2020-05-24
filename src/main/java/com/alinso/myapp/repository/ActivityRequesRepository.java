@@ -79,6 +79,6 @@ public interface ActivityRequesRepository extends JpaRepository<ActivityRequest,
     List<User> applicantsOfActivity(@Param("activity") Activity activity);
 
     @Query("select activityRequest.activity from ActivityRequest activityRequest " +
-            "where  activityRequest.activityRequestStatus=:status and activityRequest.applicant=:user and activityRequest.result=1")
+            "where  activityRequest.activityRequestStatus=:status and activityRequest.applicant=:user and activityRequest.result=1 order by activityRequest.createdAt desc")
     List<Activity> activitiesAttendedByUserPaged(@Param("user")User user, @Param("status")ActivityRequestStatus status, Pageable pageable);
 }

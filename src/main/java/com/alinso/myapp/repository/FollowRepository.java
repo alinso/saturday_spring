@@ -2,6 +2,7 @@ package com.alinso.myapp.repository;
 
 import com.alinso.myapp.entity.Follow;
 import com.alinso.myapp.entity.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +32,7 @@ public interface FollowRepository extends JpaRepository<Follow,Long> {
 
     @Query("select follow.leader from Follow follow group by follow.leader having count(follow)>100 order by count(follow) desc")
     List<User> maxFollowedUsers();
+
+    @Query("select follow.follower from  Follow follow where follow.leader=:leader ")
+    List<User> findFollowersOfUserPaged(@Param("leader") User leader, Pageable pageable);
 }

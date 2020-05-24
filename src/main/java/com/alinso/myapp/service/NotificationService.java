@@ -25,10 +25,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class NotificationService {
@@ -89,6 +86,32 @@ public class NotificationService {
         notification.setRead(false);
         notificationRepository.save(notification);
     }
+
+    private void createBulkNotification(List<User> targetList,User trigger,NotificationType notificationType,String message){
+
+
+        List<Notification> notificationList  = new ArrayList<>();
+        int i=0;
+        for(User user:targetList){
+            i++;
+
+            Notification notification = new Notification();
+            notification.setNotificationType(notificationType);
+            notification.setTarget(user);
+            notification.setMessage(message);
+            notification.setTrigger(trigger);
+            notification.setRead(false);
+            notificationList.add(notification);
+
+            if(i%50==0){
+                notificationRepository.saveAll(notificationList);
+                notificationList.clear();
+            }
+        }
+
+        notificationRepository.saveAll(notificationList);
+    }
+
 
     @Scheduled(fixedRate = 60*60*1000, initialDelay = 60*1000)
     public void newMeetingCommentAvailable(){
@@ -161,12 +184,21 @@ public class NotificationService {
         }
 
     }
-    public void newMeeting(User target,Long itemId){
+    public void newMeeting(List<User> targetList,Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        createNotification(target,trigger,NotificationType.FOLLOWING,itemId.toString());
-        if(!androidPushNotificationsService.newMeeting(trigger,target)) {
-            mailService.sendNewActivityMail(target, trigger, itemId);
-        }
+        createBulkNotification(targetList,trigger,NotificationType.NEW_ACTIVITY,itemId.toString());
+
+
+        Runnable myRunnable = () -> {
+            for(User target: targetList){
+                if(!androidPushNotificationsService.newMeeting(trigger,target)) {
+                    mailService.sendNewActivityMail(target, trigger, itemId);
+                }
+            }
+        };
+        Thread thread = new Thread(myRunnable);
+        thread.start();
+
     }
     public void newGeneral(String message,User target){
         createNotification(target,null,NotificationType.GENERAL,message);
@@ -308,6 +340,18 @@ public class NotificationService {
 
     public void newGhostMessage(User reader) {
         androidPushNotificationsService.newGhostMessage(reader);
+    }
+
+    public void newFollow(User target, User trigger) {
+        createNotification(target,trigger,NotificationType.FOLLOW,null);
+        androidPushNotificationsService.newFollow(trigger,target);
+    }
+
+    public void sendReminderOfDay(Map<User,Activity> attendantsOfDay) {
+        for(Map.Entry<User,Activity> u:attendantsOfDay.entrySet()){
+            createNotification(u.getKey(),u.getValue().getCreator(),NotificationType.REMINDER,Long.valueOf(u.getValue().getId()).toString());
+            androidPushNotificationsService.newReminder(u.getKey(),u.getValue().getCreator());
+        }
     }
 }
 

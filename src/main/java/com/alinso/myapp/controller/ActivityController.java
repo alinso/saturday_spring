@@ -67,9 +67,9 @@ public class ActivityController {
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }
-    @GetMapping("findByUserId/{id}")
-    public ResponseEntity<?> findByUserId(@PathVariable("id") Long id){
-        List<ActivityDto>  meetings = activityService.allActivitiesOfUser(id);
+    @GetMapping("findByUserId/{id}/{pageNum}")
+    public ResponseEntity<?> findByUserId(@PathVariable("id") Long id, @PathVariable("pageNum") Integer pageNum){
+        List<ActivityDto>  meetings = activityService.allActivitiesOfUser(id,pageNum);
 
         return new ResponseEntity<>(meetings,HttpStatus.OK);
     }

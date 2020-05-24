@@ -171,4 +171,27 @@ public class AndroidPushNotificationsService {
             return true;
         }
     }
+
+    public boolean newFollow(User trigger, User target) {
+        String message =  trigger.getName() + " " + trigger.getSurname() + " seni takip etti";
+        send("Yeni Takipçi", target.getFirebaseId(), message);
+        if(target.getFirebaseId()==null){
+            return false;
+        }
+        else{
+            return true;
+        }
+
+    }
+
+    public boolean newReminder(User key, User value) {
+        String message =  "Bugün "+value.getName()+" "+value.getSurname()+" ile bir aktiviten var!";
+        send("Yaklaşan Aktivite!", key.getFirebaseId(), message);
+        if(key.getFirebaseId()==null){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
 }

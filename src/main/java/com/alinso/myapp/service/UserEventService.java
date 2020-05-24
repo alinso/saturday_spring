@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -57,11 +58,14 @@ public class UserEventService {
         //user.setPoint((user.getPoint() + NEW_ACTIVITY_POINT));
         //user.setActivityCount((user.getActivityCount() + 1));
 
+        List<User> followers = new ArrayList<>();
+
         if(!activity.getSecret())
         for(User follower:followRepository.findFollowersOfUser(user)){
             if(!blockService.isThereABlock(follower.getId()))
-            notificationService.newMeeting(follower, activity.getId());
+           followers.add(follower);
         }
+        notificationService.newMeeting(followers, activity.getId());
         userRepository.save(user);
     }
 

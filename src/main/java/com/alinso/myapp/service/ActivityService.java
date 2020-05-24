@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -73,6 +74,33 @@ public class ActivityService {
 
     @Autowired
     FollowService followService;
+
+    @Autowired
+    NotificationService notificationService;
+
+    @Scheduled(cron="0 0 0/2 * * ?")
+    public void  sendReminderNotification(){
+        Calendar finish = Calendar.getInstance();
+        finish.setTime(new Date());
+        finish.add(Calendar.HOUR, +5);
+
+        Calendar start = Calendar.getInstance();
+        start.setTime(new Date());
+        start.add(Calendar.HOUR, +3);
+
+
+        List<Activity> activityList  = activityRepository.activitiesOfDay(start.getTime(),finish.getTime());
+        Map<User,Activity> attendantsOfDay = new HashMap<>();
+
+        for(Activity a:activityList){
+            for(User attendant:activityRequestService.findAttendantEntities(a)) {
+                attendantsOfDay.put(attendant,a);
+            }
+        }
+
+        notificationService.sendReminderOfDay(attendantsOfDay);
+    }
+
 
     public ActivityDto findById(Long id) {
 
@@ -437,18 +465,17 @@ public class ActivityService {
         return activityDtos;
     }
 
-    public List<ActivityDto> allActivitiesOfUser(Long id) {
+    public List<ActivityDto> allActivitiesOfUser(Long id, Integer pageNum) {
         User user = userService.findEntityById(id);
-
 
         if (blockService.isThereABlock(id))
             throw new UserWarningException("Erişim Yok");
 
+        Pageable pageable  =PageRequest.of(pageNum,5);
 
         List<Activity> activities = new ArrayList<>();
-            activities.addAll(activityRepository.findByCreatorOrderByDeadLineDesc(user));
-            activities.addAll(activityRequesRepository.activitiesAttendedByUser(user, ActivityRequestStatus.APPROVED));
-
+            activities.addAll(activityRepository.findByCreatorOrderByDeadLineDescPaged(user,pageable));
+            activities.addAll(activityRequesRepository.activitiesAttendedByUserPaged(user, ActivityRequestStatus.APPROVED,pageable));
 
         return filterActivities(activities,false);
     }

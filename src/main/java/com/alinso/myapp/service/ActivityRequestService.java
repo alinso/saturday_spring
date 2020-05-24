@@ -258,10 +258,10 @@ public class ActivityRequestService {
 
         String premiumType = premiumService.userPremiumType(user);
         if (premiumType.equals("GOLD")) {
-            limit = 25;
+            limit = 12;
         }
         if (premiumType.equals("SILVER")) {
-            limit = 15;
+            limit = 12;
         }
         if (premiumType.equals("ORGANIZATOR")) {
             limit = 9999;
