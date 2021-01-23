@@ -2,7 +2,7 @@ package com.alinso.myapp.controller;
 
 import com.alinso.myapp.entity.dto.message.ConversationDto;
 import com.alinso.myapp.entity.dto.message.MessageDto;
-import com.alinso.myapp.service.ActivityRequestService;
+import com.alinso.myapp.service.EventRequestService;
 import com.alinso.myapp.service.MessageService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class   MessageController {
 
 
     @Autowired
-    ActivityRequestService activityRequestService;
+    EventRequestService eventRequestService;
 
 
     @PostMapping("/send")
@@ -65,7 +65,7 @@ public class   MessageController {
 
     @GetMapping("haveTheseUsersMeet/{id1}/{id2}")
     public ResponseEntity<Boolean> haveTheseUsersMeet(@PathVariable("id1") Long id1,@PathVariable("id2") Long id2 ){
-        return new ResponseEntity<Boolean>(activityRequestService.haveTheseUsersMeet(id1,id2),HttpStatus.OK);
+        return new ResponseEntity<Boolean>(eventRequestService.haveTheseUsersMeet(id1,id2),HttpStatus.OK);
     }
 
 }

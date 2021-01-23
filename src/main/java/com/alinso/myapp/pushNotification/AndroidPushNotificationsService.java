@@ -161,16 +161,6 @@ public class AndroidPushNotificationsService {
 
     }
 
-    public boolean newGhostMessage(User reader) {
-        String message =  "Birisi duvara yeni bir mesaj yazdı!";
-        send("Duvarda yeni mesaj!", reader.getFirebaseId(), message);
-        if(reader.getFirebaseId()==null){
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
 
     public boolean newFollow(User trigger, User target) {
         String message =  trigger.getName() + " " + trigger.getSurname() + " seni takip etti";

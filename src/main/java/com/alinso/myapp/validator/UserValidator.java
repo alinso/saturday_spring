@@ -58,7 +58,7 @@ public class UserValidator implements Validator {
 
         if(user.getGender()==Gender.MALE){
             if (user.getReferenceCode().equals("")) {
-                errors.rejectValue("referenceCode", "Match", "Referans kodu olmadan kaydolamazsın, referans kodu için instagramdan başvuru yapmalısın(instagram:activityfriend)");
+                errors.rejectValue("referenceCode", "Match", "Referans kodu olmadan kaydolamazsın, referans kodu için instagramdan başvuru yapmalısın(instagram:event)");
             } else if(!user.getReferenceCode().equals("")) {
 
                 User parent = referenceService.findByCode(user.getReferenceCode());
@@ -67,7 +67,7 @@ public class UserValidator implements Validator {
                 }
                 if(parent!=null)
                     if (parent.getId() !=3212 && parent.getId()!=9096) {
-                        errors.rejectValue("referenceCode", "Match", "Yalnız instagram hesabından alınan referans kodları geçerlidi(instagram:activityfriend)");
+                        errors.rejectValue("referenceCode", "Match", "Yalnız instagram hesabından alınan referans kodları geçerlidi(instagram:event)");
                     }
 
 

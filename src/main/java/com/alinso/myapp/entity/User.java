@@ -68,7 +68,7 @@ public class User extends BaseEntity implements UserDetails {
     private Date lastLogin;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Category> categories;
+    private Set<Interest> interests;
 
     @NotBlank(message = "Şifre boş olamaz")
     private String password;
@@ -102,18 +102,6 @@ public class User extends BaseEntity implements UserDetails {
     @ColumnDefault("0")
     private Integer point ;
 
-    @Column
-    @ColumnDefault("0")
-    private Integer activityCount;
-
-    @Column
-    @ColumnDefault("0")
-    private Integer photoCount;
-
-    @Column
-    @ColumnDefault("0")
-    private Integer reviewCount;
-
     @ManyToOne
     @ColumnDefault("0")
     private City city;
@@ -127,8 +115,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String role;
 
-    @Column
-    private Integer socialScore;
 
     public Integer getSmsCode() {
         return smsCode;
@@ -147,21 +133,6 @@ public class User extends BaseEntity implements UserDetails {
 //    @Column
 //    private String interests;
 
-    public Integer getPhotoCount() {
-        return photoCount;
-    }
-
-    public void setPhotoCount(Integer photoCount) {
-        this.photoCount = photoCount;
-    }
-
-    public Integer getReviewCount() {
-        return reviewCount;
-    }
-
-    public void setReviewCount(Integer reviewCount) {
-        this.reviewCount = reviewCount;
-    }
 
     public String getName() {
         return name;
@@ -211,13 +182,6 @@ public class User extends BaseEntity implements UserDetails {
         this.referenceCode = referenceCode;
     }
 
-    public Integer getActivityCount() {
-        return activityCount;
-    }
-
-    public void setActivityCount(Integer activityCount) {
-        this.activityCount = activityCount;
-    }
 
     public String getEmail() {
         return email;
@@ -378,13 +342,6 @@ public class User extends BaseEntity implements UserDetails {
         this.tooNegative = tooNegative;
     }
 
-    public Integer getSocialScore() {
-        return socialScore;
-    }
-
-    public void setSocialScore(Integer socialScore) {
-        this.socialScore = socialScore;
-    }
 
     public Date getLastLogin() {
         return lastLogin;
@@ -426,11 +383,11 @@ public class User extends BaseEntity implements UserDetails {
         this.percent = percent;
     }
 
-    public Set<Category> getCategories() {
-        return categories;
+    public Set<Interest> getInterests() {
+        return interests;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    public void setInterests(Set<Interest> interests) {
+        this.interests = interests;
     }
 }

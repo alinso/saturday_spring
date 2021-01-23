@@ -4,7 +4,6 @@ import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
-import com.alinso.myapp.entity.dto.security.ResetPasswordDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.repository.CityRepository;
@@ -14,7 +13,7 @@ import com.alinso.myapp.security.SecurityConstants;
 import com.alinso.myapp.security.payload.JWTLoginSucessReponse;
 import com.alinso.myapp.security.payload.LoginRequest;
 import com.alinso.myapp.service.UserService;
-import com.alinso.myapp.service.VibeService;
+import com.alinso.myapp.service.VoteService;
 import com.alinso.myapp.util.MapValidationErrorUtil;
 import com.alinso.myapp.validator.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,7 @@ public class UserController {
 
 
     @Autowired
-    VibeService vibeService;
+    VoteService voteService;
 
     @Autowired
     UserUpdateValidator userUpdateValidator;
@@ -215,20 +214,6 @@ public class UserController {
     }
 
 
-
-    @GetMapping("activityTop100")
-    public ResponseEntity<?> activityTop100(){
-        List<ProfileDto> profileDtos  =userService.top100();
-        return new ResponseEntity<List<ProfileDto>>(profileDtos,HttpStatus.OK);
-    }
-
-//    @GetMapping("socialScoreTop100")
-//    public ResponseEntity<?> socialScoreactivityTop100(){
-//        List<ProfileDto> profileDtos  =userService.socialScoreTop100();
-//        return new ResponseEntity<List<ProfileDto>>(profileDtos,HttpStatus.OK);
-//    }
-
-
     @GetMapping("calculatePercent")
     public ResponseEntity<?> calculatePercent(){
         City city =  cityRepository.findById(Long.valueOf(1)).get();
@@ -239,8 +224,8 @@ public class UserController {
         for(User u:users){
             i++;
 
-            Integer vibe = vibeService.calculateVibe(u.getId());
-            u.setPercent(vibe);
+            Integer vote = voteService.calculateVote(u.getId());
+            u.setPercent(vote);
             newUsers.add(u);
             if(i%100==0){
                 userRepository.saveAll(newUsers);

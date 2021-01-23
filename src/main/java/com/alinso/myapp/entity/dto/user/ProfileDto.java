@@ -1,15 +1,14 @@
 package com.alinso.myapp.entity.dto.user;
 
-import com.alinso.myapp.entity.Category;
+import com.alinso.myapp.entity.Interest;
 import com.alinso.myapp.entity.enums.Gender;
-import com.alinso.myapp.entity.enums.VibeType;
+import com.alinso.myapp.entity.enums.VoteType;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Set;
 
 @Component
@@ -36,15 +35,9 @@ public class ProfileDto {
 
     private Integer attendPercent;
 
-    private Set<Category> categories;
+    private Set<Interest> interests;
 
-    private Integer followerCount;
-
-    private Integer socialScore;
-
-    private VibeType myVibe;
-
-    private String premiumType;
+    private VoteType myVote;
 
     @NotNull(message = "Cinsiyet Seçiniz")
     @Enumerated(EnumType.ORDINAL)
@@ -52,54 +45,20 @@ public class ProfileDto {
 
     private String motivation = "";
 
-    private Integer activityCount;
-    private Integer reviewCount;
-    private Integer photoCount;
-    private Integer point;
     private String referenceCode;
 
 
 
 //getter setter
-public String getPremiumType() {
-    return premiumType;
-}
 
-    public Set<Category> getCategories() {
-        return categories;
+    public Set<Interest> getInterests() {
+        return interests;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    public void setInterests(Set<Interest> interests) {
+        this.interests = interests;
     }
 
-    public void setPremiumType(String premiumType) {
-        this.premiumType = premiumType;
-    }
-
-    public Integer getReviewCount() {
-        return reviewCount;
-    }
-
-    public void setReviewCount(Integer reviewCount) {
-        this.reviewCount = reviewCount;
-    }
-
-    public Integer getPhotoCount() {
-        return photoCount;
-    }
-
-    public void setPhotoCount(Integer photoCount) {
-        this.photoCount = photoCount;
-    }
-
-    public Integer getPoint() {
-        return point;
-    }
-
-    public void setPoint(Integer point) {
-        this.point = point;
-    }
 
     public Integer getAge() {
         return age;
@@ -159,16 +118,6 @@ public String getPremiumType() {
     }
 
 
-    public Integer getActivityCount() {
-        return activityCount;
-    }
-
-    public void setActivityCount(Integer activityCount) {
-        this.activityCount = activityCount;
-    }
-
-
-
     public String getProfilePicName() {
         return profilePicName;
     }
@@ -184,7 +133,6 @@ public String getPremiumType() {
     public void setbDateString(String bDateString) {
         this.bDateString = bDateString;
     }
-
 
     public String getReferenceCode() {
         return referenceCode;
@@ -202,28 +150,13 @@ public String getPremiumType() {
         this.attendPercent = attendPercent;
     }
 
-    public Integer getFollowerCount() {
-        return followerCount;
+
+    public VoteType getMyVote() {
+        return myVote;
     }
 
-    public void setFollowerCount(Integer followerCount) {
-        this.followerCount = followerCount;
-    }
-
-    public Integer getSocialScore() {
-        return socialScore;
-    }
-
-    public void setSocialScore(Integer socialScore) {
-        this.socialScore = socialScore;
-    }
-
-    public VibeType getMyVibe() {
-        return myVibe;
-    }
-
-    public void setMyVibe(VibeType myVibe) {
-        this.myVibe = myVibe;
+    public void setMyVote(VoteType myVote) {
+        this.myVote = myVote;
     }
 
     public String getTitle() {

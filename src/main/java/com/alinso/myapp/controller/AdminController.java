@@ -1,9 +1,11 @@
 package com.alinso.myapp.controller;
 
-import com.alinso.myapp.entity.*;
+import com.alinso.myapp.entity.City;
+import com.alinso.myapp.entity.Complain;
+import com.alinso.myapp.entity.Message;
+import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.discover.DiscoverDto;
 import com.alinso.myapp.entity.enums.Gender;
-import com.alinso.myapp.entity.enums.PremiumDuration;
 import com.alinso.myapp.repository.*;
 import com.alinso.myapp.service.AdminService;
 import com.alinso.myapp.service.DiscoverService;
@@ -25,19 +27,13 @@ public class AdminController {
     DiscoverService discoverService;
 
     @Autowired
-    ActivityRequesRepository activityRequesRepository;
-
-    @Autowired
-    PremiumService premiumService;
-
-    @Autowired
-    PremiumRepository premiumRepository;
+    EventRequestRepository eventRequestRepository;
 
     @Autowired
     UserEventService userEventService;
 
     @Autowired
-    ActivityRepository activityRepository;
+    EventRepository eventRepository;
 
     @Autowired
     MessageRepository messageRepository;
@@ -131,13 +127,6 @@ public class AdminController {
 
     }
 
-    @GetMapping("userInfo/{id}")
-    public ResponseEntity<User> userInfo(@PathVariable("id") Long id) {
-        User user = adminService.userInfo(id);
-        return new ResponseEntity<>(user, HttpStatus.OK);
-
-    }
-
     @GetMapping("resetPassword/{id}")
     public ResponseEntity<String> resetPassword(@PathVariable("id") Long id) {
         adminService.resetPassword(id);
@@ -152,5 +141,25 @@ public class AdminController {
         return new ResponseEntity<>(complainList, HttpStatus.OK);
     }
 
+    @GetMapping("updateInvalidUserName/{id}")
+    public ResponseEntity<String> updateUSer(@PathVariable("id") Long id) {
+        adminService.updateInvalidUsername(id);
+        return new ResponseEntity<>("okk", HttpStatus.OK);
+
+    }
+
+    @GetMapping("userInfo/{id}")
+    public ResponseEntity<User> userInfo(@PathVariable("id") Long id) {
+        User user = adminService.userInfo(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+
+    }
+
+    @GetMapping("updateExtraPoint/{id}/{extraPoint}")
+    public ResponseEntity<String> updateExtraPoint(@PathVariable("id") Long id,@PathVariable("extraPoint") Integer extraPoint) {
+        adminService.updateExtraPoint(id,extraPoint);
+        return new ResponseEntity<>("okk", HttpStatus.OK);
+
+    }
 
 }

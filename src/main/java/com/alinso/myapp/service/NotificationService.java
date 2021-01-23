@@ -1,19 +1,19 @@
 package com.alinso.myapp.service;
 
-import com.alinso.myapp.entity.Activity;
+import com.alinso.myapp.entity.Event;
 import com.alinso.myapp.entity.Invitation;
 import com.alinso.myapp.entity.Notification;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.notification.NotificationDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
-import com.alinso.myapp.entity.enums.ActivityRequestStatus;
+import com.alinso.myapp.entity.enums.EventRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.entity.enums.NotificationType;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.mail.service.MailService;
 import com.alinso.myapp.pushNotification.AndroidPushNotificationsService;
-import com.alinso.myapp.repository.ActivityRepository;
-import com.alinso.myapp.repository.ActivityRequesRepository;
+import com.alinso.myapp.repository.EventRepository;
+import com.alinso.myapp.repository.EventRequestRepository;
 import com.alinso.myapp.repository.NotificationRepository;
 import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.UserUtil;
@@ -51,10 +51,10 @@ public class NotificationService {
     BlockService blockService;
 
     @Autowired
-    ActivityRepository activityRepository;
+    EventRepository eventRepository;
 
     @Autowired
-    ActivityRequesRepository activityRequesRepository;
+    EventRequestRepository eventRequestRepository;
 
 
     @Autowired
@@ -125,20 +125,20 @@ public class NotificationService {
         finish.setTime(new Date());
         finish.add(Calendar.HOUR, HOURS_TO_WRITE_REVIEW);
 
-        List<Activity> activityList = activityRepository.recentUncommentedActivities(start.getTime(),finish.getTime());
+        List<Event> eventList = eventRepository.recentUncommentedEvents(start.getTime(),finish.getTime());
 
-        for(Activity activity : activityList){
+        for(Event event : eventList){
             //check if attendants are more than one
-            Long meetingId  = activity.getId();
-            if(activityRequesRepository.countOfAprrovedForThisActivity(activity, ActivityRequestStatus.APPROVED)>0){
+            Long meetingId  = event.getId();
+            if(eventRequestRepository.countOfAprrovedForThisEvent(event, EventRequestStatus.APPROVED)>0){
                 //send notification to creator
-                createNotification(activity.getCreator(),null,NotificationType.MEETING_COMMENT_AVAILABLE, meetingId.toString());
+                createNotification(event.getCreator(),null,NotificationType.MEETING_COMMENT_AVAILABLE, meetingId.toString());
                // expoPushNotificationService.newReviewAvailable(activity.getCreator(),activity.getId());
-                if(!androidPushNotificationsService.newReviewAvailable(activity.getCreator())) {
-                    mailService.newReviewAvailableMail(activity.getCreator(), meetingId);
+                if(!androidPushNotificationsService.newReviewAvailable(event.getCreator())) {
+                    mailService.newReviewAvailableMail(event.getCreator(), meetingId);
                 }
                 //send notification to attendants
-                List<User> attendants  = activityRequesRepository.attendantsOfActivity(activity, ActivityRequestStatus.APPROVED);
+                List<User> attendants  = eventRequestRepository.attendantsOfEvent(event, EventRequestStatus.APPROVED);
                 for(User attendant :attendants){
                     createNotification(attendant,null,NotificationType.MEETING_COMMENT_AVAILABLE,meetingId.toString());
                   //  expoPushNotificationService.newReviewAvailable(attendant,activity.getId());
@@ -147,8 +147,8 @@ public class NotificationService {
                     }
                 }
             }
-            activity.setCommentNotificationSent(true);
-            activityRepository.save(activity);
+            event.setCommentNotificationSent(true);
+            eventRepository.save(event);
         }
     }
 
@@ -184,15 +184,15 @@ public class NotificationService {
         }
 
     }
-    public void newMeeting(List<User> targetList,Long itemId){
+    public void newEvent(List<User> targetList, Long itemId){
         User trigger = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        createBulkNotification(targetList,trigger,NotificationType.NEW_ACTIVITY,itemId.toString());
+        createBulkNotification(targetList,trigger,NotificationType.NEW_EVENT,itemId.toString());
 
 
         Runnable myRunnable = () -> {
             for(User target: targetList){
                 if(!androidPushNotificationsService.newMeeting(trigger,target)) {
-                    mailService.sendNewActivityMail(target, trigger, itemId);
+                   // mailService.event(target, trigger, itemId);
                 }
             }
         };
@@ -293,12 +293,12 @@ public class NotificationService {
        // mailService.sendNewMessageMail(target,trigger);
     }
 
-    public void newMessageActivity(User target,Activity triggerActivity) {
-        Long triggerId= triggerActivity.getId();
+    public void newMessageEvent(User target, Event triggerEvent) {
+        Long triggerId= triggerEvent.getId();
         User user  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Notification notification = new Notification();
-        notification.setNotificationType(NotificationType.MESSAGE_ACTIVITY);
+        notification.setNotificationType(NotificationType.MESSAGE_EVENT);
         notification.setTarget(target);
         notification.setMessage(triggerId.toString());
         notification.setTrigger(user);
@@ -318,7 +318,7 @@ public class NotificationService {
         Notification notification = new Notification();
         notification.setNotificationType(NotificationType.INVITATION);
         notification.setTarget(invitation.getReader());
-        notification.setMessage(((Long)invitation.getActivity().getId()).toString());
+        notification.setMessage(((Long)invitation.getEvent().getId()).toString());
         notification.setTrigger(trigger);
         notification.setRead(false);
         notificationRepository.save(notification);
@@ -338,17 +338,13 @@ public class NotificationService {
         }
     }
 
-    public void newGhostMessage(User reader) {
-        androidPushNotificationsService.newGhostMessage(reader);
-    }
-
     public void newFollow(User target, User trigger) {
         createNotification(target,trigger,NotificationType.FOLLOW,null);
         androidPushNotificationsService.newFollow(trigger,target);
     }
 
-    public void sendReminderOfDay(Map<User,Activity> attendantsOfDay) {
-        for(Map.Entry<User,Activity> u:attendantsOfDay.entrySet()){
+    public void sendReminderOfDay(Map<User, Event> attendantsOfDay) {
+        for(Map.Entry<User, Event> u:attendantsOfDay.entrySet()){
             createNotification(u.getKey(),u.getValue().getCreator(),NotificationType.REMINDER,Long.valueOf(u.getValue().getId()).toString());
             androidPushNotificationsService.newReminder(u.getKey(),u.getValue().getCreator());
         }

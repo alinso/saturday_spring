@@ -21,7 +21,7 @@ public class AdminService {
     UserService userService;
 
     @Autowired
-    ActivityRepository activityRepository;
+    EventRepository eventRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -30,7 +30,7 @@ public class AdminService {
     ComplainRepository complainRepository;
 
     @Autowired
-    ActivityService activityService;
+    EventService eventService;
 
 
     @Autowired
@@ -41,7 +41,7 @@ public class AdminService {
     MessageService messageService;
 
     @Autowired
-    ActivityRequesRepository activityRequesRepository;
+    EventRequestRepository eventRequestRepository;
 
     @Autowired
     FileStorageUtil fileStorageUtil;
@@ -54,10 +54,10 @@ public class AdminService {
 
 
     @Autowired
-    VibeRepository vibeRepository;
+    VoteRepository voteRepository;
 
     @Autowired
-    ActivityRequestService activityRequestService;
+    EventRequestService eventRequestService;
 
     /////////////////////admin////////////////////////////////////////////////////////////////////////////////
     public List<Complain> getAllComplaints() {
@@ -85,12 +85,12 @@ public class AdminService {
 
 
             User user = userRepository.getOne(id);
-            List<Activity> res = activityRepository.findByCreatorOrderByDeadLineDesc(user);
+            List<Event> res = eventRepository.findByCreatorOrderByDeadLineDesc(user);
 
-            for (Activity a : res) {
-                List<ActivityRequest> activityRequests = activityRequesRepository.findByActivityId(a.getId());
-                for (ActivityRequest r : activityRequests) {
-                    activityRequesRepository.deleteById(r.getId());
+            for (Event a : res) {
+                List<EventRequest> eventRequests = eventRequestRepository.findByEventId(a.getId());
+                for (EventRequest r : eventRequests) {
+                    eventRequestRepository.deleteById(r.getId());
                 }
             }
             //Delete profile photo
@@ -103,9 +103,9 @@ public class AdminService {
                 photoService.deletePhoto(p.getFileName());
             }
 
-            //Delete Activity Photos
-            List<Activity> meetingsCreatedByUser = activityRepository.findByCreatorOrderByDeadLineDesc(user);
-            for (Activity a : meetingsCreatedByUser) {
+            //Delete EVENT Photos
+            List<Event> meetingsCreatedByUser = eventRepository.findByCreatorOrderByDeadLineDesc(user);
+            for (Event a : meetingsCreatedByUser) {
                 if (a.getPhotoName() != null)
                     fileStorageUtil.deleteFile(a.getPhotoName());
             }
@@ -141,17 +141,17 @@ public class AdminService {
 
     }
 
-    public void deleteActivity(Long id) {
+    public void deleteEvent(Long id) {
         User currentBatman = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (currentBatman.getId() != 3211)
             throw new UserWarningException("Erişim Yok!");
 
 
-        Activity activity = activityRepository.getOne(id);
+        Event event = eventRepository.getOne(id);
 
         MessageDto messageDto = new MessageDto();
-        messageDto.setReader(userService.toProfileDto(activity.getCreator()));
+        messageDto.setReader(userService.toProfileDto(event.getCreator()));
         messageDto.setMessage("Merhaba:) İceriği açıklayıcı-net olmayan" +
                 " veya ticari amaç taşıyan " +
                 "veya tanıtım amacı taşıyan " +
@@ -179,7 +179,7 @@ public class AdminService {
 
         MessageDto messageDto = new MessageDto();
         messageDto.setReader(userService.toProfileDto(user));
-        messageDto.setMessage("Merhaba:) Activity Friend içinde insanların gerçek-tam isimlerini kullanmaları gerektiğini düşünüyoruz. Bu nedenle tam ismini kullanırsan seviniriz:)");
+        messageDto.setMessage("Merhaba:) EVENT Friend içinde insanların gerçek-tam isimlerini kullanmaları gerektiğini düşünüyoruz. Bu nedenle tam ismini kullanırsan seviniriz:)");
 
         messageService.send(messageDto);
 
@@ -209,20 +209,20 @@ public class AdminService {
 
 
     public List<Long> deletePartyVotes() {
-        List<Vibe> allVibes = vibeRepository.findAll();
-        List<Long> deletedVibeIds = new ArrayList<>();
-        for (Vibe v : allVibes) {
-            if(!activityRequestService.haveTheseUsersMeetAllTimes(v.getWriter().getId(),v.getReader().getId())){
-                deletedVibeIds.add(v.getId());
+        List<Vote> allVotes = voteRepository.findAll();
+        List<Long> deletedVoteIds = new ArrayList<>();
+        for (Vote v : allVotes) {
+            if(!eventRequestService.haveTheseUsersMeetAllTimes(v.getWriter().getId(),v.getReader().getId())){
+                deletedVoteIds.add(v.getId());
                 v.setDeleted(1);
-                vibeRepository.save(v);
+                voteRepository.save(v);
             }
             else{
                 v.setDeleted(0);
-                vibeRepository.save(v);
+                voteRepository.save(v);
             }
 
         }
-        return deletedVibeIds;
+        return deletedVoteIds;
     }
 }

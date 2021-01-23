@@ -14,7 +14,7 @@ public class DayAction extends BaseEntity {
     private Integer requestCount;
 
     @Column()
-    private Integer activityCount;
+    private Integer eventCount;
 
     public User getUser() {
         return user;
@@ -32,11 +32,11 @@ public class DayAction extends BaseEntity {
         this.requestCount = requestCount;
     }
 
-    public Integer getActivityCount() {
-        return activityCount;
+    public Integer getEventCount() {
+        return eventCount;
     }
 
-    public void setActivityCount(Integer activityCount) {
-        this.activityCount = activityCount;
+    public void setEventCount(Integer eventCount) {
+        this.eventCount = eventCount;
     }
 }

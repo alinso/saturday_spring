@@ -1,17 +1,14 @@
 package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.*;
-import com.alinso.myapp.entity.dto.user.ProfileDto;
-import com.alinso.myapp.entity.enums.ActivityRequestStatus;
 import com.alinso.myapp.entity.enums.PremiumDuration;
 import com.alinso.myapp.entity.enums.PremiumType;
 import com.alinso.myapp.entity.enums.ReviewType;
 import com.alinso.myapp.mail.service.MailService;
-import com.alinso.myapp.repository.ActivityRequesRepository;
+import com.alinso.myapp.repository.EventRequestRepository;
 import com.alinso.myapp.repository.FollowRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,10 +18,10 @@ import java.util.List;
 public class UserEventService {
 
 
-    private final Integer NEW_ACTIVITY_POINT = 0;
+    private final Integer NEW_EVENT_POINT = 0;
     private final Integer NEW_APPROVAL_POINT = 0;
     private final Integer FRIEND_REVIEW_POINT = 0;
-    private final Integer ACTIVITY_REVIEW_POINT = 0;
+    private final Integer eventrewiew = 0;
 
     @Autowired
     UserRepository userRepository;
@@ -45,27 +42,21 @@ public class UserEventService {
     ReferenceService referenceService;
 
     @Autowired
-    ActivityRequesRepository activityRequesRepository;
-
-    @Autowired
-    PremiumService premiumService;
-
-    @Autowired
-    MailService mailService;
+    EventRequestRepository eventRequestRepository;
 
 
-    public void newActivity(User user, Activity activity) {
+    public void newEvent(User user, Event event) {
         //user.setPoint((user.getPoint() + NEW_ACTIVITY_POINT));
         //user.setActivityCount((user.getActivityCount() + 1));
 
         List<User> followers = new ArrayList<>();
 
-        if(!activity.getSecret())
+        if(!event.getSecret())
         for(User follower:followRepository.findFollowersOfUser(user)){
             if(!blockService.isThereABlock(follower.getId()))
            followers.add(follower);
         }
-        notificationService.newMeeting(followers, activity.getId());
+        notificationService.newEvent(followers, event.getId());
         userRepository.save(user);
     }
 
@@ -97,8 +88,8 @@ public class UserEventService {
         notificationService.newRequest(target,itemId);
     }
 
-    public void newApproval(User target,Activity activity) {
-        notificationService.newRequestApproval(target,activity.getId());
+    public void newApproval(User target, Event event) {
+        notificationService.newRequestApproval(target, event.getId());
 
         //give APPROVED user his points
        // target.setPoint((target.getPoint()+ NEW_APPROVAL_POINT));
@@ -210,8 +201,8 @@ public class UserEventService {
         // premiumService.saveGift(child,PremiumDuration.SONE_MONTH);
     }
 
-    public void newMessageActivity(User reader, Activity triggerActivity){
-        notificationService.newMessageActivity(reader,triggerActivity);
+    public void newMessageEvent(User reader, Event triggerEvent){
+        notificationService.newMessageEvent(reader, triggerEvent);
     }
 
     public void newPremiumMessage(User reader,User writer) {

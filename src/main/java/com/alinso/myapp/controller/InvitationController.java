@@ -17,10 +17,10 @@ public class InvitationController {
     @Autowired
     InvitationService invitationService;
 
-    @GetMapping("invite/{activityId}/{readerId}")
-    public ResponseEntity<?> findActivities(@PathVariable("activityId") Long activityId, @PathVariable("readerId") Long readerId){
+    @GetMapping("invite/{eventId}/{readerId}")
+    public ResponseEntity<?> findEvents(@PathVariable("eventId") Long eventId, @PathVariable("readerId") Long readerId){
 
-        invitationService.send(readerId,activityId);
+        invitationService.send(readerId,eventId);
 
         return new ResponseEntity<String>("OK", HttpStatus.OK);
     }

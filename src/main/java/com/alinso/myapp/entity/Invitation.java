@@ -10,19 +10,19 @@ public class Invitation extends BaseEntity {
 
     @ManyToOne
     @NotNull
-    private Activity activity;
+    private Event event;
 
 
     @ManyToOne
     @NotNull
     private  User reader;
 
-    public Activity getActivity() {
-        return activity;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setActivity(Activity activity) {
-        this.activity = activity;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     public User getReader() {

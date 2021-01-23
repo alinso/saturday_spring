@@ -2,7 +2,7 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.enums.Gender;
-import com.alinso.myapp.repository.ActivityRepository;
+import com.alinso.myapp.repository.EventRepository;
 import com.alinso.myapp.repository.CityRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class StatisticsService {
 
 
     @Autowired
-    ActivityRepository activityRepository;
+    EventRepository eventRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -28,12 +28,12 @@ public class StatisticsService {
 
     public Integer aasFemale() {
         Date now = new Date();
-        return activityRepository.aasByGender(Gender.FEMALE, now);
+        return eventRepository.aasByGender(Gender.FEMALE, now);
     }
 
     public Integer aasMale() {
         Date now = new Date();
-        return activityRepository.aasByGender(Gender.MALE, now);
+        return eventRepository.aasByGender(Gender.MALE, now);
     }
 
     public List<Integer> newWomenThreeMonths() {

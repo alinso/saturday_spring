@@ -15,8 +15,8 @@ public interface DayActionRepository extends JpaRepository<DayAction, Long> {
 
     @Transactional
     @Modifying
-    @Query("update DayAction d set d.activityCount=0")
-    void clearActivity();
+    @Query("update DayAction d set d.eventCount=0")
+    void clearEvent();
 
 
     @Transactional

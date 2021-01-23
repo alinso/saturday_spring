@@ -1,18 +1,16 @@
 package com.alinso.myapp.repository;
 
-import com.alinso.myapp.entity.Discover;
+import com.alinso.myapp.entity.Announcement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import java.util.Date;
 import java.util.List;
 
-public interface DiscoverRepository extends JpaRepository<Discover,Long>  {
+public interface DiscoverRepository extends JpaRepository<Announcement,Long>  {
 
 
-    List<Discover> findAll();
+    List<Announcement> findAll();
 
-    @Query("select d.id from Discover  d where d.youtube <> ''")
+    @Query("select d.id from Announcement  d where d.youtube <> ''")
     List<Long> findIds();
 }

@@ -40,7 +40,7 @@ public class MessageService {
     UserEventService userEventService;
 
     @Autowired
-    ActivityRequestService activityRequestService;
+    EventRequestService eventRequestService;
 
     @Autowired
     BlockService blockService;
@@ -50,7 +50,7 @@ public class MessageService {
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User reader = userService.findEntityById(messageDto.getReader().getId());
 
-        if(!activityRequestService.haveTheseUsersMeet(reader.getId(),writer.getId()))
+        if(!eventRequestService.haveTheseUsersMeet(reader.getId(),writer.getId()))
             throw new UserWarningException("Erişim Yok");
 
         if (blockService.isThereABlock(reader.getId()))
@@ -229,12 +229,12 @@ public class MessageService {
         //this will be changed in future
         if (reader.getGender() == Gender.FEMALE) {
             sender = userService.findByEmail("superman@gmail.com");
-            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, Activity Friend uygulamadan ziyade sosyal bir oluşumdur:)  \n" +
-                    " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
+            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, EVENT Friend uygulamadan ziyade sosyal bir oluşumdur:)  \n" +
+                    " EVENT Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
                     " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
                     "\n" +
                     "\n" +
-                    " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
+                    " EVENT Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
                     "Sorunsuzca aktivite açıp, aktivitelere katılabilceğin bir ortam kurmaya çalışıyoruz. ÖZELLİKLE KADINLARA KARŞI RAHATSIZLIK VERİCİ EN UFAK BİR DURUMA DAHİ TAHAMMÜLÜMÜZ YOK. ISRARCI, RAHATSIZLIK VERİCİ,UYGULAMA AMACI DIŞINDA" +
                     " YAZAN OLURSA ŞİKAYET ET, BURADA ONLARA ASLA MÜSAMAHA GÖSTERMİYORUZ. " +
                     "\n" +
@@ -250,15 +250,15 @@ public class MessageService {
         else {
             sender = userService.findByEmail("superman@gmail.com");
 
-            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, Activity Friend uygulamadan ziyade sosyal bir oluşumdur:)  \n" +
-                    " Activity Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
+            message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, EVENT Friend uygulamadan ziyade sosyal bir oluşumdur:)  \n" +
+                    " EVENT Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
                     " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
                     "\n" +
                     "\n  ilk 7 gün uygulamamızı test etmen ve görmen için starndart kullanıcı olarak hesabını açtık. Sonrasında devam kullanmaya devam etmek istersen 1 aylık Gold paket alman " +
                     "gerekecek. Dilersen ilerleyen zamanlarda tekrar gold kullanıcı olabilir veya standart kullancı olarak devam edebilirsin. Fakat 7 günlük deneme süresi sonrası devam etmek isteyen " +
                     " kullanıcılardan bunu istiyoruz. Eğer devam etmek istemezseniz de yeni kullanıcılara yer açabilemk adına hesabınız silinecek."+
                     "\n" +
-                    " Activity Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
+                    " EVENT Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
                     " RAHATSIZLIK VERİCİ,ISRARCI,UYGLAMAYI AMACI DIŞINDA KULLANAN PROFİLLERİ SİLİYOR VE MÜSAMAHA GÖSTERMİYORUZ." +
                     "\n" +
                     "\n" +
