@@ -1,7 +1,6 @@
 package com.alinso.myapp.pushNotification;
 
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.repository.SystemMessageRepository;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +21,6 @@ public class AndroidPushNotificationsService {
     private static final String FIREBASE_SERVER_KEY = "AAAAul1ABXA:APA91bEhbiYV3mBnoqMExYz9aGQsWeR4q-JStDPG6Y5BWx-7cvSYwnMMAHhrlcB8oGJvwECjM1HLidOr0PUJ9GQfi3XED2vohrA6CZiW63Ebr8Ry3AwSSKzkSuLxgJOWTYmcCGdcrn6b";
     private static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
 
-    @Autowired
-    SystemMessageRepository systemMessageRepository;
 
 
     private void send(String title, String to, String message) {

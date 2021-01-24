@@ -384,9 +384,9 @@ public class EventService {
         return eventDto;
     }
 
-    public List<EventDto> toDtoList(List<Event> activities) {
+    public List<EventDto> toDtoList(List<Event> events) {
         List<EventDto> eventDtos = new ArrayList<>();
-        for (Event a : activities) {
+        for (Event a : events) {
             eventDtos.add(toDto(a));
         }
         return eventDtos;
@@ -395,23 +395,23 @@ public class EventService {
     public List<EventDto> findAllNonExpiredByInterestsByCityId(Long cityId, Integer pageNum) {
 
         Pageable pageable = PageRequest.of(pageNum, 10);
-        List<Event> activities = eventRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId), pageable);
+        List<Event> events = eventRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId), pageable);
 
         userService.setLastLogin();
 
-        return filterActivities(activities,true);
+        return filterEvents(events,true);
     }
 
 
     public List<EventDto> all(Integer pageNum) {
         Pageable pageable = PageRequest.of(pageNum, 10);
-        List<Event> activities = eventRepository.findAllOrderByDeadLineAsc(new Date(),pageable);
+        List<Event> events = eventRepository.findAllOrderByDeadLineAsc(new Date(),pageable);
 
-        return filterActivities(activities,false);
+        return filterEvents(events,false);
     }
 
 
-    public List<EventDto> filterActivities(List<Event> eventList, Boolean filterInterest){
+    public List<EventDto> filterEvents(List<Event> eventList, Boolean filterInterest){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<EventDto> eventDtos = new ArrayList<>();
@@ -457,7 +457,7 @@ public class EventService {
             events.addAll(eventRepository.findByCreatorOrderByDeadLineDescPaged(user,pageable));
             events.addAll(eventRequestRepository.activitiesAttendedByUserPaged(user, EventRequestStatus.APPROVED,pageable));
 
-        return filterActivities(events,false);
+        return filterEvents(events,false);
     }
 }
 

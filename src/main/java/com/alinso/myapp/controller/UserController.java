@@ -69,9 +69,6 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private ResetPasswordValidator resetPasswordValidator;
-
     @GetMapping("ok")
     public ResponseEntity<?> ok(){
         return new ResponseEntity<>("okkey",HttpStatus.OK);

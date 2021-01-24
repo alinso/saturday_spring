@@ -7,14 +7,10 @@ import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.enums.EventRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
-import com.alinso.myapp.entity.enums.PremiumDuration;
 import com.alinso.myapp.entity.enums.VoteType;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.mail.service.MailService;
 import com.alinso.myapp.repository.*;
-import com.alinso.myapp.service.security.ForgottenPasswordTokenService;
-import com.alinso.myapp.service.security.MailVerificationTokenService;
 import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.util.SendSms;
@@ -84,11 +80,6 @@ public class UserService {
     @Autowired
     ReferenceService referenceService;
 
-    @Autowired
-    MailVerificationTokenService mailVerificationTokenService;
-
-    @Autowired
-    ForgottenPasswordTokenService forgottenPasswordTokenService;
 
     @Autowired
     CityService cityService;
@@ -96,14 +87,11 @@ public class UserService {
     @Autowired
     UserEventService userEventService;
 
-    @Autowired
-    MailService mailService;
 
     @Autowired
     BlockService blockService;
 
-    @Autowired
-    PremiumService premiumService;
+
 
     @Autowired
     VoteRepository voteRepository;
@@ -178,16 +166,13 @@ public class UserService {
         userEventService.newUserRegistered(user);
 
 
-        Premium premium = new Premium();
-        premium.setStartDate(new Date());
 
-
-        if(user.getGender()==Gender.FEMALE) {
-            premium.setDuration(PremiumDuration.GTHREE_MONTHS);
-            premiumService.saveGift(premium, user);
-            user.setTrialUser(0);
-
-        }
+//        if(user.getGender()==Gender.FEMALE) {
+//            premium.setDuration(PremiumDuration.GTHREE_MONTHS);
+//            premiumService.saveGift(premium, user);
+//            user.setTrialUser(0);
+//
+//        }
         if(user.getGender()==Gender.MALE) {
             user.setTrialUser(99);
         }
@@ -496,8 +481,8 @@ public class UserService {
         int FOLLOW = 1;
 
 
-        List<Event> userActivities = eventRepository.last3MonthActivitiesOfUser( user);
-        Integer eventCounts = userActivities.size();
+        List<Event> userLast3MonthEvents = eventRepository.last3MonthEventsOfUser( user);
+        Integer eventCount = userLast3MonthEvents.size();
 
         //opening an activity
         point = point + (eventCount * OPENING_EVENT);
@@ -569,14 +554,14 @@ public class UserService {
 
 
 
-    public List<ProfileDto> top100() {
-        Pageable pageable = PageRequest.of(0, 100);
-        List<User> users = userRepository.top100(pageable);
-
-        List<ProfileDto> profileDtos = toProfileDtoList(users);
-
-        return profileDtos;
-    }
+//    public List<ProfileDto> top100() {
+//        Pageable pageable = PageRequest.of(0, 100);
+//        List<User> users = userRepository.top100(pageable);
+//
+//        List<ProfileDto> profileDtos = toProfileDtoList(users);
+//
+//        return profileDtos;
+//    }
 
 
     public Integer followerCount(Long userId) {
@@ -620,7 +605,6 @@ public class UserService {
         ProfileDto profileDto = modelMapper.map(user, ProfileDto.class);
         profileDto.setAge(UserUtil.calculateAge(user));
         //profileDto.setInterests(hashtagService.findByUserStr(user));
-        profileDto.setPremiumType(premiumService.userPremiumType(user));
         profileDto.setReferenceCode("");
 
         return profileDto;

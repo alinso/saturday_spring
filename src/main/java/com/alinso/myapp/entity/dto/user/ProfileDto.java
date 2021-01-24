@@ -47,6 +47,7 @@ public class ProfileDto {
 
     private String referenceCode;
 
+    private int followerCount;
 
 
 //getter setter
@@ -165,6 +166,14 @@ public class ProfileDto {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public int getFollowerCount() {
+        return followerCount;
+    }
+
+    public void setFollowerCount(int followerCount) {
+        this.followerCount = followerCount;
     }
 }
 

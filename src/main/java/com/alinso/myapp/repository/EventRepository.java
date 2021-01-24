@@ -29,7 +29,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> recentUncommentedEvents(@Param("start")Date start, @Param("finish")Date finish);
 
     @Query("select event from Event event where  event.creator=:creator ")
-    List<Event> last3MonthActivitiesOfUser(@Param("creator") User creator);
+    List<Event> last3MonthEventsOfUser(@Param("creator") User creator);
 
     @Query("select count(event) from Event event where  event.creator.gender=:gender and event.deadLine>:now ")
     Integer aasByGender(@Param("gender")Gender gender, @Param("now")Date now);

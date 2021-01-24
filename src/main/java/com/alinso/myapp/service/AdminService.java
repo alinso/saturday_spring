@@ -34,10 +34,6 @@ public class AdminService {
 
 
     @Autowired
-    BatmanLogRepository batmanLogRepository;
-
-
-    @Autowired
     MessageService messageService;
 
     @Autowired
@@ -187,17 +183,6 @@ public class AdminService {
 
     public void updateExtraPoint(Long id, Integer extraPoint) {
         User user = userService.findEntityById(id);
-
-//////////////////////////////////////////////////////////
-        BatmanLog batmanLog = new BatmanLog();
-        User batman = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        batmanLog.setBatman(batman);
-        batmanLog.setUser(user);
-        batmanLog.setPoint(extraPoint);
-        batmanLog.setOldPoint(user.getExtraPoint());
-        batmanLogRepository.save(batmanLog);
-///////////////////////////////////////////////
         user.setExtraPoint(extraPoint);
         userRepository.save(user);
 

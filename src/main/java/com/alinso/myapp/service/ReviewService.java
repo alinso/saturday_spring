@@ -6,7 +6,6 @@ import com.alinso.myapp.entity.Review;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.review.ReviewDto;
 import com.alinso.myapp.entity.enums.EventRequestStatus;
-import com.alinso.myapp.entity.enums.ReviewType;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.EventRepository;
 import com.alinso.myapp.repository.EventRequestRepository;
@@ -148,8 +147,6 @@ public class ReviewService {
         Review review = modelMapper.map(reviewDto, Review.class);
         review.setWriter(writer);
         review.setReader(reader);
-        if(haveUsersMeetRecently)
-            review.setReviewType(ReviewType.MEETING);
 
         reviewRepository.save(review);
         notificationService.newReview(reader,review.getId());

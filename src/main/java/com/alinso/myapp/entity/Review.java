@@ -1,6 +1,5 @@
 package com.alinso.myapp.entity;
 
-import com.alinso.myapp.entity.enums.ReviewType;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -21,14 +20,6 @@ public class Review extends BaseEntity {
     @NotNull
     private User writer;
 
-    @Column
-    @Enumerated(EnumType.ORDINAL)
-    @NotNull
-    private ReviewType reviewType;
-
-    @Column
-    @NotNull
-    private Boolean isPositive;
 
 
     public String getReview() {
@@ -55,19 +46,4 @@ public class Review extends BaseEntity {
         this.writer = writer;
     }
 
-    public ReviewType getReviewType() {
-        return reviewType;
-    }
-
-    public void setReviewType(ReviewType reviewType) {
-        this.reviewType = reviewType;
-    }
-
-    public Boolean getPositive() {
-        return isPositive;
-    }
-
-    public void setPositive(Boolean positive) {
-        isPositive = positive;
-    }
 }

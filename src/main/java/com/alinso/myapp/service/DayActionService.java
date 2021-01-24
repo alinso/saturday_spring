@@ -2,10 +2,8 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.Event;
 import com.alinso.myapp.entity.DayAction;
-import com.alinso.myapp.entity.Premium;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.Gender;
-import com.alinso.myapp.entity.enums.PremiumDuration;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.DayActionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,22 +141,6 @@ public class DayActionService {
 //                warning="Günde en fazla " + limit + " istek gönderebilirsin!";
 //            }
 //        }
-
-        if(premium!=null){
-
-            if(premium.getDuration()== PremiumDuration.SONE_MONTH || premium.getDuration()==PremiumDuration.STHREE_MONTHS || premium.getDuration()==PremiumDuration.SSIX_MONTHS){
-                limit = SILVER_USER_REQUEST_LIMIT;
-                warning = "Silver kullanıcılar günde en fazla " + limit + " istek gönderebilir!";
-            }
-            if(premium.getDuration()== PremiumDuration.GONE_MONTH || premium.getDuration()==PremiumDuration.GTHREE_MONTHS || premium.getDuration()==PremiumDuration.GSIX_MONTHS){
-                limit = GOLD_USER_REQUEST_LIMIT;
-                warning = "Gold kullanıcılar günde en fazla " + limit + " istek gönderebilir!";
-            }
-            if(premium.getDuration()==PremiumDuration.ORGANIZATOR){
-                limit = ORGANIZATOR_USER_REQUEST_LIMIT;
-                warning = "Profesyonel kullanıcılar günde en fazla " + limit + " istek gönderebilir!";
-            }
-        }
 
         if (dayAction != null)
             if (dayAction.getRequestCount() >= limit) {

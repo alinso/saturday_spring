@@ -87,8 +87,8 @@ public class VoteService {
         }
 
 
-        List<EventRequest> activitiesIAttend = eventRequestRepository.findByApplicantId(u.getId());
-        for (EventRequest r : activitiesIAttend) {
+        List<EventRequest> eventsIAttend = eventRequestRepository.findByApplicantId(u.getId());
+        for (EventRequest r : eventsIAttend) {
 
 
             //only add if I attended it

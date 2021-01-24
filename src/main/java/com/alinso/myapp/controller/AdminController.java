@@ -9,7 +9,6 @@ import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.repository.*;
 import com.alinso.myapp.service.AdminService;
 import com.alinso.myapp.service.DiscoverService;
-import com.alinso.myapp.service.PremiumService;
 import com.alinso.myapp.service.UserEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -75,12 +74,6 @@ public class AdminController {
                 continue;
             if (i > (page * 500))
                 break;
-
-
-            Premium premium  = new Premium();
-            premium.setDuration(PremiumDuration.GONE_MONTH);
-
-            premiumService.saveGift(premium,u);
 
 
             String messageText = u.getName()+" merhaba, Activuss kadınların güçlü ve çoğunlukta olduğu bir platform. Burada sizleri rahatsız edebilecek durumların olmaması ve topluluğumuzu eviniz" +

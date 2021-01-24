@@ -1,10 +1,6 @@
 package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.*;
-import com.alinso.myapp.entity.enums.PremiumDuration;
-import com.alinso.myapp.entity.enums.PremiumType;
-import com.alinso.myapp.entity.enums.ReviewType;
-import com.alinso.myapp.mail.service.MailService;
 import com.alinso.myapp.repository.EventRequestRepository;
 import com.alinso.myapp.repository.FollowRepository;
 import com.alinso.myapp.repository.UserRepository;

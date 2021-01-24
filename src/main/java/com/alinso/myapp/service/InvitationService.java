@@ -27,9 +27,6 @@ public class InvitationService {
     EventRepository eventRepository;
 
     @Autowired
-    PremiumService premiumService;
-
-    @Autowired
     VoteService voteService;
 
     @Autowired
@@ -50,15 +47,8 @@ public class InvitationService {
 
         if(creator.getId()!=1 ) {
             List<Invitation> invitationList = invitationRepository.findByEvent(event);
-            if (invitationList.size() > 3 && !premiumService.userPremiumType(creator).equals("GOLD") &&!premiumService.userPremiumType(creator).equals("ORGANIZATOR")) {
-                throw new UserWarningException("Gold kullanıcılar 25, standart kullanıcılar 3 davet gönderebilir");
-            }
-
-            if (invitationList.size() > 25 && premiumService.userPremiumType(creator).equals("GOLD")) {
-                throw new UserWarningException("Gold kullanıcılar 25 davet gönderebilir");
-            }
-            if (invitationList.size() > 100 && premiumService.userPremiumType(creator).equals("ORGANIZATOR")) {
-                throw new UserWarningException("Profesyonel kullanıcılar 100 davet gönderebilir");
+            if (invitationList.size() >3) {
+                throw new UserWarningException("standart kullanıcılar 3 davet gönderebilir");
             }
         }
 

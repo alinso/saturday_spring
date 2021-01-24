@@ -82,7 +82,7 @@ public class InterestService {
         Pageable pageable  = PageRequest.of(pageNum,10);
 
         List<Event> eventList = eventRepository.findByInterestsOrderByDeadLine(interest,pageable);
-        return eventService.filterActivities(eventList,false);
+        return eventService.filterEvents(eventList,false);
 
     }
 }

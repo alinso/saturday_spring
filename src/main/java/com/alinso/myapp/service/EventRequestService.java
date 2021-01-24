@@ -44,11 +44,6 @@ public class EventRequestService {
     @Autowired
     DayActionService dayActionService;
 
-
-    @Autowired
-    PremiumService premiumService;
-
-
     @Autowired
     VoteService voteService;
 
@@ -95,7 +90,7 @@ public class EventRequestService {
                 //check event req limit
                 List<EventRequest> allRequests = eventRequestRepository.findByEventId(id);
 
-                if (allRequests.size() > 14 &&)
+                if (allRequests.size() > 20)
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
 
                 //check male limit
@@ -175,8 +170,6 @@ public class EventRequestService {
         if (event.getCreator().getId() == loggedUser.getId())
             return true;
 
-        if(premiumService.userPremiumType(loggedUser)=="GOLD" || premiumService.userPremiumType(loggedUser)=="ORGANIZATOR")
-            return true;
 
         Boolean isThisUserApproved = false;
         List<EventRequest> eventRequests = eventRequestRepository.findByEventId(event.getId());
@@ -249,19 +242,7 @@ public class EventRequestService {
         User user = event.getCreator();
 
 
-        Integer limit=8;
-
-        String premiumType = premiumService.userPremiumType(user);
-        if (premiumType.equals("GOLD")) {
-            limit = 12;
-        }
-        if (premiumType.equals("SILVER")) {
-            limit = 12;
-        }
-        if (premiumType.equals("ORGANIZATOR")) {
-            limit = 9999;
-        }
-
+        Integer limit=20;
 
         if (c == limit) {
             throw new UserWarningException("Her aktivite için en fazla " + limit + " kişi onaylayabilirsin");
