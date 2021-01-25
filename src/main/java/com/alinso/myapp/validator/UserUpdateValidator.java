@@ -30,7 +30,7 @@ public class UserUpdateValidator implements Validator {
             errors.rejectValue("phone","Match", "Bu telefon numarası ile kayıt olunmuş");
         }
 
-        ProfileInfoForUpdateDto profileInfoForUpdateDtoInDbEmail = userService.findByEmail(profileInfoForUpdateDto.getEmail());
+        ProfileInfoForUpdateDto profileInfoForUpdateDtoInDbEmail = userService.findByPhone("asfasdf");//todo: aliinsan
 
         if(profileInfoForUpdateDtoInDbEmail !=null && profileInfoForUpdateDto.getId().longValue()!= profileInfoForUpdateDtoInDbEmail.getId().longValue()){
             errors.rejectValue("email","Match", "Bu email adresi ile daha önce kayıt olunmuş");

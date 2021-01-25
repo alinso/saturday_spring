@@ -82,11 +82,6 @@ public class DayActionService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
 
-        if(user.getTrialUser()==100)
-        {
-            throw new UserWarningException("Hesabınızın deneme süresi doldu, aktifleştirmek için bir defaya mahsus gold üye olmalısınız");
-        }
-
         Integer vote  = voteService.calculateVote(user.getId());
 
         if(vote<75 && vote>1 && user.getGender()==Gender.MALE){
@@ -111,11 +106,6 @@ public class DayActionService {
     public void checkRequestLimit(Event event) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
-
-        if(user.getTrialUser()==100)
-        {
-            throw new UserWarningException("Hesabınızın deneme süresi doldu, aktifleştirmek için bir defaya mahsus gold üye olmalısınız");
-        }
 
         Integer vote  = voteService.calculateVote(user.getId());
 

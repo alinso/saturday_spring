@@ -92,7 +92,6 @@ public class UserService {
     BlockService blockService;
 
 
-
     @Autowired
     VoteRepository voteRepository;
 
@@ -109,12 +108,12 @@ public class UserService {
 
         //reference code for men
         Integer starterPoint = 0;
-        User parent=null;
-        if(newUser.getGender()==Gender.MALE) {
+        User parent = null;
+        if (newUser.getGender() == Gender.MALE) {
             parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
         }
 
-        if(newUser.getGender()==Gender.FEMALE && !newUser.getReferenceCode().equals("")){
+        if (newUser.getGender() == Gender.FEMALE && !newUser.getReferenceCode().equals("")) {
             parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
         }
 
@@ -125,7 +124,7 @@ public class UserService {
         newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
         newUser.setPoint(0);
         newUser.setTooNegative(0);
-        newUser.setExtraPoint(starterPoint);
+        newUser.setExtraPercent(starterPoint);
         newUser.setCity(ankara);
 
         newUser.setReferenceCode(referenceCode);
@@ -139,7 +138,7 @@ public class UserService {
         User user = userRepository.save(newUser);
 
 
-       // if (parent != null && parent.getId()!=3212) {
+        // if (parent != null && parent.getId()!=3212) {
         //    parent.setReferenceCode(referenceService.makeReferenceCode());
         //    userRepository.save(parent);
         //}
@@ -160,53 +159,13 @@ public class UserService {
         if (user == null || user.getName().equals("silinen"))
             throw new UserWarningException("Bu kullanıcı bulunamadı");
 
-
         user.setEnabled(true);
         user.setSmsCode(null);
         userEventService.newUserRegistered(user);
-
-
-
-//        if(user.getGender()==Gender.FEMALE) {
-//            premium.setDuration(PremiumDuration.GTHREE_MONTHS);
-//            premiumService.saveGift(premium, user);
-//            user.setTrialUser(0);
-//
-//        }
-        if(user.getGender()==Gender.MALE) {
-            user.setTrialUser(99);
-        }
         userRepository.save(user);
-
         return user;
     }
 
-
-    public Integer getMaleCount() {
-        City city=cityService.findById(Long.valueOf(1));
-        return userRepository.getUserCountGende(city,Gender.MALE);
-    }
-    public Integer getFemaleCount() {
-        City city=cityService.findById(Long.valueOf(1));
-        return userRepository.getUserCountGende(city,Gender.FEMALE);
-    }
-
-
-    //this the registration with mail verification
-//    public User register(User newUser) {
-//
-//        newUser.setConfirmPassword("");
-//        newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
-//        newUser.setPhotoCount(0);
-//        newUser.setReviewCount(0);
-//        newUser.setPoint(0);
-//        newUser.setActivityCount(0);
-//
-//        User user = userRepository.save(newUser);
-//        String token = mailVerificationTokenService.saveToken(user);
-//        mailService.sendMailVerificationMail(user, token);
-//        return user;
-//    }
 
     public void forgottePasswordSendPass(String phone) {
         User user;
@@ -228,43 +187,13 @@ public class UserService {
         SendSms.send("Saturday yeni şifreniz : " + pass.toString(), phone);
     }
 
-//    public void verifyMail(String tokenString) {
-//        MailVerificationToken token = mailVerificationTokenService.findByActiveToken(tokenString);
-//
-//        if (token == null) {
-//            throw new RecordNotFound404Exception("Geçersiz link");
-//        }
-//        User user = userRepository.findById(token.getWriter().getId()).get();
-//        user.setEnabled(true);
-//
-//        //userEventService.setReferenceChain(user);
-//        userRepository.save(user);
-//        userEventService.newUserRegistered(user);
-//
-//        //if we dont delete token every time user clicks the link, same process above duplicates
-//        mailVerificationTokenService.delete(token);
-//
-//    }
 
-//    public void resetPassword(ResetPasswordDto resetPasswordDto) {
-//        if (resetPasswordDto.getToken() == null) {
-//            throw new RecordNotFound404Exception("Geçersiz link");
-//        }
-//
-//        ForgottenPasswordToken token = forgottenPasswordTokenService.findByToken(resetPasswordDto.getToken());
-//
-//        User user = userRepository.findById(token.getUser().getId()).get();
-//        user.setPassword(bCryptPasswordEncoder.encode(resetPasswordDto.getPassword()));
-//        forgottenPasswordTokenService.delete(token);
-//        userRepository.save(user);
-//    }
-
-
-    public void setLastLogin(){
+    public void setLastLogin() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user.setLastLogin(new Date());
         userRepository.save(user);
     }
+
     public User findEntityById(Long id) {
         try {
             return userRepository.findById(id).get();
@@ -280,15 +209,9 @@ public class UserService {
         loggedUser.setCity(cityService.findById(profileInfoForUpdateDto.getCityId()));
         loggedUser.setSurname(profileInfoForUpdateDto.getSurname());
         loggedUser.setEmail(profileInfoForUpdateDto.getEmail());
-        //loggedUser.setPhone(profileInfoForUpdateDto.getPhone());
         loggedUser.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(), "dd/MM/yyyy"));
         loggedUser.setMotivation(profileInfoForUpdateDto.getMotivation());
         loggedUser.setAbout(profileInfoForUpdateDto.getAbout());
-        loggedUser.setNick(profileInfoForUpdateDto.getNick());
-        //loggedUser.setGender(profileInfoForUpdateDto.getGender());
-        //loggedUser.setInterests(profileInfoForUpdateDto.getInterests());
-        //loggedUser.setReferenceCode(profileInfoForUpdateDto.getReferenceCode());
-       // hashtagService.saveUserHashtag(loggedUser, profileInfoForUpdateDto.getInterests());
 
         userRepository.save(loggedUser);
         return profileInfoForUpdateDto;
@@ -313,7 +236,6 @@ public class UserService {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             profileInfoForUpdateDto.setbDateString(DateUtil.dateToString(user.getBirthDate(), "dd/MM/yyyy"));
-           // profileInfoForUpdateDto.setInterests(hashtagService.findByUserStr(user));
 
             profileInfoForUpdateDto.setReferenceCode("");
 
@@ -333,17 +255,6 @@ public class UserService {
             return null;
         }
     }
-
-    public ProfileInfoForUpdateDto findByEmail(String email) {
-        try {
-            User user = userRepository.findByEmail(email).get();
-            ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
-            return profileInfoForUpdateDto;
-        } catch (NoSuchElementException e) {
-            return null;
-        }
-    }
-
 
     public void deleteById(Long id) {
 
@@ -424,7 +335,7 @@ public class UserService {
     public List<ProfileDto> searchUser(String searchText, Integer pageNum) {
 
         Pageable pageable = PageRequest.of(pageNum, 20);
-        searchText.replaceAll("\\s+","");
+        searchText.replaceAll("\\s+", "");
         List<User> users = userRepository.searchUser(searchText, pageable);
         List<ProfileDto> profileDtos = new ArrayList<>();
         for (User user : users) {
@@ -450,7 +361,7 @@ public class UserService {
 //    }
     public Integer calculateUserPoint(User user) {
 
-        if(user.getId()==3212){
+        if (user.getId() == 3212) {
             return 0;
         }
 
@@ -475,13 +386,13 @@ public class UserService {
         int SEND_REQUEST = 2;
         int OPENING_EVENT = 5;
 
-        if(user.getGender()==Gender.FEMALE)
-            OPENING_EVENT=10;
+        if (user.getGender() == Gender.FEMALE)
+            OPENING_EVENT = 10;
 
         int FOLLOW = 1;
 
 
-        List<Event> userLast3MonthEvents = eventRepository.last3MonthEventsOfUser( user);
+        List<Event> userLast3MonthEvents = eventRepository.last3MonthEventsOfUser(user);
         Integer eventCount = userLast3MonthEvents.size();
 
         //opening an activity
@@ -531,7 +442,7 @@ public class UserService {
                 negativeVoteCount++;
         }
 
-        if (negativeVoteCount*6 > positiveVoteCount*4) {
+        if (negativeVoteCount * 6 > positiveVoteCount * 4) {
             user.setTooNegative(1);
         } else {
             point = point + voteListOfWriter.size() * VOTE;
@@ -545,13 +456,12 @@ public class UserService {
 
 
         //complain count
-       // Integer complainCount = complainRepository.last3MonthscountOfComplaintsByTheUser(user, threeMonthsAgo);
-       // point = point + (complainCount * COMPLAIN);
+        // Integer complainCount = complainRepository.last3MonthscountOfComplaintsByTheUser(user, threeMonthsAgo);
+        // point = point + (complainCount * COMPLAIN);
 
 
         return point;
     }
-
 
 
 //    public List<ProfileDto> top100() {

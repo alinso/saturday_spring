@@ -39,20 +39,6 @@ public class User extends BaseEntity implements UserDetails {
     private Integer percent;
 
     @Column
-    private String nick;
-
-    @Column
-    private String title;//profsyonel kullanıcılar iin tanımlayıcı
-
-    @Column
-    private Integer trialUser;
-
-    @Column
-    @Email(message = "Geçerli bir email adresi giriniz")
-    @NotBlank(message = "Email adresi boş olamaz")
-    private String email;
-
-    @Column
     private Integer tooNegative;
 
     @Column
@@ -83,6 +69,10 @@ public class User extends BaseEntity implements UserDetails {
     private String profilePicName = "";
 
     @Column
+    private Integer smsCode;
+
+
+    @Column
     @Enumerated(EnumType.ORDINAL)
     @NotNull(message = "Cinsiyet Seçiniz")
     private Gender gender;
@@ -110,11 +100,10 @@ public class User extends BaseEntity implements UserDetails {
     private  String firebaseId;
 
     @Column
-    private Integer extraPoint;
+    private Integer extraPercent;
 
     @Column
     private String role;
-
 
     public Integer getSmsCode() {
         return smsCode;
@@ -123,9 +112,6 @@ public class User extends BaseEntity implements UserDetails {
     public void setSmsCode(Integer smsCode) {
         this.smsCode = smsCode;
     }
-
-    @Column
-    private Integer smsCode;
 
 
 
@@ -182,13 +168,8 @@ public class User extends BaseEntity implements UserDetails {
         this.referenceCode = referenceCode;
     }
 
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email.toLowerCase();
+    public void setEmail(String phone) {
+        this.phone = phone;
     }
 
     public String getPassword() {
@@ -244,7 +225,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return phone;
     }
 
 
@@ -326,12 +307,12 @@ public class User extends BaseEntity implements UserDetails {
         this.role = role;
     }
 
-    public Integer getExtraPoint() {
-        return extraPoint;
+    public Integer getExtraPercent() {
+        return extraPercent;
     }
 
-    public void setExtraPoint(Integer extraPoint) {
-        this.extraPoint = extraPoint;
+    public void setExtraPercent(Integer extraPoint) {
+        this.extraPercent = extraPoint;
     }
 
     public Integer getTooNegative() {
@@ -351,29 +332,6 @@ public class User extends BaseEntity implements UserDetails {
         this.lastLogin = lastLogin;
     }
 
-    public Integer getTrialUser() {
-        return trialUser;
-    }
-
-    public void setTrialUser(Integer trialUser) {
-        this.trialUser = trialUser;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getNick() {
-        return nick;
-    }
-
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
 
     public Integer getPercent() {
         return percent;

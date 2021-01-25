@@ -20,6 +20,7 @@ public class StatisticsService {
     @Autowired
     EventRepository eventRepository;
 
+
     @Autowired
     UserRepository userRepository;
 

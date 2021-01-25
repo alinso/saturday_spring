@@ -11,6 +11,7 @@ import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.DeletedConversationRepository;
 import com.alinso.myapp.repository.MessageRepository;
 import com.alinso.myapp.util.DateUtil;
+import com.sun.org.apache.bcel.internal.generic.LNEG;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -228,7 +229,7 @@ public class MessageService {
 
         //this will be changed in future
         if (reader.getGender() == Gender.FEMALE) {
-            sender = userService.findByEmail("superman@gmail.com");
+            sender = userService.getMyProfileInfoForUpdate();
             message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, EVENT Friend uygulamadan ziyade sosyal bir oluşumdur:)  \n" +
                     " EVENT Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +
                     " Üstelik sen de başkalarının aktivitelerine katılabilir, yeni insanlarla tanışabilirsin." +
@@ -248,7 +249,7 @@ public class MessageService {
                     "İyi eğlenceler:)");
         }
         else {
-            sender = userService.findByEmail("superman@gmail.com");
+            sender = userService.getMyProfileInfoForUpdate();
 
             message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, EVENT Friend uygulamadan ziyade sosyal bir oluşumdur:)  \n" +
                     " EVENT Friend sayesinde bir şey yapacağın zaman yalnız kalmak istemezsen bunu paylaşabilir ve aktivitende(yemek yemek, dışarı çıkmak, konsere gitmek vs...) sana eşlik edecek kişiler bulabilirsin." +

@@ -112,6 +112,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/profile/**").permitAll()
                 .antMatchers("/user/ok/**").permitAll()
                 .antMatchers("/m/a/**").permitAll()
+                .antMatchers("/application/**").permitAll()
                 .antMatchers("/xbatmany/updatePoint/").permitAll()
                 .antMatchers("/xbatmany/updateScore/").permitAll()
                 .antMatchers("/lkaldjfnuterhjbsfsdf/**").hasRole("ADMIN")

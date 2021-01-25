@@ -30,6 +30,8 @@ public class StatisticsController {
         return new ResponseEntity<String>(aasFemale.toString(),HttpStatus.OK);
     }
 
+
+
     @GetMapping("maleCount")
     public ResponseEntity<?> maleCount(){
         Integer aasFemale  =statistics.maleCount();

@@ -75,23 +75,6 @@ public class UserController {
     }
 
 
-    @GetMapping("maleCount")
-    public ResponseEntity<?> maleCount(){
-
-        Integer maleCount = userService.getMaleCount();
-
-        return new ResponseEntity<>(maleCount,HttpStatus.OK);
-    }
-
-    @GetMapping("femaleCount")
-    public ResponseEntity<?> femaleCount(){
-
-        Integer maleCount = userService.getFemaleCount();
-
-        return new ResponseEntity<>(maleCount,HttpStatus.OK);
-    }
-
-
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result) {
@@ -105,7 +88,7 @@ public class UserController {
                 )
         );
 
-        ProfileInfoForUpdateDto user = userService.findByEmail(loginRequest.getUsername());
+        ProfileInfoForUpdateDto user = userService.findByPhone("string phone");//todo aliinsan
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = SecurityConstants.TOKEN_PREFIX + tokenProvider.generateToken(authentication);

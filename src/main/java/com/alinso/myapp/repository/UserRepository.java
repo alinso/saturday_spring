@@ -17,8 +17,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByEmail(String email);
-
     @Query("select user from User user where user.phone like CONCAT('%',:phone,'%') ")
     User findByPhone(@Param("phone") String phone);
 
@@ -72,8 +70,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select user from User user where user.city=:city and user.point>=:point")
     List<User> findAbovePoint(@Param("point") int point, @Param("city") City city);
 
-    @Query("select user from User user where user.trialUser=:trial")
-    List<User> findMaleTrialUsers(@Param("trial") Integer trial);
 
     @Query("select count(user) from User user where user.gender=:gender and user.createdAt>:start and user.createdAt<:finish")
     Integer userCountCreatedGivenDate(@PathVariable("gender") Gender gender, @Param("start")Date start, @Param("finish") Date finish);
@@ -88,8 +84,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select count(user) from User user where user.gender=:gender and user.city=:city")
     Integer getUserCountGende(@Param("city")City city, @Param("gender")Gender gender);
 
-    @Query("select user from User user where user.gender=:gender and user.city=:city and user.trialUser=:trialUser")
-    List<User> findtrialUsers(@Param("trialUser") int trialUser, @Param("city")City city, @Param("gender")Gender male);
 
 }
 

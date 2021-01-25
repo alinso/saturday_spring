@@ -183,7 +183,7 @@ public class AdminService {
 
     public void updateExtraPoint(Long id, Integer extraPoint) {
         User user = userService.findEntityById(id);
-        user.setExtraPoint(extraPoint);
+        user.setExtraPercent(extraPoint);
         userRepository.save(user);
 
     }

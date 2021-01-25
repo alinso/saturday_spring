@@ -63,10 +63,7 @@ public class MessageWallService {
 
 
 
-            String code = g.getWriter().getNick();
-            if(code==null || code.equals("")) {
-                code = "profil-bilgilerim kısmından nick alsana sen";
-            }
+            String code = loggedUser.getName();
 
 
 
@@ -105,11 +102,7 @@ public class MessageWallService {
 
 
 
-            String code = g.getWriter().getNick();
-            if(code==null) {
-                code="profil-bilgilerim kısmından nick alsana sen";
-            }
-
+            String code = g.getWriter().getName();
 
             String msgConcate = "<div style='margin-left:5px;word-wrap:break-word;font-size:12px' >"+g.getMessage()+"<br/><strong>("+code+")</strong></div>" +
                     "<span style='float:right;font-size:11px;color:gray'>"+ DateUtil.dateToString(g.getCreatedAt(),"dd/MM HH:mm")+"</span>";
