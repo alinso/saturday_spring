@@ -27,17 +27,17 @@ public class ReferenceController {
     UserRepository userRepository;
 
 
-    @GetMapping("/myReferenceCode")
-    public ResponseEntity<?> myReferenceCode(){
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(user.getReferenceCode().equals("") || user.getReferenceCode()==null)
-            user.setReferenceCode(referenceService.makeReferenceCode());
-        userRepository.save(user);
-
-        String referenceCode = user.getReferenceCode();
-
-        return new ResponseEntity<>(referenceCode,HttpStatus.OK);
-    }
+//    @GetMapping("/myReferenceCode")
+//    public ResponseEntity<?> myReferenceCode(){
+//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if(user.getReferenceCode().equals("") || user.getReferenceCode()==null)
+//            user.setReferenceCode(referenceService.makeReferenceCode());
+//        userRepository.save(user);
+//
+//        String referenceCode = user.getReferenceCode();
+//
+//        return new ResponseEntity<>(referenceCode,HttpStatus.OK);
+//    }
 
     @GetMapping("/myReferences")
     public ResponseEntity<?> myReferences(){

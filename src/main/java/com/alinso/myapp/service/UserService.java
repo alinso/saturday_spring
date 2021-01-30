@@ -5,6 +5,7 @@ import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
+import com.alinso.myapp.entity.dto.user.RegisterDto;
 import com.alinso.myapp.entity.enums.EventRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.entity.enums.VoteType;
@@ -31,6 +32,8 @@ import java.util.*;
 @Service
 public class UserService {
 
+    // USER ID :1 AND USER ID 4 IS USED FOR TESTING.
+// THESE 2 USERS SHOULD NOT BE BOTHERED
 
     @Autowired
     ReviewService reviewService;
@@ -80,6 +83,8 @@ public class UserService {
     @Autowired
     ReferenceService referenceService;
 
+    @Autowired
+    ReferenceRepository referenceRepository;
 
     @Autowired
     CityService cityService;
@@ -100,69 +105,31 @@ public class UserService {
     ComplainRepository complainRepository;
 
     //this the registration without mail verification
-    public User register(User newUser) {
+    public User register(RegisterDto registerDto) {
 
+        User userInDb = userRepository.findByApprovalCode(registerDto.getApprovalCode());
+
+        if (userInDb == null) {
+            throw new UserWarningException("no user found!");
+        }
         City ankara = cityService.findById(Long.valueOf(1));
-        String referenceCode = referenceService.makeReferenceCode();
+        String newReferenceCode = referenceService.makeReferenceCode();
 
+        userInDb.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
+        userInDb.setPoint(0);
+        userInDb.setTooNegative(0);
+        userInDb.setExtraPercent(0);
+        userInDb.setCity(ankara);
+        userInDb.setApprovalCode(null);
+        userInDb.setEnabled(true);
+        userInDb.setGender(registerDto.getGender());
+        User user = userRepository.save(userInDb);
 
-        //reference code for men
-        Integer starterPoint = 0;
-        User parent = null;
-        if (newUser.getGender() == Gender.MALE) {
-            parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
-        }
+        Reference reference = new Reference();
+        reference.setReferenceCode(newReferenceCode);
+        reference.setParent(user);
+        referenceRepository.save(reference);
 
-        if (newUser.getGender() == Gender.FEMALE && !newUser.getReferenceCode().equals("")) {
-            parent = userRepository.findByReferenceCode(newUser.getReferenceCode());
-        }
-
-        if (newUser.getPhone().length() == 10)
-            newUser.setPhone("0" + newUser.getPhone());
-
-        newUser.setConfirmPassword("");
-        newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
-        newUser.setPoint(0);
-        newUser.setTooNegative(0);
-        newUser.setExtraPercent(starterPoint);
-        newUser.setCity(ankara);
-
-        newUser.setReferenceCode(referenceCode);
-        newUser.setEnabled(false);
-        newUser.setParent(parent);
-
-
-        Random rnd = new Random();
-        Integer code = rnd.nextInt(999999);
-        newUser.setSmsCode(code);
-        User user = userRepository.save(newUser);
-
-
-        // if (parent != null && parent.getId()!=3212) {
-        //    parent.setReferenceCode(referenceService.makeReferenceCode());
-        //    userRepository.save(parent);
-        //}
-
-
-        SendSms.send("Activuss kaydı tamamlamak için sms onay kodu : " + code.toString(), newUser.getPhone());
-        //String token = mailVerificationTokenService.saveToken(user);
-        //mailService.sendMailVerificationMail(user, token);
-        // userEventService.setReferenceChain(user);
-
-        return user;
-    }
-
-
-    public User completeRegistration(Integer code) {
-
-        User user = userRepository.findBySmsCode(code);
-        if (user == null || user.getName().equals("silinen"))
-            throw new UserWarningException("Bu kullanıcı bulunamadı");
-
-        user.setEnabled(true);
-        user.setSmsCode(null);
-        userEventService.newUserRegistered(user);
-        userRepository.save(user);
         return user;
     }
 
@@ -185,6 +152,11 @@ public class UserService {
         userRepository.save(user);
 
         SendSms.send("Saturday yeni şifreniz : " + pass.toString(), phone);
+    }
+
+    public String getNameForRegistration(String approvalCode) {
+        User user = userRepository.findByApprovalCode(approvalCode);
+        return user.getName();
     }
 
 
@@ -252,6 +224,7 @@ public class UserService {
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             return profileInfoForUpdateDto;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -287,14 +260,13 @@ public class UserService {
             }
 
 
-            //move children
-            User batman = userRepository.getOne(Long.valueOf(3211));
-            List<User> children = userRepository.findByParent(user);
-            for (User child : children) {
-                child.setParent(batman);
-                userRepository.save(child);
-            }
-
+            //move children todo: aliinsan handle references
+//            User batman = userRepository.getOne(Long.valueOf(3211));
+//            List<User> children = referenceService.getChildrenOfParent(user);
+//            for (User child : children) {
+//                child.setParent(batman);
+//                userRepository.save(child);
+//            }
 
             StoredProcedureQuery delete_user_sp = entityManager.createNamedStoredProcedureQuery("delete_user_sp");
             delete_user_sp.setParameter("userId", id);

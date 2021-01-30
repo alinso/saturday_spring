@@ -48,6 +48,8 @@ public class AdminService {
     @Autowired
     EntityManager entityManager;
 
+    @Autowired
+    ReferenceService referenceService;
 
     @Autowired
     VoteRepository voteRepository;
@@ -106,13 +108,13 @@ public class AdminService {
                     fileStorageUtil.deleteFile(a.getPhotoName());
             }
 
-            //move children
-            User batman = userRepository.getOne(Long.valueOf(3211));
-            List<User> children = userRepository.findByParent(user);
-            for (User child : children) {
-                child.setParent(batman);
-                userRepository.save(child);
-            }
+            //move children todo:aliinsan handle references
+//            User batman = userRepository.getOne(Long.valueOf(3211));
+//            List<User> children = referenceService.getChildrenOfParent(user);
+//            for (User child : children) {
+//                child.setParent(batman);
+//                userRepository.save(child);
+//            }
 
             User u = new User();
             u.setName("silinen");

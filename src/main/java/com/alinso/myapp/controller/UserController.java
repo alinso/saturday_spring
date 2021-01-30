@@ -6,6 +6,7 @@ import com.alinso.myapp.entity.dto.photo.SinglePhotoUploadDto;
 import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
+import com.alinso.myapp.entity.dto.user.RegisterDto;
 import com.alinso.myapp.repository.CityRepository;
 import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.security.JwtTokenProvider;
@@ -36,7 +37,7 @@ public class UserController {
 
 
     @Autowired
-    UserValidator userValidator;
+    RegisterValidator registerValidator;
 
     @Autowired
     ChangePasswordValidator changePasswordValidator;
@@ -88,12 +89,12 @@ public class UserController {
                 )
         );
 
-        ProfileInfoForUpdateDto user = userService.findByPhone("string phone");//todo aliinsan
+        User user = userRepository.findByPhone(loginRequest.getUsername());
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = SecurityConstants.TOKEN_PREFIX + tokenProvider.generateToken(authentication);
 
-        return ResponseEntity.ok(new JWTLoginSucessReponse(true, jwt, user.getProfilePicName(),user.getCityId()));
+        return ResponseEntity.ok(new JWTLoginSucessReponse(true, jwt, user.getProfilePicName(),user.getCity().getId()));
     }
 
     @GetMapping("deleteAccount/{userId}")
@@ -106,11 +107,11 @@ public class UserController {
         return new ResponseEntity<>("Silindi",HttpStatus.OK);
     }
 
-    @GetMapping("verifyMobile/{code}")
-    public ResponseEntity<?> verifyCode(@PathVariable("code") Integer code){
-        userService.completeRegistration(code);
-        return new ResponseEntity<String>("verified", HttpStatus.OK);
-    }
+//    @GetMapping("verifyMobile/{code}")
+//    public ResponseEntity<?> verifyCode(@PathVariable("code") Integer code){
+//        userService.completeRegistration(code);
+//        return new ResponseEntity<String>("verified", HttpStatus.OK);
+//    }
 
 //    @GetMapping("userCount")
 //    public ResponseEntity<?> userCount(){
@@ -141,19 +142,26 @@ public class UserController {
 //
 //    }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody User user, BindingResult result) {
-        // Validate passwords match
-        userValidator.validate(user, result);
 
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterDto registerDto, BindingResult result) {
+        // Validate passwords match
+        registerValidator.validate(registerDto, result);
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
         if (errorMap != null) return errorMap;
-
-        user.setPassword(user.getPassword());
-        User newUser = userService.register(user);
+        User newUser = userService.register(registerDto);
 
         return new ResponseEntity<String>("Created", HttpStatus.CREATED);
     }
+
+
+    @GetMapping("/getNameForRegistration/{approvalCode}")
+    public ResponseEntity<String> getNameForRegistration(@PathVariable("approvalCode") String approvalCode) {
+        String name= userService.getNameForRegistration(approvalCode);
+        return new ResponseEntity<String>(name, HttpStatus.CREATED);
+    }
+
 
     @GetMapping("/myProfile")
     public ResponseEntity<?> getMyProfileInfoForUpdate() {

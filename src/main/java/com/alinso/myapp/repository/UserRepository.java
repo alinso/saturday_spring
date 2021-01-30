@@ -3,6 +3,7 @@ package com.alinso.myapp.repository;
 import com.alinso.myapp.entity.City;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.Gender;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,16 +18,11 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("select user from User user where user.phone like CONCAT('%',:phone,'%') ")
+    @Query("select user from User user where user.phone=:phone")
     User findByPhone(@Param("phone") String phone);
 
     @Query("select user from User user where  CONCAT( user.name,   user.surname )  like CONCAT('%',:search,'%') ")
     List<User> searchUser(@Param("search") String search, Pageable pageable);
-
-    @Query("select user from User  user where user.parent=:parent")
-    List<User> findByParent(@Param("parent") User parent);
-
-    User findByReferenceCode(String referenceCode);
 
     @Query("select count(*) from User")
     Integer getUserCount();
@@ -50,9 +46,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select user from User user where user.point>=0 and user.point<10")
     List<User> findInactiveUsers();
 
-
-    @Query("select user from User  user where user.smsCode=:code")
-    User findBySmsCode(@Param("code") Integer code);
 
     @Query("select user from User user where user.point>=20")
     List<User> findAbove20();
@@ -85,6 +78,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Integer getUserCountGende(@Param("city")City city, @Param("gender")Gender gender);
 
 
+    @Query("select u from User u where u.approvalCode=:approvalCode")
+    User findByApprovalCode(@Param("approvalCode") String approvalCode);
+
+    @Query("select u from User u where u.name=:name")
+    List<User> findByName(@Param("name") String name);
 }
 
 

@@ -1,13 +1,16 @@
 package com.alinso.myapp.service;
 
+import com.alinso.myapp.entity.Reference;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
+import com.alinso.myapp.repository.ReferenceRepository;
 import com.alinso.myapp.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
@@ -24,11 +27,8 @@ public class ReferenceService {
     @Autowired
     UserService userService;
 
-
-    public void createNewReferenceCode(User parent) {
-        parent.setReferenceCode(makeReferenceCode());
-        userRepository.save(parent);
-    }
+    @Autowired
+    ReferenceRepository referenceRepository;
 
 
     public String makeReferenceCode() {
@@ -50,19 +50,33 @@ public class ReferenceService {
 
     public List<ProfileDto> getMyReferences() {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<User> references = userRepository.findByParent(loggedUser);
-        return userService.toProfileDtoList(references);
+        List<User> myReferences  = getChildrenOfParent(loggedUser);
+        return userService.toProfileDtoList(myReferences);
     }
 
-    public User findByCode(String referenceCode) {
-        User user = userRepository.findByReferenceCode(referenceCode);
-        return user;
+    public User findParentByRefereceCode(String referenceCode) {
+        Reference r = referenceRepository.findByCode(referenceCode);
+        return r.getParent();
     }
 
-    public List<ProfileDto> getChildrenOfParent(User parent) {
-        List<User> references = userRepository.findByParent(parent);
-        return userService.toProfileDtoList(references);
+    public List<User> getChildrenOfParent(User parent) {
+        List<Reference> references = referenceRepository.findByParent(parent);
+        List<User> users = new ArrayList<>();
+        for (Reference r : references) {
+            users.add(r.getChild());
+        }
+        return users;
     }
+
+    public boolean isReferenceCodeValid(String referenceCode) {
+        Reference reference = referenceRepository.getValidReference(referenceCode);
+
+        if (reference == null)
+            return false;
+        else
+            return true;
+    }
+
 }
 
 

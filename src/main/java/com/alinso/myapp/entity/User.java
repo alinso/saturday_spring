@@ -56,8 +56,9 @@ public class User extends BaseEntity implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Interest> interests;
 
-    @NotBlank(message = "Şifre boş olamaz")
     private String password;
+
+    private String approvalCode;
 
     @Transient
     private String confirmPassword;
@@ -69,24 +70,12 @@ public class User extends BaseEntity implements UserDetails {
     private String profilePicName = "";
 
     @Column
-    private Integer smsCode;
-
-
-    @Column
     @Enumerated(EnumType.ORDINAL)
-    @NotNull(message = "Cinsiyet Seçiniz")
     private Gender gender;
 
     @Column(columnDefinition="TEXT")
     private String motivation = "";
 
-    @Column
-    private String referenceCode;
-
-    //reference parent
-    @ManyToOne
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private User parent;
 
     @Column
     @ColumnDefault("0")
@@ -104,14 +93,6 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column
     private String role;
-
-    public Integer getSmsCode() {
-        return smsCode;
-    }
-
-    public void setSmsCode(Integer smsCode) {
-        this.smsCode = smsCode;
-    }
 
 
 
@@ -160,14 +141,6 @@ public class User extends BaseEntity implements UserDetails {
         this.motivation = motivation;
     }
 
-    public String getReferenceCode() {
-        return referenceCode;
-    }
-
-    public void setReferenceCode(String referenceCode) {
-        this.referenceCode = referenceCode;
-    }
-
     public void setEmail(String phone) {
         this.phone = phone;
     }
@@ -193,7 +166,7 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.phone = phone.replaceAll("\\s+","");
     }
 
     public Boolean getEnabled() {
@@ -281,16 +254,6 @@ public class User extends BaseEntity implements UserDetails {
         this.city = city;
     }
 
-
-
-    public User getParent() {
-        return parent;
-    }
-
-    public void setParent(User parent) {
-        this.parent = parent;
-    }
-
     public String getFirebaseId() {
         return firebaseId;
     }
@@ -347,5 +310,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setInterests(Set<Interest> interests) {
         this.interests = interests;
+    }
+
+    public String getApprovalCode() {
+        return approvalCode;
+    }
+
+    public void setApprovalCode(String approvalCode) {
+        this.approvalCode = approvalCode;
     }
 }

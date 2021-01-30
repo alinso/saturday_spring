@@ -110,6 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/forgottenPassword/**").permitAll()
                 .antMatchers("/user/resetPassword/**").permitAll()
                 .antMatchers("/user/profile/**").permitAll()
+                .antMatchers("/user/getNameForRegistration/**").permitAll()
                 .antMatchers("/user/ok/**").permitAll()
                 .antMatchers("/m/a/**").permitAll()
                 .antMatchers("/application/**").permitAll()
@@ -119,6 +120,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/xbatmany/**").hasRole("ADMIN")
                 .antMatchers("/infoPage/update/**").hasRole("ADMIN")
                 .antMatchers("/statistics/**").hasRole("ADMIN")
+                .antMatchers("/application/all/**").hasRole("ADMIN")
                 .antMatchers("/infoPage/findById/**").permitAll()
 
                 .antMatchers(SecurityConstants.H2_URL).permitAll()

@@ -42,7 +42,7 @@ public class MessageWallService {
 
 
     public List<MessageWallDto> getAllMessages(){
-        Pageable pageable = PageRequest.of(0, 100);
+            Pageable pageable = PageRequest.of(0, 100);
         List<MessageWall> messageWallList = messageWallRepository.findLast200(pageable);
         List<MessageWallDto> messages  = new ArrayList<>();
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

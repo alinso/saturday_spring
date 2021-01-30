@@ -15,10 +15,9 @@ public class Application extends BaseEntity{
     @Column
     private String name;
 
-    @NotBlank(message = "Surame can't be empty")
+    @NotBlank(message = "Surname can't be empty")
     @Column
     private String surname;
-
 
     @NotBlank(message = "Phone can't be empty")
     @Column
@@ -47,7 +46,7 @@ public class Application extends BaseEntity{
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.phone = phone.replaceAll("\\s+","");
     }
 
     public String getReferenceCode() {
