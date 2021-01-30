@@ -2,7 +2,9 @@ package com.alinso.myapp.service;
 
 import com.alinso.myapp.entity.Follow;
 import com.alinso.myapp.entity.User;
+import com.alinso.myapp.entity.dto.FollowDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
+import com.alinso.myapp.entity.enums.FollowStatus;
 import com.alinso.myapp.repository.FollowRepository;
 import com.alinso.myapp.repository.NotificationRepository;
 import org.modelmapper.ModelMapper;
@@ -30,45 +32,46 @@ public class FollowService {
     @Autowired
     NotificationService notificationService;
 
-    public Boolean follow(Long leaderId){
+    public FollowStatus sendFollowRequest(Long leaderId) {
 
-        User follower  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User leader =userService.findEntityById(leaderId);
-        Follow follow = followRepository.findFollowingByLeaderAndFollower(leader,follower);
+        User follower = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User leader = userService.findEntityById(leaderId);
+        Follow follow = followRepository.findFollowingByLeaderAndFollower(leader, follower);
 
-        Boolean isFollowing;
-        if(follow==null){
+        FollowStatus status;
+        if (follow == null) {
             Follow newFollow = new Follow();
             newFollow.setFollower(follower);
             newFollow.setLeader(leader);
+            newFollow.setStatus(FollowStatus.WAITING);
             followRepository.save(newFollow);
-            notificationService.newFollow(leader,follower);
-            isFollowing=true;
-        }else{
+            notificationService.newFollow(leader, follower);
+            status = FollowStatus.WAITING;
+        } else {
             followRepository.delete(follow);
-            isFollowing=false;
+            status = FollowStatus.NOT_FOLLOWING;
         }
-        return isFollowing;
+        return status;
     }
 
-    public Boolean isFollowing(Long leaderId) {
+    public FollowStatus isFollowing(Long leaderId) {
 
-        User follower  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User leader =userService.findEntityById(leaderId);
+        User follower = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User leader = userService.findEntityById(leaderId);
 
-        Follow follow = followRepository.findFollowingByLeaderAndFollower(leader,follower);
-        if(follow==null)
-            return false;
+        Follow follow = followRepository.findFollowingByLeaderAndFollower(leader, follower);
+        if (follow == null)
+            return FollowStatus.NOT_FOLLOWING;
         else
-            return true;
+            return follow.getStatus();
     }
 
     public List<ProfileDto> findMyFollowings() {
-        User loggedUser  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<User> followingUsers = followRepository.findUsersFollowedByTheUser(loggedUser);
 
-        List<ProfileDto> profileDtos  = new ArrayList<>();
-        for(User user: followingUsers){
+        List<ProfileDto> profileDtos = new ArrayList<>();
+        for (User user : followingUsers) {
             profileDtos.add(userService.toProfileDto(user));
         }
 
@@ -81,12 +84,30 @@ public class FollowService {
         return followingUsers;
     }
 
-    public List<ProfileDto> findMyFollowers(Integer pageNum) {
-        User loggedUser  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Pageable pageable = PageRequest.of(pageNum,20);
+    public List<FollowDto> findMyFollowers(Integer pageNum) {
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Pageable pageable = PageRequest.of(pageNum, 20);
 
-        List<User> userList  = followRepository.findFollowersOfUserPaged(loggedUser,pageable);
-        return  userService.toProfileDtoList(userList);
+        List<Follow> followers = followRepository.findFollowersOfUserPaged(loggedUser, pageable);
+        List<FollowDto> followDtos = new ArrayList<>();
+        for (Follow f : followers) {
+            FollowDto followDto = new FollowDto();
+            followDto.setFollower(userService.toProfileDto(f.getFollower()));
+            followDto.setStatus(f.getStatus());
+            followDto.setId(f.getId());
+            followDtos.add(followDto);
+        }
+        return followDtos;
+    }
+
+    public void approve(Long followId) {
+        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Follow follow = followRepository.findById(followId).get();
+
+        if (loggedUser.getId() == follow.getLeader().getId()) {
+            follow.setStatus(FollowStatus.APPROVED);
+            followRepository.save(follow);
+        }
     }
 }
 

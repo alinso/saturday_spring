@@ -1,6 +1,8 @@
 package com.alinso.myapp.controller;
 
+import com.alinso.myapp.entity.dto.FollowDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
+import com.alinso.myapp.entity.enums.FollowStatus;
 import com.alinso.myapp.service.FollowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,13 +23,20 @@ public class FollowController {
 
     @GetMapping("follow/{leaderId}")
     public ResponseEntity<?> follow(@PathVariable("leaderId") Long leaderId){
-        Boolean result = followService.follow(leaderId);
+        FollowStatus result = followService.sendFollowRequest(leaderId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("isFollowing/{leaderId}")
+
+    @GetMapping("approve/{followId}")
+    public ResponseEntity<?> approve(@PathVariable("followId") Long followId){
+         followService.approve(followId);
+        return new ResponseEntity<>("approved", HttpStatus.OK);
+    }
+
+    @GetMapping("followStatus/{leaderId}")
     public ResponseEntity<?> isFollowing(@PathVariable("leaderId") Long leaderId){
-        Boolean result = followService.isFollowing(leaderId);
+        FollowStatus result = followService.isFollowing(leaderId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -42,8 +51,8 @@ public class FollowController {
     @GetMapping("myFollowers/{pageNum}")
     public ResponseEntity<?> myFollowers(@PathVariable("pageNum") Integer pageNum){
 
-        List<ProfileDto> profileDtoList =followService.findMyFollowers(pageNum);
-        return new ResponseEntity<>(profileDtoList,HttpStatus.OK);
+        List<FollowDto> followDtos =followService.findMyFollowers(pageNum);
+        return new ResponseEntity<>(followDtos,HttpStatus.OK);
     }
 
 

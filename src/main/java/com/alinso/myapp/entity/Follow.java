@@ -1,5 +1,8 @@
 package com.alinso.myapp.entity;
 
+import com.alinso.myapp.entity.enums.FollowStatus;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -11,6 +14,9 @@ public class Follow extends BaseEntity {
 
     @ManyToOne
     private User follower;
+
+    @Column
+    private FollowStatus status;
 
     public User getLeader() {
         return leader;
@@ -26,5 +32,13 @@ public class Follow extends BaseEntity {
 
     public void setFollower(User follower) {
         this.follower = follower;
+    }
+
+    public FollowStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(FollowStatus status) {
+        this.status = status;
     }
 }
