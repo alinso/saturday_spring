@@ -35,7 +35,6 @@ public class CustomAuthenticationProvider
         }
 
 
-
         if ( BCrypt.checkpw(password, userDetails.getPassword())) {
 
             // use the credentials

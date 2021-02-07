@@ -22,6 +22,9 @@ public class Reference extends BaseEntity{
     @OneToOne
     private User child;
 
+    @OneToOne
+    private Application application;
+
     public String getReferenceCode() {
         return referenceCode;
     }
@@ -44,5 +47,13 @@ public class Reference extends BaseEntity{
 
     public void setChild(User child) {
         this.child = child;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
     }
 }

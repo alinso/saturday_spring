@@ -22,29 +22,27 @@ import java.util.List;
 @RestController
 public class AdminController {
 
-    @Autowired
+
     DiscoverService discoverService;
-
-    @Autowired
     EventRequestRepository eventRequestRepository;
-
-    @Autowired
     UserEventService userEventService;
-
-    @Autowired
     EventRepository eventRepository;
-
-    @Autowired
     MessageRepository messageRepository;
-
-    @Autowired
     UserRepository userRepository;
-
-    @Autowired
     AdminService adminService;
+    CityRepository cityRepository;
 
     @Autowired
-    CityRepository cityRepository;
+    public AdminController(DiscoverService discoverService, EventRequestRepository eventRequestRepository, UserEventService userEventService, EventRepository eventRepository, MessageRepository messageRepository, UserRepository userRepository, AdminService adminService, CityRepository cityRepository) {
+        this.discoverService = discoverService;
+        this.eventRequestRepository = eventRequestRepository;
+        this.userEventService = userEventService;
+        this.eventRepository = eventRepository;
+        this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
+        this.adminService = adminService;
+        this.cityRepository = cityRepository;
+    }
 
     @GetMapping("dashboard")
     public ResponseEntity<?> dashboard() {

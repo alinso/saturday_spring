@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DeletedConversationRepository extends JpaRepository<DeletedConversation,Long> {
 
-    @Query("select d from DeletedConversation d where d.eraserUser=:eraser and d.otherUser=:other")
+    @Query("select d from DeletedConversation d where d.eraserUser=:eraser and d.otherUser=:other and d.eraserUser.enabled=true and d.otherUser.enabled=true")
     DeletedConversation findByUserIds(@Param("eraser")User eraser, @Param("other")User other);
 }

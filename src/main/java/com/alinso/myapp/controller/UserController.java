@@ -107,40 +107,12 @@ public class UserController {
         return new ResponseEntity<>("Silindi",HttpStatus.OK);
     }
 
-//    @GetMapping("verifyMobile/{code}")
-//    public ResponseEntity<?> verifyCode(@PathVariable("code") Integer code){
-//        userService.completeRegistration(code);
-//        return new ResponseEntity<String>("verified", HttpStatus.OK);
-//    }
-
-//    @GetMapping("userCount")
-//    public ResponseEntity<?> userCount(){
-//        return new ResponseEntity<>(userService.getUserCount(),HttpStatus.OK);
-//    }
-
-//    @GetMapping("/verifyMail/{token}")
-//    public ResponseEntity<?> verifyMail(@PathVariable("token") String token) {
-//        userService.verifyMail(token);
-//        return new ResponseEntity<String>("verified", HttpStatus.OK);
-//    }
 
     @GetMapping("forgottenPassword/{phone}")
     public ResponseEntity<?> sendForgottenPasswordMail(@PathVariable("phone") String phone) {
         userService.forgottePasswordSendPass(phone);
         return new ResponseEntity<>("mail sent", HttpStatus.OK);
     }
-
-//    @PostMapping("/resetPassword")
-//    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDto resetPassword, BindingResult result) {
-//        resetPasswordValidator.validate(resetPassword, result);
-//
-//        ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
-//        if (errorMap != null) return errorMap;
-//
-//        userService.resetPassword(resetPassword);
-//        return new ResponseEntity<>("password reset", HttpStatus.OK);
-//
-//    }
 
 
 

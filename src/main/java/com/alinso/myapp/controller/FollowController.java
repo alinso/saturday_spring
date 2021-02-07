@@ -33,6 +33,11 @@ public class FollowController {
          followService.approve(followId);
         return new ResponseEntity<>("approved", HttpStatus.OK);
     }
+    @GetMapping("remove/{followId}")
+    public ResponseEntity<?> remove(@PathVariable("followId") Long followId){
+        followService.remove(followId);
+        return new ResponseEntity<>("approved", HttpStatus.OK);
+    }
 
     @GetMapping("followStatus/{leaderId}")
     public ResponseEntity<?> isFollowing(@PathVariable("leaderId") Long leaderId){
@@ -44,8 +49,8 @@ public class FollowController {
     @GetMapping("myFollowings")
     public ResponseEntity<?> myFollowings(){
 
-        List<ProfileDto> profileDtoList =followService.findMyFollowings();
-        return new ResponseEntity<>(profileDtoList,HttpStatus.OK);
+        List<FollowDto> followDtos =followService.findMyFollowings();
+        return new ResponseEntity<>(followDtos,HttpStatus.OK);
     }
 
     @GetMapping("myFollowers/{pageNum}")

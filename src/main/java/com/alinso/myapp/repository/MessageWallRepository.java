@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface MessageWallRepository extends JpaRepository<MessageWall,Long> {
 
-    @Query("select g from MessageWall g order by g.id DESC")
+    @Query("select g from MessageWall g  where g.writer.enabled=true order by g.id DESC")
     List<MessageWall> findLast200(Pageable pageable);
 
 }

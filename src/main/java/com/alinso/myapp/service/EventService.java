@@ -4,6 +4,7 @@ import com.alinso.myapp.entity.*;
 import com.alinso.myapp.entity.dto.event.EventDto;
 import com.alinso.myapp.entity.dto.event.EventRequestDto;
 import com.alinso.myapp.entity.enums.EventRequestStatus;
+import com.alinso.myapp.entity.enums.FollowStatus;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.EventRepository;
@@ -216,45 +217,45 @@ public class EventService {
         return eventRepository.save(eventInDb);
     }
 
-    public List<EventDto> findAllNonExpiredByCityId(Long cityId, Integer pageNum) {
-
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-
-        Pageable pageable = PageRequest.of(pageNum, 10);
-        List<Event> activities = eventRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId), pageable);
-        List<EventDto> eventDtos = new ArrayList<>();
-
-        //balon futbolu
-        //  User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (pageNum == 0) {
-
-            user.setLastLogin(new Date());
-            userRepository.save(user);
-
-
-            //     Activity selected2 = activityRepository.findById(Long.valueOf(9358)).get();
-            //   Activity selected = activityRepository.findById(Long.valueOf(9361)).get();
-            // Activity selected3 = activityRepository.findById(Long.valueOf(9256)).get();
-            //   activityDtos.add(toDto(selected2));
-            //   activityDtos.add(toDto(selected));
-            // activityDtos.add(toDto(selected3));
-
-        }
-
-        for (Event event : activities) {
-
-            if (blockService.isThereABlock(event.getCreator().getId()))
-                continue;
-
-            if (!canSeeEvent(event))
-                continue;
-
-            EventDto eventDto = toDto(event);
-            eventDtos.add(eventDto);
-        }
-        return eventDtos;
-    }
+//    public List<EventDto> findAllNonExpiredByCityId(Long cityId, Integer pageNum) {
+//
+//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//
+//
+//        Pageable pageable = PageRequest.of(pageNum, 10);
+//        List<Event> activities = eventRepository.findAllNonExpiredByCityIdOrderByDeadLine(new Date(), cityService.findById(cityId), pageable);
+//        List<EventDto> eventDtos = new ArrayList<>();
+//
+//        //balon futbolu
+//        //  User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if (pageNum == 0) {
+//
+//            user.setLastLogin(new Date());
+//            userRepository.save(user);
+//
+//
+//            //     Activity selected2 = activityRepository.findById(Long.valueOf(9358)).get();
+//            //   Activity selected = activityRepository.findById(Long.valueOf(9361)).get();
+//            // Activity selected3 = activityRepository.findById(Long.valueOf(9256)).get();
+//            //   activityDtos.add(toDto(selected2));
+//            //   activityDtos.add(toDto(selected));
+//            // activityDtos.add(toDto(selected3));
+//
+//        }
+//
+//        for (Event event : activities) {
+//
+//            if (blockService.isThereABlock(event.getCreator().getId()))
+//                continue;
+//
+//            if (!canSeeEvent(event))
+//                continue;
+//
+//            EventDto eventDto = toDto(event);
+//            eventDtos.add(eventDto);
+//        }
+//        return eventDtos;
+//    }
 
 
     private boolean canSeeEvent(Event event) {
@@ -266,9 +267,9 @@ public class EventService {
             return true;
         }
 
-        List<User> followings = followService.findFollowingsOfUser(event.getCreator());
-        for (User following : followings) {
-            if (loggedUser.getId() == following.getId()) {
+        List<Follow> followers= followService.findFollowersByUser(event.getCreator());
+        for (Follow f : followers) {
+            if (loggedUser.getId() == f.getFollower().getId() && f.getStatus()== FollowStatus.APPROVED) {
                 return true;
             }
         }
@@ -403,12 +404,12 @@ public class EventService {
     }
 
 
-    public List<EventDto> all(Integer pageNum) {
-        Pageable pageable = PageRequest.of(pageNum, 10);
-        List<Event> events = eventRepository.findAllOrderByDeadLineAsc(new Date(),pageable);
-
-        return filterEvents(events,false);
-    }
+//    public List<EventDto> all(Integer pageNum) {
+//        Pageable pageable = PageRequest.of(pageNum, 10);
+//        List<Event> events = eventRepository.findAllOrderByDeadLineAsc(new Date(),pageable);
+//
+//        return filterEvents(events,false);
+//    }
 
 
     public List<EventDto> filterEvents(List<Event> eventList, Boolean filterInterest){
@@ -432,6 +433,8 @@ public class EventService {
                             break;
                         }
                     }
+                    if(inInterest) //break above cannot break the outer loop so we need this
+                        break;
                 }
                 if(!inInterest)
                     continue;

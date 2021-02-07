@@ -36,11 +36,7 @@ public class InterestService {
 
     public void setUserInterests(List<Long> selectedInterestIds){
 
-        if(selectedInterestIds.size()>10)
-            throw new UserWarningException("En fazla 10 ilgi alanı seçebilirsin");
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-
         //substract old data count
         Set<Interest> oldInterestList = user.getInterests();
         for(Interest interest : oldInterestList){
@@ -63,7 +59,6 @@ public class InterestService {
         }
         interestRepository.saveAll(newInterestList);
 
-
     }
 
     public List<Interest> allInterests() {
@@ -75,14 +70,13 @@ public class InterestService {
         return  user.getInterests();
     }
 
-
     public List<EventDto> eventsByInterestId(Long id, Integer pageNum) {
 
         Interest interest = interestRepository.findById(id).get();
         Pageable pageable  = PageRequest.of(pageNum,10);
 
         List<Event> eventList = eventRepository.findByInterestsOrderByDeadLine(interest,pageable);
+        //todo:remove events of deleted users
         return eventService.filterEvents(eventList,false);
-
     }
 }

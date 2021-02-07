@@ -51,6 +51,7 @@ public class ReferenceService {
     public List<ProfileDto> getMyReferences() {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<User> myReferences  = getChildrenOfParent(loggedUser);
+        //todo:remove disabled references
         return userService.toProfileDtoList(myReferences);
     }
 

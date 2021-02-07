@@ -5,16 +5,15 @@ import com.alinso.myapp.entity.Application;
 import com.alinso.myapp.entity.Reference;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.enums.ApplicationStatus;
+import com.alinso.myapp.entity.enums.UserStatus;
 import com.alinso.myapp.repository.ApplicationRepository;
 import com.alinso.myapp.repository.ReferenceRepository;
 import com.alinso.myapp.repository.UserRepository;
-import com.alinso.myapp.util.SendSms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.jws.soap.SOAPBinding;
 import java.util.List;
 import java.util.Random;
 
@@ -31,7 +30,15 @@ public class ApplicationService {
     ReferenceRepository referenceRepository;
 
     public void save(Application a){
+        a.setApplicationStatus(ApplicationStatus.WAITING);
         applicationRepository.save(a);
+
+        if(!a.getReferenceCode().equals("")){
+            Reference reference  = referenceRepository.getValidReference(a.getReferenceCode());
+            reference.setApplication(a);
+            referenceRepository.save(reference);
+        }
+
     }
 
     public List<Application> all(int pageNum){
@@ -49,7 +56,6 @@ public class ApplicationService {
     public void approve(Long id){
 
         Application application = applicationRepository.findById(id).get();
-        Reference reference  = referenceRepository.getValidReference(application.getReferenceCode());
         User user = userRepository.findByPhone(application.getPhone());
 
         application.setApplicationStatus(ApplicationStatus.APPROVED);
@@ -57,21 +63,26 @@ public class ApplicationService {
 
         if(user==null)
         user= new User();
+
         String approvalCode = makeApprovalCode();
+        while (!isApprovalCodeUnique(approvalCode)){
+            approvalCode=makeApprovalCode();
+        }
         user.setAbout(application.getAbout());
         user.setName(application.getName());
         user.setSurname(application.getSurname());
         user.setPhone(application.getPhone());
         user.setApprovalCode(approvalCode);
+        user.setStatus(UserStatus.APPROVED);
         user.setEnabled(false);
         userRepository.save(user);
 
-
-        if(reference!=null) {//if there is more application with same ref code, first approval is valid
+        if(!application.getReferenceCode().equals("")) {
+            Reference reference = referenceRepository.getReferenceByApplication(application);
             reference.setChild(user);
             referenceRepository.save(reference);
-            removeReferenceCodeFromApplications(reference.getReferenceCode());
         }
+        //todo:enable sms
         //SendSms.send("Your Saturday account approved. Register at: https://saturdayapp.net/reg/" +approvalCode,application.getPhone() );
     }
 
@@ -103,6 +114,14 @@ public class ApplicationService {
         String newName = c1.toString() + c2.toString() + c4.toString() + c3.toString() + c5.toString() + c6.toString()
                 +c7.toString()+c8.toString()+c9.toString()+c10.toString()+c11.toString();
         return newName;
+    }
+
+    public Boolean isApprovalCodeUnique(String code){
+        int count   =userRepository.findCountByApprovalCode(code);
+        if(count==0)
+            return true;
+        else
+            return false;
     }
 
 

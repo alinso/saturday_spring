@@ -48,9 +48,9 @@ public class UserEventService {
         List<User> followers = new ArrayList<>();
 
         if(!event.getSecret())
-        for(User follower:followRepository.findFollowersOfUser(user)){
-            if(!blockService.isThereABlock(follower.getId()))
-           followers.add(follower);
+        for(Follow follower:followRepository.findFollowersOfUser(user)){
+            if(!blockService.isThereABlock(follower.getFollower().getId()))
+           followers.add(follower.getFollower());
         }
         notificationService.newEvent(followers, event.getId());
         userRepository.save(user);

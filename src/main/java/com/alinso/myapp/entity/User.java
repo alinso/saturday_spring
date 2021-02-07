@@ -1,16 +1,14 @@
 package com.alinso.myapp.entity;
 
 import com.alinso.myapp.entity.enums.Gender;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.alinso.myapp.entity.enums.UserStatus;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @Entity
@@ -23,9 +21,6 @@ import java.util.*;
 )
 public class User extends BaseEntity implements UserDetails {
 
-
-    @Column
-    private Boolean enabled = false;
 
     @NotBlank(message = "İsim boş olamaz")
     @Column
@@ -60,8 +55,6 @@ public class User extends BaseEntity implements UserDetails {
 
     private String approvalCode;
 
-    @Transient
-    private String confirmPassword;
 
     @Column(columnDefinition="TEXT")
     private String about = "";
@@ -73,6 +66,10 @@ public class User extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
 
+    @Column
+    @Enumerated(EnumType.ORDINAL)
+    private UserStatus status;
+
     @Column(columnDefinition="TEXT")
     private String motivation = "";
 
@@ -80,6 +77,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     @ColumnDefault("0")
     private Integer point ;
+
+    @Column
+    private Boolean enabled;
 
     @ManyToOne
     @ColumnDefault("0")
@@ -94,11 +94,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private String role;
 
-
-
-    //
-//    @Column
-//    private String interests;
 
 
     public String getName() {
@@ -141,9 +136,6 @@ public class User extends BaseEntity implements UserDetails {
         this.motivation = motivation;
     }
 
-    public void setEmail(String phone) {
-        this.phone = phone;
-    }
 
     public String getPassword() {
         return password;
@@ -151,14 +143,6 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
     }
 
     public String getPhone() {
@@ -169,15 +153,8 @@ public class User extends BaseEntity implements UserDetails {
         this.phone = phone.replaceAll("\\s+","");
     }
 
-    public Boolean getEnabled() {
-        return enabled;
-    }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
 
-    //user details methods
 
 
     @Override
@@ -201,26 +178,6 @@ public class User extends BaseEntity implements UserDetails {
         return phone;
     }
 
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
 
     public String getProfilePicName() {
         return profilePicName;
@@ -319,4 +276,37 @@ public class User extends BaseEntity implements UserDetails {
     public void setApprovalCode(String approvalCode) {
         this.approvalCode = approvalCode;
     }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled){
+        this.enabled=enabled;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
 }
+

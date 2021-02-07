@@ -121,7 +121,6 @@ public class AdminService {
             u.setSurname("kullanıcı");
             u.setProfilePicName("");
             u.setAbout("");
-            u.setEmail("useasdfffasdf4trfd@uyegjfbd.com");
             u.setPoint(0);
             u.setMotivation("");
             u.setGender(user.getGender());

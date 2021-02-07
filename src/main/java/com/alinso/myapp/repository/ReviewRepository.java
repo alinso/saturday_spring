@@ -14,14 +14,13 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
 
-    @Query("select review from Review review where review.writer=:me and review.reader=:other")
-    Review myPreviousReview(@Param("me") User me, @Param("other")User other);
+    @Query("select review from Review review where review.writer=:me and review.reader=:other " +
+            " and review.writer.enabled=true and review.reader.enabled=true ")
+    Review myPreviousReview(@Param("me") User me, @Param("other") User other);
 
-    List<Review> findByReader(User reader);
+    @Query("select  r from Review  r where r.reader=:reader and r.writer.enabled=true and r.reader.enabled=true")
+    List<Review> findByReader(@Param("reader") User reader);
 
-    @Query("select review from Review review where review.reader=:reader and review.createdAt<:twoDaysAgo")
-    List<Review> findByReaderBefore2Days(@Param("reader")User reader, @Param("twoDaysAgo") Date twoDaysAgo);
-
-    @Query("select review from Review review where review.writer=:writer")
+    @Query("select review from Review review where review.writer=:writer and review.reader.enabled=true")
     List<Review> last3MonthReviewsOfUser(@Param("writer") User user);
 }

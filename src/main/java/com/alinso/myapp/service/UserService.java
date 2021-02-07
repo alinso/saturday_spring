@@ -6,9 +6,7 @@ import com.alinso.myapp.entity.dto.security.ChangePasswordDto;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
 import com.alinso.myapp.entity.dto.user.RegisterDto;
-import com.alinso.myapp.entity.enums.EventRequestStatus;
-import com.alinso.myapp.entity.enums.Gender;
-import com.alinso.myapp.entity.enums.VoteType;
+import com.alinso.myapp.entity.enums.*;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
 import com.alinso.myapp.repository.*;
@@ -104,7 +102,16 @@ public class UserService {
     @Autowired
     ComplainRepository complainRepository;
 
-    //this the registration without mail verification
+
+    public boolean isReferenceCodeUnique(String code){
+        int count = referenceRepository.findCountByReferenceCode(code);
+
+        if(count==0)
+            return true;
+        else
+            return false;
+    }
+
     public User register(RegisterDto registerDto) {
 
         User userInDb = userRepository.findByApprovalCode(registerDto.getApprovalCode());
@@ -113,7 +120,12 @@ public class UserService {
             throw new UserWarningException("no user found!");
         }
         City ankara = cityService.findById(Long.valueOf(1));
+
+
         String newReferenceCode = referenceService.makeReferenceCode();
+        while (!isReferenceCodeUnique(newReferenceCode)){
+            newReferenceCode = referenceService.makeReferenceCode();
+        }
 
         userInDb.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
         userInDb.setPoint(0);
@@ -121,10 +133,11 @@ public class UserService {
         userInDb.setExtraPercent(0);
         userInDb.setCity(ankara);
         userInDb.setApprovalCode(null);
-        userInDb.setEnabled(true);
         userInDb.setGender(registerDto.getGender());
-        User user = userRepository.save(userInDb);
+        userInDb.setStatus(UserStatus.REGISTERED);
+        userInDb.setEnabled(true);
 
+        User user = userRepository.save(userInDb);
         Reference reference = new Reference();
         reference.setReferenceCode(newReferenceCode);
         reference.setParent(user);
@@ -156,7 +169,10 @@ public class UserService {
 
     public String getNameForRegistration(String approvalCode) {
         User user = userRepository.findByApprovalCode(approvalCode);
-        return user.getName();
+        if(user.getStatus()==UserStatus.APPROVED)
+            return user.getName();
+        else
+            throw new UserWarningException("Invalid application code");
     }
 
 
@@ -180,7 +196,6 @@ public class UserService {
         loggedUser.setName(profileInfoForUpdateDto.getName());
         loggedUser.setCity(cityService.findById(profileInfoForUpdateDto.getCityId()));
         loggedUser.setSurname(profileInfoForUpdateDto.getSurname());
-        loggedUser.setEmail(profileInfoForUpdateDto.getEmail());
         loggedUser.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(), "dd/MM/yyyy"));
         loggedUser.setMotivation(profileInfoForUpdateDto.getMotivation());
         loggedUser.setAbout(profileInfoForUpdateDto.getAbout());
@@ -449,7 +464,7 @@ public class UserService {
     public Integer followerCount(Long userId) {
         User user = userRepository.findById(userId).get();
         //followers
-        Integer followerCount = followRepository.findFollowerCount(user);
+        Integer followerCount = followRepository.findFollowerCount(user, FollowStatus.APPROVED);
         return followerCount;
     }
 

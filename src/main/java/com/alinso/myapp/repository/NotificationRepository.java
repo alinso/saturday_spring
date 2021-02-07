@@ -14,11 +14,13 @@ import java.util.List;
 public interface
 NotificationRepository extends JpaRepository<Notification,Long> {
 
-    @Query("select notification from Notification  notification where notification.target=:target and notification.isRead=false ")
+    @Query("select notification from Notification  notification where notification.target=:target and notification.isRead=false" +
+            " and notification.trigger.enabled=true")
     List<Notification> findTargetNotReadedNotifications(@Param("target")User target);
 
     List<Notification> findByTarget(User target);
 
-    List<Notification> findByTargetOrderByCreatedAtDesc(User target, Pageable pageable);
+    @Query("select n from Notification n where n.target=:target and n.trigger.enabled=true order by id desc ")
+    List<Notification> findByTargetOrderByCreatedAtDesc(@Param("target") User target, Pageable pageable);
 
 }

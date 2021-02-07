@@ -6,16 +6,16 @@ import com.alinso.myapp.entity.enums.FollowStatus;
 public class FollowDto {
 
     private Long id;
-    private ProfileDto follower;
+    private ProfileDto profileDto;
     private FollowStatus status;
 
 
-    public ProfileDto getFollower() {
-        return follower;
+    public ProfileDto getProfileDto() {
+        return profileDto;
     }
 
-    public void setFollower(ProfileDto follower) {
-        this.follower = follower;
+    public void setProfileDto(ProfileDto profileDto) {
+        this.profileDto = profileDto;
     }
 
     public FollowStatus getStatus() {

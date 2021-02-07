@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface MessageEventRepository extends JpaRepository<MessageEvent,Long> {
 
-    @Query("select m from MessageEvent m where m.event=:event order by m.id")
+    @Query("select m from MessageEvent m where m.event=:event and m.writer.enabled=true and m.event.creator.enabled=true order by m.id")
     List<MessageEvent> findByEvent(@Param("event") Event event);
 }

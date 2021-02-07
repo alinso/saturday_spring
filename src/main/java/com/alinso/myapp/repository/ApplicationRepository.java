@@ -17,7 +17,7 @@ public interface ApplicationRepository extends JpaRepository<Application,Long> {
     @Query("select a from Application a order by id DESC ")
     List<Application> all(Pageable pageable);
 
-    @Query("select a from Application a where phone=:phone and name=:name")
+    @Query("select a from Application a where a.phone=:phone and a.name=:name")
     List<Application> findByPhoneAndName(@Param("phone") String phone, @Param("name") String name);
 
     @Query("select a from Application a where a.referenceCode=:referenceCode")

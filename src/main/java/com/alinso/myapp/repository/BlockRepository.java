@@ -12,13 +12,13 @@ import java.util.List;
 
 @Repository
 public interface BlockRepository extends JpaRepository<Block, Long> {
-    @Query("select block from  Block block where block.blocker=:blocker and block.blocked=:blocked")
+    @Query("select block from  Block block where block.blocker=:blocker and block.blocked=:blocked and block.blocked.enabled=true and block.blocker.enabled=true")
     Block findBlockByBlockedAndBlocker(@Param("blocked") User blocked, @Param("blocker")User blocker);
 
-    @Query("select block.blocked from  Block block where block.blocker=:blocker")
+    @Query("select block.blocked from  Block block where block.blocker=:blocker and block.blocked.enabled=true")
     List<User> findUsersBlcokedByTheUser(@Param("blocker") User blocker);
 
-    @Query("select count(block) from Block  block where block.blocked=:user")
+    @Query("select count(block) from Block  block where block.blocked=:user and block.blocker.enabled=true")
     Integer blockerCount(@Param("user") User user);
 
     @Query("select block.blocked from Block block group by block.blocked having count(block)>3 order by count(block) desc ")

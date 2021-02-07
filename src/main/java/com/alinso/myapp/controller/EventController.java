@@ -30,7 +30,7 @@ public class EventController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<?> save(@Valid EventDto eventDto, BindingResult result){
+    public ResponseEntity<?> save(@Valid   EventDto eventDto, BindingResult result){
 
         eventValidator.validate(eventDto,result);
         ResponseEntity<?> errorMap = mapValidationErrorUtil.MapValidationService(result);
@@ -40,12 +40,12 @@ public class EventController {
         return new ResponseEntity<>(eventDto,HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("findAllByCityId/{cityId}/{pageNum}")
-    public ResponseEntity<?> findAll(@PathVariable("cityId") Long cityId, @PathVariable("pageNum") Integer pageNum){
-        List<EventDto>  meetings = eventService.findAllNonExpiredByCityId(cityId,pageNum);
-
-        return new ResponseEntity<>(meetings,HttpStatus.OK);
-    }
+//    @GetMapping("findAllByCityId/{cityId}/{pageNum}")
+//    public ResponseEntity<?> findAll(@PathVariable("cityId") Long cityId, @PathVariable("pageNum") Integer pageNum){
+//        List<EventDto>  meetings = eventService.findAllNonExpiredByCityId(cityId,pageNum);
+//
+//        return new ResponseEntity<>(meetings,HttpStatus.OK);
+//    }
     @GetMapping("findByInterestByCityId/{cityId}/{pageNum}")
     public ResponseEntity<?> findByInterestByCityId(@PathVariable("cityId") Long cityId, @PathVariable("pageNum") Integer pageNum){
         List<EventDto>  events = eventService.findAllNonExpiredByInterestsByCityId(cityId,pageNum);
@@ -73,11 +73,11 @@ public class EventController {
         return new ResponseEntity<>(events,HttpStatus.OK);
     }
 
-    @GetMapping("all/{pageNum}")
-    public ResponseEntity<?> all(@PathVariable("pageNum") Integer pageNum){
-        List<EventDto> eventDtos = eventService.all(pageNum);
-        return new ResponseEntity<>(eventDtos,HttpStatus.OK);
-    }
+//    @GetMapping("all/{pageNum}")
+//    public ResponseEntity<?> all(@PathVariable("pageNum") Integer pageNum){
+//        List<EventDto> eventDtos = eventService.all(pageNum);
+//        return new ResponseEntity<>(eventDtos,HttpStatus.OK);
+//    }
 
     @GetMapping("delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
