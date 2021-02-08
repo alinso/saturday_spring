@@ -38,18 +38,18 @@ public class VoteController {
         return new ResponseEntity<String>("OK", HttpStatus.OK);
     }
 
-    @GetMapping("votePercent/{userId}")
-    public ResponseEntity<?> votePercent(@PathVariable("userId") Long userId){
-        Integer vote  = voteService.calculateVote(userId);
-        return new ResponseEntity<Integer>(vote,HttpStatus.OK);
-    }
+//    @GetMapping("votePercent/{userId}")
+//    public ResponseEntity<?> votePercent(@PathVariable("userId") Long userId){
+//        Integer vote  = voteService.calculateVote(userId);
+//        return new ResponseEntity<Integer>(vote,HttpStatus.OK);
+//    }
 
 
-    @GetMapping("votePercentOfEventOwner/{eventId}")
-    public ResponseEntity<?> votePercentOfEventOwner(@PathVariable("eventId") Long eventId){
-        Integer vote  = voteService.calculateVoteOfOrganiser(eventId);
-        return new ResponseEntity<Integer>(vote,HttpStatus.OK);
-    }
+//    @GetMapping("votePercentOfEventOwner/{eventId}")
+//    public ResponseEntity<?> votePercentOfEventOwner(@PathVariable("eventId") Long eventId){
+//        Integer vote  = voteService.calculateVoteOfOrganiser(eventId);
+//        return new ResponseEntity<Integer>(vote,HttpStatus.OK);
+//    }
 
     @GetMapping("usersICanVote")
     public ResponseEntity<?> usersICanVote(){
@@ -58,16 +58,16 @@ public class VoteController {
     }
 
 
-    @GetMapping("votePercentOfRequestOwner/{requestId}")
-    public ResponseEntity<?> votePercentOfRequestOwner(@PathVariable("requestId") Long requestId){
-        Integer vote  = voteService.votePercentOfRequester(requestId);
-        return new ResponseEntity<Integer>(vote,HttpStatus.OK);
-    }
-    @GetMapping("voteCountOfUser/{userId}")
-    public ResponseEntity<?> voteCountOfUser(@PathVariable("userId") Long userId){
-        Integer vote  = voteService.voteCountOfUser(userId);
-        return new ResponseEntity<Integer>(vote,HttpStatus.OK);
-    }
+//    @GetMapping("votePercentOfRequestOwner/{requestId}")
+//    public ResponseEntity<?> votePercentOfRequestOwner(@PathVariable("requestId") Long requestId){
+//        Integer vote  = voteService.votePercentOfRequester(requestId);
+//        return new ResponseEntity<Integer>(vote,HttpStatus.OK);
+//    }
+//    @GetMapping("voteCountOfUser/{userId}")
+//    public ResponseEntity<?> voteCountOfUser(@PathVariable("userId") Long userId){
+//        Integer vote  = voteService.voteCountOfUser(userId);
+//        return new ResponseEntity<Integer>(vote,HttpStatus.OK);
+//    }
 
 
     @GetMapping("myVoteOfThisUser/{userId}")

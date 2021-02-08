@@ -8,6 +8,8 @@ import com.alinso.myapp.entity.Vote;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.vote.VoteDto;
 import com.alinso.myapp.entity.enums.EventRequestStatus;
+import com.alinso.myapp.entity.enums.Gender;
+import com.alinso.myapp.entity.enums.UserStatus;
 import com.alinso.myapp.entity.enums.VoteType;
 import com.alinso.myapp.repository.EventRepository;
 import com.alinso.myapp.repository.EventRequestRepository;
@@ -90,11 +92,10 @@ public class VoteService {
         List<EventRequest> eventsIAttend = eventRequestRepository.findByApplicantId(u.getId());
         for (EventRequest r : eventsIAttend) {
 
-
             //only add if I attended it
             Integer result = r.getResult();
             if(result!=null)
-            if (r.getEventRequestStatus() == EventRequestStatus.APPROVED && r.getEvent().getCreator().getId() != 3212 &&  result==1) {
+            if (r.getEventRequestStatus() == EventRequestStatus.APPROVED &&  result==1) {
 
                 //add other attendants
                 List<EventRequest> otherApprovedRequests = eventRequestRepository.findByEventId(r.getEvent().getId());
@@ -142,33 +143,40 @@ public class VoteService {
 
         List<Vote> allVotes = voteRepository.findByReaderNonDeleted(reader);
 
-        if (allVotes.size() < 8)
+        if (allVotes.size() < 10)
             return 0;
 
         Integer negativeVoteCount = 0;
-        Integer haterUserCount = 0;
+        Integer positiveVoteCount=0;
+        Integer notrCount=0;
 
         for (Vote v : allVotes) {
-
-
-            Boolean isHater = false;
-
             if (v.getWriter().getTooNegative() != null) {
                 if (v.getWriter().getTooNegative() == 1)
-                    haterUserCount++;
-            }
+                    continue;
 
-            if (v.getWriter().getTooNegative() == 1)
-                isHater = true;
-
-            if (v.getVoteType() == VoteType.NEGATIVE && !isHater) {
-                negativeVoteCount++;
+                if (v.getVoteType() == VoteType.NEGATIVE) {
+                    negativeVoteCount++;
+                }
+                if(v.getVoteType()==VoteType.NEGATIVE  && v.getWriter().getGender()== Gender.FEMALE && v.getReader().getGender()==Gender.MALE){
+                    negativeVoteCount++;
+                }
+                if(v.getVoteType()==VoteType.POSITIVE) {
+                    positiveVoteCount++;
+                }
+                if(v.getVoteType()==VoteType.NOTR){
+                    notrCount++;
+                }
             }
         }
 
-        Integer allVotesCount = allVotes.size() - haterUserCount;
-        Integer posivitiveVoteCount = allVotesCount - negativeVoteCount;
-        Integer positivePercent = (posivitiveVoteCount * 100) / allVotesCount;
+        Integer allVotesCount = negativeVoteCount*3 + positiveVoteCount*3 +notrCount;
+        Integer  positivePercent = (positiveVoteCount * 100) / allVotesCount;
+
+        if(positivePercent<60){
+            reader.setStatus(UserStatus.DISABLED);
+            userRepository.save(reader);
+        }
 
         return positivePercent;
     }

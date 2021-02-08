@@ -32,7 +32,6 @@ public class AdminService {
     @Autowired
     EventService eventService;
 
-
     @Autowired
     MessageService messageService;
 
@@ -182,6 +181,9 @@ public class AdminService {
 
     }
 
+
+
+
     public void updateExtraPoint(Long id, Integer extraPoint) {
         User user = userService.findEntityById(id);
         user.setExtraPercent(extraPoint);
@@ -194,21 +196,4 @@ public class AdminService {
     }
 
 
-    public List<Long> deletePartyVotes() {
-        List<Vote> allVotes = voteRepository.findAll();
-        List<Long> deletedVoteIds = new ArrayList<>();
-        for (Vote v : allVotes) {
-            if(!eventRequestService.haveTheseUsersMeetAllTimes(v.getWriter().getId(),v.getReader().getId())){
-                deletedVoteIds.add(v.getId());
-                v.setDeleted(1);
-                voteRepository.save(v);
-            }
-            else{
-                v.setDeleted(0);
-                voteRepository.save(v);
-            }
-
-        }
-        return deletedVoteIds;
-    }
 }

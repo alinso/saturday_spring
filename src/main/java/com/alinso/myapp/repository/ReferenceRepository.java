@@ -21,7 +21,7 @@ public interface ReferenceRepository extends JpaRepository<Reference,Long> {
     Reference findByCode(@Param("code") String referenceCode);
 
 
-    @Query("select r from Reference r where r.referenceCode=:code and reference.parent.enabled=true and r.application is null")
+    @Query("select r from Reference r where r.referenceCode=:code and r.parent.enabled=true and r.application is null")
     Reference getValidReference(@Param("code") String code);
 
     @Query("select r from Reference r where r.child=:child and r.child.enabled=true" )

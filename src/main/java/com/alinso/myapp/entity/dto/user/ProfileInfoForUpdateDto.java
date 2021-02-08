@@ -20,18 +20,11 @@ public class ProfileInfoForUpdateDto {
 
     private String profilePicName;
 
-    private String nick;
-
     @NotBlank(message = "İsim boş olamaz")
     private String name;
 
     @NotBlank(message = "Soyisim boş olamaz")
     private String surname;
-
-    @Email(message = "Geçerli bir email adresi giriniz")
-    @NotBlank(message = "Email adresi boş olamaz")
-    private String email;
-
 
     private String about = "";
 
@@ -44,8 +37,6 @@ public class ProfileInfoForUpdateDto {
     private Gender gender;
 
     private String motivation = "";
-
-    private String referenceCode;
 
     private Long cityId;
 
@@ -75,14 +66,6 @@ public class ProfileInfoForUpdateDto {
         this.surname = surname;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email.toLowerCase();
-    }
-
     public String getAbout() {
         return about;
     }
@@ -105,14 +88,6 @@ public class ProfileInfoForUpdateDto {
 
     public void setMotivation(String motivation) {
         this.motivation = motivation;
-    }
-
-    public String getReferenceCode() {
-        return referenceCode;
-    }
-
-    public void setReferenceCode(String referenceCode) {
-        this.referenceCode = referenceCode;
     }
 
     public String getPhone() {
@@ -156,11 +131,4 @@ public class ProfileInfoForUpdateDto {
         this.interests = interests;
     }
 
-    public String getNick() {
-        return nick;
-    }
-
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
 }

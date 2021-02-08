@@ -212,8 +212,7 @@ public class UserService {
         } catch (Exception e) {
             throw new RecordNotFound404Exception("Kullanıcı Bulunamadı: " + id);
         }
-//        user.setPoint(calculateUserPoint(user));
-        //      userRepository.save(user);
+
         return toProfileDto(user);
     }
 
@@ -223,9 +222,6 @@ public class UserService {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             profileInfoForUpdateDto.setbDateString(DateUtil.dateToString(user.getBirthDate(), "dd/MM/yyyy"));
-
-            profileInfoForUpdateDto.setReferenceCode("");
-
 
             return profileInfoForUpdateDto;
         } catch (Exception e) {
@@ -492,10 +488,16 @@ public class UserService {
         if (approveCount > 0) {
             Integer attendCount = (approveCount - nonAttendCount) * 100;
             Integer percent = attendCount / approveCount;
+
+            if(approveCount>10 && percent<50){
+                User applicant = userRepository.findById(userId).get();
+                applicant.setStatus(UserStatus.DISABLED);
+                userRepository.save(applicant);
+            }
+
             return percent;
         }
         return 0;
-
     }
 
     public ProfileDto toProfileDto(User user) {

@@ -26,8 +26,10 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @Query(value = "select o from Message o left join Message b " +
             "on (o.reader = b.reader and o.writer = b.writer and o.createdAt<b.createdAt) " +
             "where b.createdAt is null and (o.reader=:me or o.writer=:me)" +
-             "and message.writer.enabled=true" +
-            "and message.reader.enabled=true"+
+             " and o.writer.enabled=true" +
+            " and o.reader.enabled=true "+
+            " and b.writer.enabled=true" +
+            " and b.reader.enabled=true "+
             " order by o.createdAt desc")
     List<Message> latestMessageFromEachConversation(@Param("me") User me, Pageable pageable);
 
