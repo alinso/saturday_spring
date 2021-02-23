@@ -26,10 +26,10 @@ public class EventDto {
     private Long cityId;
     private Set<Interest> interests;
     private Set<Long> selectedInterestIds;
-
     @NotBlank(message="İleri bir zaman seçmelisiniz(10 dk sonra, 1 saat sonra...)")
     private String deadLineString;
-
+    private Integer vote;
+    private Integer myVote;
 
 
     public Set<Interest> getInterests() {
@@ -153,5 +153,21 @@ public class EventDto {
 
     public void setThisUserJoined(Integer thisUserJoined) {
         this.thisUserJoined = thisUserJoined;
+    }
+
+    public Integer getVote() {
+        return vote;
+    }
+
+    public void setVote(Integer vote) {
+        this.vote = vote;
+    }
+
+    public Integer getMyVote() {
+        return myVote;
+    }
+
+    public void setMyVote(Integer myVote) {
+        this.myVote = myVote;
     }
 }

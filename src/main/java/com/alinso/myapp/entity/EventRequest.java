@@ -1,5 +1,6 @@
 package com.alinso.myapp.entity;
 
+import com.alinso.myapp.entity.enums.EventRequestResult;
 import com.alinso.myapp.entity.enums.EventRequestStatus;
 
 import javax.persistence.*;
@@ -24,8 +25,8 @@ public class EventRequest extends BaseEntity{
     private EventRequestStatus eventRequestStatus;
 
     @Column
-    private Integer result;
-
+    @Enumerated(EnumType.ORDINAL)
+    private EventRequestResult result;
 
     public Event getEvent() {
         return event;
@@ -51,11 +52,11 @@ public class EventRequest extends BaseEntity{
         this.eventRequestStatus = eventRequestStatus;
     }
 
-    public Integer getResult() {
+    public EventRequestResult getResult() {
         return result;
     }
 
-    public void setResult(Integer result) {
+    public void setResult(EventRequestResult result) {
         this.result = result;
     }
 }

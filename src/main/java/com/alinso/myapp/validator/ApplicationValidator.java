@@ -2,8 +2,6 @@ package com.alinso.myapp.validator;
 
 import com.alinso.myapp.entity.Application;
 import com.alinso.myapp.entity.User;
-import com.alinso.myapp.entity.dto.user.ProfileInfoForUpdateDto;
-import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.repository.UserRepository;
 import com.alinso.myapp.service.ReferenceService;
 import com.alinso.myapp.service.UserService;
@@ -11,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-
-import javax.jws.soap.SOAPBinding;
 
 @Component
 public class ApplicationValidator implements Validator {
@@ -36,7 +32,7 @@ public class ApplicationValidator implements Validator {
     public void validate(Object object, Errors errors) {
 
         Application application = (Application) object;
-        User user = userRepository.findByPhone(application.getPhone());
+        User user = userRepository.findByPhoneEnabled(application.getPhone());
 
         if (application.getPhone().length() != 10) {
             errors.rejectValue("phone", "Match", "Phone number has to be 10 digits! ex: 5535919925");

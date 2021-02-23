@@ -7,10 +7,7 @@ import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.Vote;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
 import com.alinso.myapp.entity.dto.vote.VoteDto;
-import com.alinso.myapp.entity.enums.EventRequestStatus;
-import com.alinso.myapp.entity.enums.Gender;
-import com.alinso.myapp.entity.enums.UserStatus;
-import com.alinso.myapp.entity.enums.VoteType;
+import com.alinso.myapp.entity.enums.*;
 import com.alinso.myapp.repository.EventRepository;
 import com.alinso.myapp.repository.EventRequestRepository;
 import com.alinso.myapp.repository.UserRepository;
@@ -79,10 +76,10 @@ public class VoteService {
             List<EventRequest> requests = eventRequestRepository.findByEventId(a.getId());
             for (EventRequest r : requests) {
 
-                Integer result = r.getResult();
+                EventRequestResult result = r.getResult();
 
                 if(result!=null)
-                if (r.getEventRequestStatus() == EventRequestStatus.APPROVED && result==1) {
+                if (r.getEventRequestStatus() == EventRequestStatus.APPROVED && result==EventRequestResult.CAME) {
                     myEventAttendants.add(r.getApplicant());
                 }
             }
@@ -93,9 +90,9 @@ public class VoteService {
         for (EventRequest r : eventsIAttend) {
 
             //only add if I attended it
-            Integer result = r.getResult();
+            EventRequestResult result = r.getResult();
             if(result!=null)
-            if (r.getEventRequestStatus() == EventRequestStatus.APPROVED &&  result==1) {
+            if (r.getEventRequestStatus() == EventRequestStatus.APPROVED &&  result==EventRequestResult.CAME) {
 
                 //add other attendants
                 List<EventRequest> otherApprovedRequests = eventRequestRepository.findByEventId(r.getEvent().getId());
@@ -105,10 +102,9 @@ public class VoteService {
                         myEventAttendants.add(otherApprovedRequest.getApplicant());
                     }
                 }
+                //add activity owner
+                myEventAttendants.add(r.getEvent().getCreator());
             }
-
-            //add activity owner
-            myEventAttendants.add(r.getEvent().getCreator());
         }
 
 
@@ -220,7 +216,7 @@ public class VoteService {
 
         attendants.add(event.getCreator());
         for(User u:attendants){
-            if(!eventRequestService.haveTheseUsersMeetAllTimes(u.getId(),nonComingUser.getId())){
+            if(eventRequestService.haveTheseUsersMeetAllTimes(u.getId(),nonComingUser.getId())){
                 Vote v = voteRepository.findByWriterAndReader(u,nonComingUser);
                 if(v!=null) {
                     v.setDeleted(1);
@@ -245,10 +241,8 @@ public class VoteService {
         deletedVotesOfApplicant.addAll(deletedVotesOfApplicant2);
 
         for (Vote v : deletedVotesOfApplicant) {
-            if(eventRequestService.haveTheseUsersMeetAllTimes(v.getWriter().getId(),v.getReader().getId())){
                 v.setDeleted(0);
                 voteRepository.save(v);
-            }
         }
     }
 }

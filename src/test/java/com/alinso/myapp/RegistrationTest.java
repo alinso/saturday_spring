@@ -19,7 +19,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultHandler;
@@ -345,7 +344,7 @@ public class RegistrationTest {
         Application applicationApproved = applicationRepository.findById(savedApplication.getId()).get();
         assertTrue(applicationApproved.getApplicationStatus() == ApplicationStatus.APPROVED);
 
-        User user = userRepository.findByPhone(application.get("phone"));
+        User user = userRepository.findByPhoneNotEnabled(application.get("phone"));
         assertTrue(user.getAbout().equals(application.get("about")));
         assertTrue(user.getPhone().equals(application.get("phone")));
         assertTrue(user.getName().equals(application.get("name")));
@@ -353,7 +352,7 @@ public class RegistrationTest {
         assertTrue(user.getStatus() == UserStatus.APPROVED);
         assertTrue(!user.isEnabled());
 
-        Reference reference = referenceRepository.findByChild(user); //ever user has one single parent
+        Reference reference = referenceRepository.findByChildNotEnabled(user); //ever user has one single parent
         assertTrue(reference != null);
 
 
@@ -385,7 +384,7 @@ public class RegistrationTest {
         Application applicationApproved = applicationRepository.findById(savedApplication.getId()).get();
         assertTrue(applicationApproved.getApplicationStatus() == ApplicationStatus.APPROVED);
 
-        User user = userRepository.findByPhone(application.get("phone"));
+        User user = userRepository.findByPhoneNotEnabled(application.get("phone"));
         assertTrue(user.getAbout().equals(application.get("about")));
         assertTrue(user.getPhone().equals(application.get("phone")));
         assertTrue(user.getName().equals(application.get("name")));
@@ -394,7 +393,7 @@ public class RegistrationTest {
         assertTrue(!user.isEnabled());
 
 
-        Reference reference = referenceRepository.findByChild(user); //ever user has one single parent
+        Reference reference = referenceRepository.findByChildNotEnabled(user); //ever user has one single parent
         assertTrue(reference == null);
 
        clearDb();

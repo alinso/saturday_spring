@@ -25,7 +25,10 @@ public interface ReferenceRepository extends JpaRepository<Reference,Long> {
     Reference getValidReference(@Param("code") String code);
 
     @Query("select r from Reference r where r.child=:child and r.child.enabled=true" )
-    Reference findByChild(@Param("child") User child);
+    Reference findByChildEnabled(@Param("child") User child);
+
+    @Query("select r from Reference r where r.child=:child" )
+    Reference findByChildNotEnabled(@Param("child") User child);
 
     @Query("select reference from Reference reference where reference.referenceCode=:code and reference.parent.enabled=true")
     List<Reference> findReferencesByCode(@Param("code") String referenceCode);
@@ -34,6 +37,6 @@ public interface ReferenceRepository extends JpaRepository<Reference,Long> {
     @Query("select count(r) from Reference r where r.referenceCode=:code")
     int findCountByReferenceCode(@Param("code") String code);
 
-    @Query("select r from Reference r where r.application=:application and r.parent.enabled=:true")
+    @Query("select r from Reference r where r.application=:application and r.parent.enabled=true")
     Reference getReferenceByApplication(@Param("application") Application application);
 }

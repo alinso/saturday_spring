@@ -7,10 +7,7 @@ import com.alinso.myapp.entity.enums.EventRequestStatus;
 import com.alinso.myapp.entity.enums.FollowStatus;
 import com.alinso.myapp.exception.RecordNotFound404Exception;
 import com.alinso.myapp.exception.UserWarningException;
-import com.alinso.myapp.repository.EventRepository;
-import com.alinso.myapp.repository.EventRequestRepository;
-import com.alinso.myapp.repository.InterestRepository;
-import com.alinso.myapp.repository.UserRepository;
+import com.alinso.myapp.repository.*;
 import com.alinso.myapp.util.DateUtil;
 import com.alinso.myapp.util.FileStorageUtil;
 import com.alinso.myapp.util.UserUtil;
@@ -30,6 +27,9 @@ public class EventService {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    EventVoteRepository eventVoteRepository;
 
     @Autowired
     InterestRepository interestRepository;
@@ -76,8 +76,10 @@ public class EventService {
     @Autowired
     NotificationService notificationService;
 
-    @Scheduled(cron="0 0 0/2 * * ?")
-    public void  sendReminderNotification(){
+
+
+    @Scheduled(cron = "0 0 0/2 * * ?")
+    public void sendReminderNotification() {
         Calendar finish = Calendar.getInstance();
         finish.setTime(new Date());
         finish.add(Calendar.HOUR, +5);
@@ -87,12 +89,12 @@ public class EventService {
         start.add(Calendar.HOUR, +3);
 
 
-        List<Event> eventList = eventRepository.eventsOfDay(start.getTime(),finish.getTime());
+        List<Event> eventList = eventRepository.eventsOfDay(start.getTime(), finish.getTime());
         Map<User, Event> attendantsOfDay = new HashMap<>();
 
-        for(Event a: eventList){
-            for(User attendant: eventRequestService.findAttendantEntities(a)) {
-                attendantsOfDay.put(attendant,a);
+        for (Event a : eventList) {
+            for (User attendant : eventRequestService.findAttendantEntities(a)) {
+                attendantsOfDay.put(attendant, a);
             }
         }
 
@@ -109,9 +111,9 @@ public class EventService {
             throw new UserWarningException("Aktivite Bulunamadı");
         }
 
-        if(blockService.isThereABlock(event.getCreator().getId()))
+        if (blockService.isThereABlock(event.getCreator().getId()))
             throw new UserWarningException("Erişim Yok");
-        if(!canSeeEvent(event))
+        if (!canSeeEvent(event))
             throw new UserWarningException("Erişim Yok");
 
 
@@ -165,8 +167,7 @@ public class EventService {
         event.setCity(city);
         event.setDeadLine(DateUtil.stringToDate(eventDto.getDeadLineString(), "dd/MM/yyyy HH:mm"));
         event.setPhotoName(fileStorageUtil.saveFileAndReturnName(eventDto.getFile()));
-
-        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loggedUser  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         event.setCreator(loggedUser);
         event.setCommentNotificationSent(false);
         event.setSecret(eventDto.getSecret());
@@ -262,14 +263,14 @@ public class EventService {
         if (!event.getSecret()) {
             return true;
         }
-        User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(event.getCreator().getId()==loggedUser.getId()){
+        User loggedUser  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (event.getCreator().getId() == loggedUser.getId()) {
             return true;
         }
 
-        List<Follow> followers= followService.findFollowersByUser(event.getCreator());
+        List<Follow> followers = followService.findFollowersByUser(event.getCreator());
         for (Follow f : followers) {
-            if (loggedUser.getId() == f.getFollower().getId() && f.getStatus()== FollowStatus.APPROVED) {
+            if (loggedUser.getId() == f.getFollower().getId() && f.getStatus() == FollowStatus.APPROVED) {
                 return true;
             }
         }
@@ -326,14 +327,14 @@ public class EventService {
         if (blockService.isThereABlock(id))
             throw new UserWarningException("Erişim Yok");
 
-        Pageable pageable = PageRequest.of(pageNum,5);
+        Pageable pageable = PageRequest.of(pageNum, 5);
 
         List<Event> events = new ArrayList<>();
-        if(type.equals("created"))
-        events = eventRepository.findByCreatorOrderByDeadLineDescPaged(user,pageable);
+        if (type.equals("created"))
+            events = eventRepository.findByCreatorOrderByDeadLineDescPaged(user, pageable);
 
-        if(type.equals("joined"))
-           events= eventRequestRepository.activitiesAttendedByUserPaged(user, EventRequestStatus.APPROVED,pageable);
+        if (type.equals("joined"))
+            events = eventRequestRepository.activitiesAttendedByUserPaged(user, EventRequestStatus.APPROVED, pageable);
 
 
         List<EventDto> eventDtos = new ArrayList<>();
@@ -375,7 +376,12 @@ public class EventService {
         eventDto.setDeadLineString(DateUtil.dateToString(event.getDeadLine(), "dd/MM/yyyy HH:mm"));
         eventDto.setThisUserJoined(eventRequestService.isThisUserJoined(event.getId()));
         eventDto.setAttendants(eventRequestService.findAttendants(event));
-       // activityDto.setHashtagListString(hashtagService.findByActivityStr(activity));
+        eventDto.setVote(eventVoteRepository.findTotalByEvent(event));
+        User loggedUser  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        EventVote ev = eventVoteRepository.findByVoterAndEvent(loggedUser, event);
+        if(ev!=null)
+        eventDto.setMyVote(ev.getVote());
 
         if (event.getDeadLine().compareTo(new Date()) < 0)
             eventDto.setExpired(true);
@@ -400,7 +406,7 @@ public class EventService {
 
         userService.setLastLogin();
 
-        return filterEvents(events,true);
+        return filterEvents(events, true);
     }
 
 
@@ -412,7 +418,7 @@ public class EventService {
 //    }
 
 
-    public List<EventDto> filterEvents(List<Event> eventList, Boolean filterInterest){
+    public List<EventDto> filterEvents(List<Event> eventList, Boolean filterInterest) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         List<EventDto> eventDtos = new ArrayList<>();
@@ -424,7 +430,7 @@ public class EventService {
             if (!canSeeEvent(event))
                 continue;
 
-            if(filterInterest) {
+            if (filterInterest) {
                 Boolean inInterest = false;
                 for (Interest userInterest : user.getInterests()) {
                     for (Interest eventInterest : event.getInterests()) {
@@ -433,13 +439,12 @@ public class EventService {
                             break;
                         }
                     }
-                    if(inInterest) //break above cannot break the outer loop so we need this
+                    if (inInterest) //break above cannot break the outer loop so we need this
                         break;
                 }
-                if(!inInterest)
+                if (!inInterest)
                     continue;
             }
-
 
 
             EventDto eventDto = toDto(event);
@@ -454,13 +459,13 @@ public class EventService {
         if (blockService.isThereABlock(id))
             throw new UserWarningException("Erişim Yok");
 
-        Pageable pageable  =PageRequest.of(pageNum,5);
+        Pageable pageable = PageRequest.of(pageNum, 5);
 
         List<Event> events = new ArrayList<>();
-            events.addAll(eventRepository.findByCreatorOrderByDeadLineDescPaged(user,pageable));
-            events.addAll(eventRequestRepository.activitiesAttendedByUserPaged(user, EventRequestStatus.APPROVED,pageable));
+        events.addAll(eventRepository.findByCreatorOrderByDeadLineDescPaged(user, pageable));
+        events.addAll(eventRequestRepository.activitiesAttendedByUserPaged(user, EventRequestStatus.APPROVED, pageable));
 
-        return filterEvents(events,false);
+        return filterEvents(events, false);
     }
 }
 

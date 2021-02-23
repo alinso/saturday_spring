@@ -1,5 +1,6 @@
 package com.alinso.myapp.controller;
 
+import com.alinso.myapp.entity.enums.EventRequestResult;
 import com.alinso.myapp.entity.enums.EventRequestStatus;
 import com.alinso.myapp.service.EventRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class EventRequestController {
 
 
     @GetMapping("requestResult/{requestId}/{result}")
-    public ResponseEntity<?> saveResults(@PathVariable("requestId") Long requestId, @PathVariable("result") Integer result){
+    public ResponseEntity<?> saveResults(@PathVariable("requestId") Long requestId, @PathVariable("result") EventRequestResult result){
         eventRequestService.saveResult(requestId,result);
 
         return new ResponseEntity<>("SAVED",HttpStatus.OK);

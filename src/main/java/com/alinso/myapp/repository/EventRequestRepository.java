@@ -29,7 +29,7 @@ public interface EventRequestRepository extends JpaRepository<EventRequest, Long
     Integer countOfAprrovedForThisEvent(@Param("event") Event event, @Param("status") EventRequestStatus status);
 
     @Query("select eventRequest.event from EventRequest eventRequest " +
-            "where  eventRequest.eventRequestStatus=:status and eventRequest.applicant=:user and eventRequest.result=1 " +
+            "where  eventRequest.eventRequestStatus=:status and eventRequest.applicant=:user and eventRequest.result=0 " +
             "and eventRequest.applicant.enabled=true")
     List<Event> eventsAttendedByUser(@Param("user") User user, @Param("status") EventRequestStatus status);
 
@@ -66,7 +66,7 @@ public interface EventRequestRepository extends JpaRepository<EventRequest, Long
     @Query("select count(eventRequest) from EventRequest eventRequest " +
             "where eventRequest.event.creator = :user1 " +
             "and eventRequest.applicant=:user2 " +
-            " and eventRequest.result=1 "+
+            " and eventRequest.result=0 "+
             "and eventRequest.eventRequestStatus=:status" +
             " and eventRequest.applicant.enabled=true" +
             " and eventRequest.event.creator.enabled=true")
@@ -84,14 +84,14 @@ public interface EventRequestRepository extends JpaRepository<EventRequest, Long
     Integer last3MonthSentRequestsOfUser(@Param("user")User user);
 
     @Query("select count(eventRequest) from EventRequest eventRequest where eventRequest.applicant=:user and " +
-            "eventRequest.eventRequestStatus=:approved and eventRequest.result=1 and eventRequest.event.creator.enabled=true")
+            "eventRequest.eventRequestStatus=:approved and eventRequest.result=0 and eventRequest.event.creator.enabled=true")
     Integer findApprovedRequestCountByApplicant(@Param("user") User user, @Param("approved") EventRequestStatus approved);
 
     @Query("select eventRequest.applicant from EventRequest eventRequest where eventRequest.event=:event and eventRequest.applicant.enabled=true")
     List<User> applicantsOfEvent(@Param("event") Event event);
 
     @Query("select eventRequest.event from EventRequest eventRequest " +
-            "where  eventRequest.eventRequestStatus=:status and eventRequest.applicant=:user and eventRequest.result=1" +
+            "where  eventRequest.eventRequestStatus=:status and eventRequest.applicant=:user and eventRequest.result=0" +
             " and eventRequest.event.creator.enabled=true order by eventRequest.createdAt desc")
     List<Event> activitiesAttendedByUserPaged(@Param("user")User user, @Param("status") EventRequestStatus status, Pageable pageable);
 }

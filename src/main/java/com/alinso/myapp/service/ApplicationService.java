@@ -56,7 +56,7 @@ public class ApplicationService {
     public void approve(Long id){
 
         Application application = applicationRepository.findById(id).get();
-        User user = userRepository.findByPhone(application.getPhone());
+        User user = userRepository.findByPhoneEnabled(application.getPhone());
 
         application.setApplicationStatus(ApplicationStatus.APPROVED);
         applicationRepository.save(application);

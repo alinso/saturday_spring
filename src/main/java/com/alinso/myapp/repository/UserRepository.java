@@ -19,7 +19,10 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select user from User user where user.phone=:phone  and user.enabled=true")
-    User findByPhone(@Param("phone") String phone);
+    User findByPhoneEnabled(@Param("phone") String phone);
+
+    @Query("select user from User user where user.phone=:phone")
+    User findByPhoneNotEnabled(@Param("phone") String phone);
 
     @Query("select user from User user where  CONCAT( user.name,   user.surname )  like CONCAT('%',:search,'%')  and user.enabled=true")
     List<User> searchUser(@Param("search") String search, Pageable pageable);

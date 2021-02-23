@@ -18,7 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String phone) throws UsernameNotFoundException {
         try {
-            User user = userRepository.findByPhone(phone);
+            User user = userRepository.findByPhoneEnabled(phone);
             return user;
         } catch (Exception e) {
             throw new UserWarningException("Kullanıcı adı veya şifre yanlış");

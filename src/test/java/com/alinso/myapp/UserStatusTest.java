@@ -117,7 +117,7 @@ public class UserStatusTest {
         viewer.setInterests(interestSet);
         viewer.setName(userName);
         viewer.setSurname("sur");
-        viewer.setPhone(sharerPhone);
+        viewer.setPhone(viewerPhone);
         viewer.setGender(Gender.MALE);
         viewer.setPassword(userPassword);
         viewer.setApprovalCode(null);

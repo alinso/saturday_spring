@@ -15,7 +15,6 @@ public class Event extends BaseEntity {
     @NotBlank(message = "Bu kısmı boş bırakamazsınız")
     private String detail;
 
-
     public Event(@NotBlank(message = "Bu kısmı boş bırakamazsınız") String detail) {
         this.detail = detail;
     }
@@ -43,6 +42,13 @@ public class Event extends BaseEntity {
 
     @Column(columnDefinition = "boolean default false")
     private Boolean isCommentNotificationSent;
+
+    @Column(columnDefinition = "integer default 0")
+    private Integer vote;
+
+
+
+
 
     public Set<Interest> getInterests() {
         return interests;
@@ -106,5 +112,13 @@ public class Event extends BaseEntity {
 
     public void setCommentNotificationSent(Boolean commentNotificationSent) {
         isCommentNotificationSent = commentNotificationSent;
+    }
+
+    public Integer getVote() {
+        return vote;
+    }
+
+    public void setVote(Integer vote) {
+        this.vote = vote;
     }
 }

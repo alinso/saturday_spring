@@ -150,7 +150,7 @@ public class UserService {
     public void forgottePasswordSendPass(String phone) {
         User user;
         try {
-            user = userRepository.findByPhone(phone);
+            user = userRepository.findByPhoneEnabled(phone);
         } catch (NoSuchElementException e) {
             throw new UserWarningException("Bu numara ile kayıtlı kullanıcı bulunamadı");
         }
@@ -231,7 +231,7 @@ public class UserService {
 
     public ProfileInfoForUpdateDto findByPhone(String phone) {
         try {
-            User user = userRepository.findByPhone(phone);
+            User user = userRepository.findByPhoneEnabled(phone);
             ProfileInfoForUpdateDto profileInfoForUpdateDto = modelMapper.map(user, ProfileInfoForUpdateDto.class);
             return profileInfoForUpdateDto;
         } catch (Exception e) {
@@ -473,14 +473,14 @@ public class UserService {
 
         for (EventRequest a : eventRequests) {
 
-            Integer result = a.getResult();
+            EventRequestResult result = a.getResult();
             if (result == null)
-                result = 1;
+                result = EventRequestResult.CAME;
 
             if (a.getEventRequestStatus() == EventRequestStatus.APPROVED) {
                 approveCount++;
             }
-            if (result == 0 && a.getEventRequestStatus() == EventRequestStatus.APPROVED) {
+            if (result == EventRequestResult.DIDNT_CAME && a.getEventRequestStatus() == EventRequestStatus.APPROVED) {
                 nonAttendCount++;
             }
         }

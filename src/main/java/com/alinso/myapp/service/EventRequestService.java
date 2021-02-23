@@ -4,6 +4,7 @@ import com.alinso.myapp.entity.Event;
 import com.alinso.myapp.entity.EventRequest;
 import com.alinso.myapp.entity.User;
 import com.alinso.myapp.entity.dto.user.ProfileDto;
+import com.alinso.myapp.entity.enums.EventRequestResult;
 import com.alinso.myapp.entity.enums.EventRequestStatus;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.exception.UserWarningException;
@@ -47,22 +48,22 @@ public class EventRequestService {
     @Autowired
     VoteService voteService;
 
-    public void saveResult(Long requestId, Integer result) {
+    public void saveResult(Long requestId, EventRequestResult result) {
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         EventRequest eventRequest = eventRequestRepository.findById(requestId).get();
         if (eventRequest.getEvent().getCreator().getId() == loggedUser.getId()) {
 
-            eventRequest.setResult(result);
-            eventRequestRepository.save(eventRequest);
-
-            if(result==0){
+            if(result==EventRequestResult.DIDNT_CAME){
                 voteService.deleteVotesOfNonComingUser(eventRequest.getEvent(), eventRequest.getApplicant());
             }
-            if(result==1) {
+            if(result==EventRequestResult.CAME) {
                 voteService.recoverVotesOfApplicant(eventRequest.getApplicant());
             }
+
+            eventRequest.setResult(result);
+            eventRequestRepository.save(eventRequest);
         }
     }
 
@@ -83,10 +84,6 @@ public class EventRequestService {
         if (isThisUserJoined==0) {
 
 
-            if (event.getCreator().getId() != 3212 && event.getCreator().getId() != 448) {
-
-
-
                 //check event req limit
                 List<EventRequest> allRequests = eventRequestRepository.findByEventId(id);
 
@@ -101,7 +98,7 @@ public class EventRequestService {
                 }
                 if (loggedUser.getGender() == Gender.MALE && maleCount > 4 && event.getCreator().getGender() == Gender.FEMALE )
                     throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
-            }
+
 
             //check if user reached the limit
             dayActionService.checkRequestLimit(event);
@@ -124,11 +121,12 @@ public class EventRequestService {
             if (event.getDeadLine().compareTo(DateUtil.xHoursLater(2)) < 0)
                 throw new UserWarningException("Son 2 saatte isteği iptal edemezsin");
 
+            //delete points if this activity request was approved
+            voteService.deleteVotesOfNonComingUser(eventRequest.getEvent(),loggedUser);
+
             eventRequestRepository.delete(eventRequest);
             isThisUserJoined=0;
 
-            //delete points if this activity request was approved
-            voteService.deleteVotesOfNonComingUser(eventRequest.getEvent(),loggedUser);
         }
 
        return isThisUserJoined;
@@ -201,14 +199,15 @@ public class EventRequestService {
         if (eventRequest.getEventRequestStatus() == EventRequestStatus.WAITING) {
             checkMaxApproveCountExceeded(eventRequest.getEvent());
             eventRequest.setEventRequestStatus(EventRequestStatus.APPROVED);
-            eventRequest.setResult(1);
+            eventRequest.setResult(EventRequestResult.CAME);
             eventRequestRepository.save(eventRequest);
             userEventService.newApproval(eventRequest.getApplicant(), eventRequest.getEvent());
         } else {
+            voteService.deleteVotesOfNonComingUser(eventRequest.getEvent(), eventRequest.getApplicant());
+
             eventRequest.setResult(null);
             eventRequest.setEventRequestStatus(EventRequestStatus.WAITING);
             eventRequestRepository.save(eventRequest);
-            voteService.deleteVotesOfNonComingUser(eventRequest.getEvent(), eventRequest.getApplicant());
         }
 
         return eventRequest.getEventRequestStatus();

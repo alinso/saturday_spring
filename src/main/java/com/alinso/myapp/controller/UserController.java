@@ -89,7 +89,7 @@ public class UserController {
                 )
         );
 
-        User user = userRepository.findByPhone(loginRequest.getUsername());
+        User user = userRepository.findByPhoneEnabled(loginRequest.getUsername());
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = SecurityConstants.TOKEN_PREFIX + tokenProvider.generateToken(authentication);

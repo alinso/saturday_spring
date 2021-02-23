@@ -1,6 +1,7 @@
 package com.alinso.myapp.entity.dto.event;
 
 import com.alinso.myapp.entity.dto.user.ProfileDto;
+import com.alinso.myapp.entity.enums.EventRequestResult;
 import com.alinso.myapp.entity.enums.EventRequestStatus;
 
 public class EventRequestDto {
@@ -8,7 +9,7 @@ public class EventRequestDto {
     private Long id;
     private EventRequestStatus eventRequestStatus;
     private ProfileDto profileDto;
-    private Integer result;
+    private EventRequestResult result;
 
     public EventRequestStatus getEventRequestStatus() {
         return eventRequestStatus;
@@ -34,11 +35,12 @@ public class EventRequestDto {
         this.id = id;
     }
 
-    public Integer getResult() {
+
+    public EventRequestResult getResult() {
         return result;
     }
 
-    public void setResult(Integer result) {
+    public void setResult(EventRequestResult result) {
         this.result = result;
     }
 }
