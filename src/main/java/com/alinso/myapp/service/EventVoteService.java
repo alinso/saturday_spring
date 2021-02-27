@@ -19,7 +19,7 @@ public class EventVoteService {
     EventRepository eventRepository;
 
 
-    public void saveVote(Long eventId, String voteStr) {
+    public Integer saveVote(Long eventId, String voteStr) {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Event event = eventRepository.findById(eventId).get();
 
@@ -31,6 +31,11 @@ public class EventVoteService {
         eventVote.setVote(Integer.parseInt(voteStr));
         eventVote.setEvent(event);
         voteRepository.save(eventVote);
+        int totalVote = eventTotal(eventId);
+        event.setVote(totalVote);
+        eventRepository.save(event);
+
+        return totalVote;
     }
 
     public int eventTotal(Long eventId) {

@@ -29,6 +29,9 @@ public class EventService {
     UserService userService;
 
     @Autowired
+    EventViewRepository eventViewRepository;
+
+    @Autowired
     EventVoteRepository eventVoteRepository;
 
     @Autowired
@@ -388,6 +391,13 @@ public class EventService {
         else
             eventDto.setExpired(false);
 
+        EventView view = eventViewRepository.findByEventAndViewer(event,loggedUser);
+        if(view==null){
+            view = new EventView();
+            view.setEvent(event);
+            view.setViewer(loggedUser);
+            eventViewRepository.save(view);
+        }
         return eventDto;
     }
 
@@ -466,6 +476,14 @@ public class EventService {
         events.addAll(eventRequestRepository.activitiesAttendedByUserPaged(user, EventRequestStatus.APPROVED, pageable));
 
         return filterEvents(events, false);
+    }
+
+    public List<EventDto> findAllNonExpiredByInterestsByCityIdOrderByVote(Long cityId, Integer pageNum) {
+        Pageable pageable = PageRequest.of(pageNum, 10);
+        List<Event> events = eventRepository.findAllNonExpiredByCityIdOrderByVote(new Date(), cityService.findById(cityId), pageable);
+        userService.setLastLogin();
+
+        return filterEvents(events, true);
     }
 }
 

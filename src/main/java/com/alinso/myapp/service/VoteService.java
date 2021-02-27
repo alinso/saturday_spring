@@ -55,7 +55,6 @@ public class VoteService {
 
             vote.setReader(reader);
             vote.setWriter(writer);
-            vote.setDeleted(0);
             vote.setVoteType(voteDto.getVoteType());
 
             voteRepository.save(vote);

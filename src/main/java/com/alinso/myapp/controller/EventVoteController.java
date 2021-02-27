@@ -18,8 +18,9 @@ public class EventVoteController {
     EventVoteService eventVoteService;
 
     @GetMapping("/save/{eventId}/{type}")
-    public void save(@PathVariable("eventId") Long eventId, @PathVariable("type") String type) {
-        eventVoteService.saveVote(eventId, type);
+    public ResponseEntity<?>  save(@PathVariable("eventId") Long eventId, @PathVariable("type") String type) {
+        int totalVote   = eventVoteService.saveVote(eventId, type);
+        return new ResponseEntity<>(totalVote,HttpStatus.OK);
     }
 
     @GetMapping("/eventTotal/{eventId}")
@@ -31,7 +32,7 @@ public class EventVoteController {
     @GetMapping("/myVote/{eventId}")
     public ResponseEntity<?> myVote(@PathVariable("eventId") Long eventId) {
         int res = eventVoteService.myVote(eventId);
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return new ResponseEntity<Integer>(res, HttpStatus.OK);
     }
 
 

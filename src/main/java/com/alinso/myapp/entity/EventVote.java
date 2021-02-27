@@ -11,7 +11,6 @@ public class EventVote extends BaseEntity{
     @Column
     private Integer vote;
 
-
     @ManyToOne
     private User voter;
 

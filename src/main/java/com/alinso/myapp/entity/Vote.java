@@ -23,7 +23,7 @@ public class Vote extends BaseEntity{
     private VoteType voteType;
 
 
-    @Column
+    @Column(columnDefinition = "integer default 0")
     private Integer deleted;
 
     public User getWriter() {

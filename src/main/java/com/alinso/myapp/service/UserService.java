@@ -103,10 +103,10 @@ public class UserService {
     ComplainRepository complainRepository;
 
 
-    public boolean isReferenceCodeUnique(String code){
+    public boolean isReferenceCodeUnique(String code) {
         int count = referenceRepository.findCountByReferenceCode(code);
 
-        if(count==0)
+        if (count == 0)
             return true;
         else
             return false;
@@ -123,14 +123,12 @@ public class UserService {
 
 
         String newReferenceCode = referenceService.makeReferenceCode();
-        while (!isReferenceCodeUnique(newReferenceCode)){
+        while (!isReferenceCodeUnique(newReferenceCode)) {
             newReferenceCode = referenceService.makeReferenceCode();
         }
 
         userInDb.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
-        userInDb.setPoint(0);
-        userInDb.setTooNegative(0);
-        userInDb.setExtraPercent(0);
+        userInDb.setBalance(Balance.YES);
         userInDb.setCity(ankara);
         userInDb.setApprovalCode(null);
         userInDb.setGender(registerDto.getGender());
@@ -169,7 +167,7 @@ public class UserService {
 
     public String getNameForRegistration(String approvalCode) {
         User user = userRepository.findByApprovalCode(approvalCode);
-        if(user.getStatus()==UserStatus.APPROVED)
+        if (user.getStatus() == UserStatus.APPROVED)
             return user.getName();
         else
             throw new UserWarningException("Invalid application code");
@@ -199,6 +197,7 @@ public class UserService {
         loggedUser.setBirthDate(DateUtil.stringToDate(profileInfoForUpdateDto.getbDateString(), "dd/MM/yyyy"));
         loggedUser.setMotivation(profileInfoForUpdateDto.getMotivation());
         loggedUser.setAbout(profileInfoForUpdateDto.getAbout());
+        loggedUser.setBalance(profileInfoForUpdateDto.getBalance());
 
         userRepository.save(loggedUser);
         return profileInfoForUpdateDto;
@@ -489,7 +488,7 @@ public class UserService {
             Integer attendCount = (approveCount - nonAttendCount) * 100;
             Integer percent = attendCount / approveCount;
 
-            if(approveCount>10 && percent<50){
+            if (approveCount > 10 && percent < 50) {
                 User applicant = userRepository.findById(userId).get();
                 applicant.setStatus(UserStatus.DISABLED);
                 userRepository.save(applicant);

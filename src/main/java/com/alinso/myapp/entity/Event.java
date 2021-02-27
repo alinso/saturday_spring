@@ -47,9 +47,6 @@ public class Event extends BaseEntity {
     private Integer vote;
 
 
-
-
-
     public Set<Interest> getInterests() {
         return interests;
     }

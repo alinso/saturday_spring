@@ -47,4 +47,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> eventsOfDay(@Param("start") Date start, @Param("finish") Date finish);
 
     List<Event> findByDetail(String non_secret_event_detail);
+
+    @Query("select event from Event event where event.deadLine > :now and event.city= :city and event.creator.enabled=true order by event.vote desc ")
+    List<Event> findAllNonExpiredByCityIdOrderByVote(@Param("now") Date now, @Param("city") City city, Pageable pageable);
 }

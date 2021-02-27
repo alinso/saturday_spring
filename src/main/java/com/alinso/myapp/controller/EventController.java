@@ -52,6 +52,15 @@ public class EventController {
 
         return new ResponseEntity<>(events,HttpStatus.OK);
     }
+    @GetMapping("findByInterestByCityIdOrderByVote/{cityId}/{pageNum}")
+    public ResponseEntity<?> findByInterestByCityIdOrderByVote(@PathVariable("cityId") Long cityId, @PathVariable("pageNum") Integer pageNum){
+        List<EventDto>  events = eventService.findAllNonExpiredByInterestsByCityIdOrderByVote(cityId,pageNum);
+
+        return new ResponseEntity<>(events,HttpStatus.OK);
+    }
+
+
+
 
     @GetMapping("eventWithRequests/{id}")
     public ResponseEntity<?> eventWithRequests(@PathVariable("id") Long id){

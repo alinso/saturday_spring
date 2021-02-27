@@ -1,5 +1,6 @@
 package com.alinso.myapp.entity.dto.user;
 
+import com.alinso.myapp.entity.enums.Balance;
 import com.alinso.myapp.entity.enums.Gender;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,10 @@ public class ProfileInfoForUpdateDto {
     @NotNull(message = "Cinsiyet Seçiniz")
     @Enumerated(EnumType.ORDINAL)
     private Gender gender;
+
+
+    @Enumerated(EnumType.ORDINAL)
+    private Balance balance;
 
     private String motivation = "";
 
@@ -131,4 +136,11 @@ public class ProfileInfoForUpdateDto {
         this.interests = interests;
     }
 
+    public Balance getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Balance balance) {
+        this.balance = balance;
+    }
 }

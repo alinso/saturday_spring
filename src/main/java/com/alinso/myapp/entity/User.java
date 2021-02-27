@@ -1,5 +1,6 @@
 package com.alinso.myapp.entity;
 
+import com.alinso.myapp.entity.enums.Balance;
 import com.alinso.myapp.entity.enums.Gender;
 import com.alinso.myapp.entity.enums.UserStatus;
 import org.hibernate.annotations.ColumnDefault;
@@ -12,13 +13,6 @@ import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 @Entity
-@NamedStoredProcedureQuery(
-        name = "delete_user_sp",
-        procedureName = "delete_user",
-        parameters = {
-                @StoredProcedureParameter(name = "userId", mode = ParameterMode.IN, type = Long.class),
-        }
-)
 public class User extends BaseEntity implements UserDetails {
 
 
@@ -33,7 +27,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private Integer percent;
 
-    @Column
+    @Column(columnDefinition = "integer default 0")
     private Integer tooNegative;
 
     @Column
@@ -74,9 +68,12 @@ public class User extends BaseEntity implements UserDetails {
     private String motivation = "";
 
 
-    @Column
-    @ColumnDefault("0")
+    @Column(columnDefinition = "integer default 0")
     private Integer point ;
+
+
+    @Column
+    private Balance balance;
 
     @Column
     private Boolean enabled;
@@ -88,7 +85,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private  String firebaseId;
 
-    @Column
+    @Column(columnDefinition = "integer default 0")
     private Integer extraPercent;
 
     @Column
@@ -307,6 +304,14 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public Balance getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Balance balance) {
+        this.balance = balance;
     }
 }
 
