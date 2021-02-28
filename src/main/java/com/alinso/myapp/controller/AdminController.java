@@ -91,12 +91,6 @@ public class AdminController {
 
     }
 
-//    @GetMapping("deletePartyVotes")
-//    public ResponseEntity<?> deletePartyVotes(@Valid DiscoverDto discoverDto) {
-//        List<Long> votes = adminService.deletePartyVotes();
-//        return new ResponseEntity<>(votes, HttpStatus.OK);
-//    }
-
 
     @PostMapping("createDiscover")
     public ResponseEntity<?> saveEvent(@Valid DiscoverDto discoverDto) {

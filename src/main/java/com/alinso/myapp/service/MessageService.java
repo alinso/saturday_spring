@@ -46,13 +46,16 @@ public class MessageService {
     @Autowired
     BlockService blockService;
 
+    @Autowired
+    FlorinService florinService;
+
     public MessageDto send(MessageDto messageDto) {
         Message message = modelMapper.map(messageDto, Message.class);
         User writer = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User reader = userService.findEntityById(messageDto.getReader().getId());
 
-        if(!eventRequestService.haveTheseUsersMeet(reader.getId(),writer.getId()))
-            throw new UserWarningException("Erişim Yok");
+        if (!eventRequestService.haveTheseUsersMeet(reader.getId(), writer.getId()))
+            florinService.dm(writer);
 
         if (blockService.isThereABlock(reader.getId()))
             throw new UserWarningException("Erişim Yok");
@@ -62,29 +65,11 @@ public class MessageService {
         message.setReader(reader);
 
         messageRepository.save(message);
-
-
-        //if writer id=36 dont send the message
-//        if(message.getWriter().getId()==36
-//                || message.getWriter().getId()==1109
-//                || message.getWriter().getId()==44){
-//            deleteConversationNedim(message.getReader().getId(),message.getWriter().getId());
-//            return messageDto;
-//        }
-//        else{
-            userEventService.newMessage(message.getReader());
-     //   }
+        userEventService.newMessage(message.getReader());
 
         messageDto.setCreatedAt(DateUtil.dateToString(message.getCreatedAt(), "DD/MM HH:mm"));
         messageDto.setReader(userService.toProfileDto(message.getReader()));
         return messageDto;
-    }
-
-    public void sendPremiumMessage(Message message) {
-
-        messageRepository.save(message);
-        userEventService.newPremiumMessage(message.getReader(),message.getWriter());
-
     }
 
 
@@ -118,12 +103,11 @@ public class MessageService {
         while (i.hasNext()) {
 
 
-
             Message message = i.next();
             Long oppositeId = getOppositeId(message, eraser);
             User oppositeUser = userService.findEntityById(oppositeId);
 
-            DeletedConversation deletedConversation = deletedConversationRepository.findByUserIds(eraser,oppositeUser);
+            DeletedConversation deletedConversation = deletedConversationRepository.findByUserIds(eraser, oppositeUser);
             //it means user did not deleted any conversations with this other user
             if (deletedConversation == null)
                 continue;
@@ -149,10 +133,10 @@ public class MessageService {
 
     public List<ConversationDto> getMyConversations(Integer pageNum) {
         User me = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Pageable pageable  = PageRequest.of(pageNum,10);
+        Pageable pageable = PageRequest.of(pageNum, 10);
 
         //read sql dtos from database
-        List<Message> latestMessageFromEachConversation = messageRepository.latestMessageFromEachConversation(me,pageable);
+        List<Message> latestMessageFromEachConversation = messageRepository.latestMessageFromEachConversation(me, pageable);
 
         latestMessageFromEachConversation = removeDeletedConversations(latestMessageFromEachConversation);
 
@@ -190,7 +174,7 @@ public class MessageService {
 
         }
 
-      //  userEventService.messaesRead();
+        //  userEventService.messaesRead();
         return myConversationDtos;
     }
 
@@ -247,8 +231,7 @@ public class MessageService {
                     "\n Sormak veya söylemek istediğin herhangi bir şey olursa buradan yazabilirsin,lütfen çekinme, yardımcı olmaktan mutluluk duyarım." +
                     "\n" +
                     "İyi eğlenceler:)");
-        }
-        else {
+        } else {
             sender = userService.getMyProfileInfoForUpdate();
 
             message.setMessage("Aramıza Hoşgeldin, ilk kullanıcılarımızdan biri olduğun için çok teşekkür ederiz, EVENT Friend uygulamadan ziyade sosyal bir oluşumdur:)  \n" +
@@ -257,7 +240,7 @@ public class MessageService {
                     "\n" +
                     "\n  ilk 7 gün uygulamamızı test etmen ve görmen için starndart kullanıcı olarak hesabını açtık. Sonrasında devam kullanmaya devam etmek istersen 1 aylık Gold paket alman " +
                     "gerekecek. Dilersen ilerleyen zamanlarda tekrar gold kullanıcı olabilir veya standart kullancı olarak devam edebilirsin. Fakat 7 günlük deneme süresi sonrası devam etmek isteyen " +
-                    " kullanıcılardan bunu istiyoruz. Eğer devam etmek istemezseniz de yeni kullanıcılara yer açabilemk adına hesabınız silinecek."+
+                    " kullanıcılardan bunu istiyoruz. Eğer devam etmek istemezseniz de yeni kullanıcılara yer açabilemk adına hesabınız silinecek." +
                     "\n" +
                     " EVENT Friend kadın-erkek sayısı dengeli, kullanıcı kalitesine önem veren, GÜVENLİ ve NEZİH bir ortam sunma amacı olan bir sistemdir." +
                     " RAHATSIZLIK VERİCİ,ISRARCI,UYGLAMAYI AMACI DIŞINDA KULLANAN PROFİLLERİ SİLİYOR VE MÜSAMAHA GÖSTERMİYORUZ." +
@@ -297,7 +280,7 @@ public class MessageService {
         deletedConversationRepository.save(deletedConversation);
     }
 
-    public void deleteConversationNedim(Long readerId,Long writerId) {
+    public void deleteConversationNedim(Long readerId, Long writerId) {
         User eraserUser = userService.findEntityById(readerId);
         User otherUSer = userService.findEntityById(writerId);
 

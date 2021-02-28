@@ -32,6 +32,9 @@ public class InvitationService {
     @Autowired
     NotificationService notificationService;
 
+    @Autowired
+    FlorinService florinService;
+
     public void send(Long readerId,Long eventId){
         User reader= userRepository.findById(readerId).get();
         Event event = eventRepository.findById(eventId).get();
@@ -45,10 +48,13 @@ public class InvitationService {
             throw  new UserWarningException("Bu kullanıcıyı zaten davet etmiştin");
         }
 
+        if(votePercentOfOrganiser<80)
+            throw new UserWarningException("You cannot send invitations, please read voting rules.");
+
         if(creator.getId()!=1 ) {
             List<Invitation> invitationList = invitationRepository.findByEvent(event);
             if (invitationList.size() >3) {
-                throw new UserWarningException("standart kullanıcılar 3 davet gönderebilir");
+                florinService.invite(creator);
             }
         }
 

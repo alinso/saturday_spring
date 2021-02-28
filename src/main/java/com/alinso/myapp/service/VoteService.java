@@ -39,6 +39,8 @@ public class VoteService {
     @Autowired
     EventRequestService eventRequestService;
 
+    @Autowired
+    FlorinService florinService;
 
     public void save(VoteDto voteDto) {
 
@@ -51,6 +53,7 @@ public class VoteService {
             Vote vote = voteRepository.findByWriterAndReader(writer, reader);
             if (vote == null) {
                 vote = new Vote();
+                florinService.giveVoted(writer);
             }
 
             vote.setReader(reader);

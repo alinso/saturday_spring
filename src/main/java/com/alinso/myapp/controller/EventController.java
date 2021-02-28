@@ -82,12 +82,6 @@ public class EventController {
         return new ResponseEntity<>(events,HttpStatus.OK);
     }
 
-//    @GetMapping("all/{pageNum}")
-//    public ResponseEntity<?> all(@PathVariable("pageNum") Integer pageNum){
-//        List<EventDto> eventDtos = eventService.all(pageNum);
-//        return new ResponseEntity<>(eventDtos,HttpStatus.OK);
-//    }
-
     @GetMapping("delete/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id){
 
@@ -113,8 +107,7 @@ public class EventController {
     @GetMapping("findById/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") Long id){
 
-        EventDto eventDto = eventService.findById(id);
-
+        EventDto eventDto = eventService.eventDetailWithAttents(id);
         return new ResponseEntity<>(eventDto,HttpStatus.OK);
     }
 

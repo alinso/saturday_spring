@@ -18,6 +18,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    @Query("select user from User user where user.enabled=true")
+    List<User> findAllEnabled();
+
     @Query("select user from User user where user.phone=:phone  and user.enabled=true")
     User findByPhoneEnabled(@Param("phone") String phone);
 
@@ -33,7 +36,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByPassword(String pasword);
 
     //auto message queries
-    @Query("select user from User user where user.gender=:gender and user.point<10 and user.enabled=true")
+    @Query("select user from User user where user.gender=:gender and user.florin<10 and user.enabled=true")
     List<User> findZeroPointWomen(@Param("gender")Gender gender);
 
 
@@ -41,15 +44,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllWomen(@Param("gender")Gender gender);
 
 
-    @Query("select user from User user where  user.point>0  and user.enabled=true")
+    @Query("select user from User user where  user.florin>0  and user.enabled=true")
     List<User> findNonZeroUsers();
 
 
-    @Query("select user from User user where user.point>=0 and user.point<10  and user.enabled=true")
+    @Query("select user from User user where user.florin>=0 and user.florin<10  and user.enabled=true")
     List<User> findInactiveUsers();
 
 
-    @Query("select user from User user where user.point>=20  and user.enabled=true")
+    @Query("select user from User user where user.florin>=20  and user.enabled=true")
     List<User> findAbove20();
 
 
@@ -60,14 +63,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select user from User user where user.city=:city and user.gender=:female  and user.enabled=true")
     List<User> allAnkaraWomen(@Param("city") City city, @Param("female") Gender female);
 
-    @Query("select user from User user where user.city=:city and user.point>=:point  and user.enabled=true")
+    @Query("select user from User user where user.city=:city and user.florin>=:point  and user.enabled=true")
     List<User> findAbovePoint(@Param("point") int point, @Param("city") City city);
 
 
     @Query("select count(user) from User user where user.gender=:gender and user.createdAt>:start and user.createdAt<:finish  and user.enabled=true")
     Integer userCountCreatedGivenDate(@PathVariable("gender") Gender gender, @Param("start")Date start, @Param("finish") Date finish);
 
-    @Query("select count(user) from User user where user.gender=:gender and user.city=:city and user.point>:point  and user.enabled=true")
+    @Query("select count(user) from User user where user.gender=:gender and user.city=:city and user.florin>:point  and user.enabled=true")
     Integer userCountByGenderCityPoint(@Param("gender")Gender gender, @Param("city")City ankara, @Param("point")int point);
 
     @Query("select count(user) from User user where user.gender=:gender and user.createdAt>:start  and user.enabled=true")

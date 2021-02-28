@@ -18,22 +18,29 @@ public class EventVoteService {
     @Autowired
     EventRepository eventRepository;
 
+    @Autowired
+    FlorinService florinService;
 
     public Integer saveVote(Long eventId, String voteStr) {
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Event event = eventRepository.findById(eventId).get();
-
+        int myVote = Integer.parseInt(voteStr);
         EventVote eventVote = voteRepository.findByVoterAndEvent(loggedUser, event);
         if (eventVote == null)
             eventVote = new EventVote();
 
         eventVote.setVoter(loggedUser);
-        eventVote.setVote(Integer.parseInt(voteStr));
+        eventVote.setVote(myVote);
         eventVote.setEvent(event);
         voteRepository.save(eventVote);
         int totalVote = eventTotal(eventId);
         event.setVote(totalVote);
         eventRepository.save(event);
+
+        if(myVote==1)
+            florinService.eventUpvoted(event.getCreator());
+        if(myVote==-1)
+            florinService.eventDownvote(event.getCreator());
 
         return totalVote;
     }

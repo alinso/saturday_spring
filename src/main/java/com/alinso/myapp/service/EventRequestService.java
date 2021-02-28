@@ -48,6 +48,9 @@ public class EventRequestService {
     @Autowired
     VoteService voteService;
 
+    @Autowired
+    FlorinService florinService;
+
     public void saveResult(Long requestId, EventRequestResult result) {
 
         User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -84,24 +87,9 @@ public class EventRequestService {
         if (isThisUserJoined==0) {
 
 
-                //check event req limit
-                List<EventRequest> allRequests = eventRequestRepository.findByEventId(id);
-
-                if (allRequests.size() > 20)
-                    throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
-
-                //check male limit
-                Integer maleCount = 0;
-                for (EventRequest r : allRequests) {
-                    if (r.getApplicant().getGender() == Gender.MALE)
-                        maleCount++;
-                }
-                if (loggedUser.getGender() == Gender.MALE && maleCount > 4 && event.getCreator().getGender() == Gender.FEMALE )
-                    throw new UserWarningException("Bu aktivite  dolmuştur, daha fazla istek atılamaz");
-
 
             //check if user reached the limit
-            dayActionService.checkRequestLimit(event);
+            dayActionService.checkRequestLimit();
 
 
             EventRequest newEventRequest = new EventRequest();
@@ -233,18 +221,12 @@ public class EventRequestService {
 
     public void checkMaxApproveCountExceeded(Event event) {
 
-        if (event.getCreator().getId() == 3212 || event.getCreator().getId() == 448) {
-            return;
-        }
-
         Integer c = eventRequestRepository.countOfAprrovedForThisEvent(event, EventRequestStatus.APPROVED);
         User user = event.getCreator();
+        Integer limit=10;
 
-
-        Integer limit=20;
-
-        if (c == limit) {
-            throw new UserWarningException("Her aktivite için en fazla " + limit + " kişi onaylayabilirsin");
+        if (c > limit) {
+            florinService.approvalExcess(user);
         }
     }
 

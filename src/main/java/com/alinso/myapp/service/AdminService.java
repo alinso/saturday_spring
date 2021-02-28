@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.StoredProcedureQuery;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -120,7 +119,7 @@ public class AdminService {
             u.setSurname("kullanıcı");
             u.setProfilePicName("");
             u.setAbout("");
-            u.setPoint(0);
+            u.setFlorin(0);
             u.setMotivation("");
             u.setGender(user.getGender());
             u.setPhone(user.getPhone());
@@ -165,8 +164,6 @@ public class AdminService {
 
     }
 
-
-    //////////////////batman/////////////////////////////////////////////////////////////////////////////////////
     public void updateInvalidUsername(Long id) {
         User user = userService.findEntityById(id);
         user.setName("GEÇERSİZ");
@@ -180,10 +177,6 @@ public class AdminService {
         messageService.send(messageDto);
 
     }
-
-
-
-
     public void updateExtraPoint(Long id, Integer extraPoint) {
         User user = userService.findEntityById(id);
         user.setExtraPercent(extraPoint);
@@ -194,6 +187,8 @@ public class AdminService {
     public User userInfo(Long id) {
         return userService.findEntityById(id);
     }
+
+
 
 
 }

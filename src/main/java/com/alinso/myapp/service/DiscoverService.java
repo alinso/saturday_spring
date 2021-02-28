@@ -88,7 +88,7 @@ public class DiscoverService {
       DiscoverDto discoverDto  = modelMapper.map(announcement, DiscoverDto.class);
       User user =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-      if(user.getPoint()<20 && discoverDto.getId()==84)
+      if(user.getFlorin()<20 && discoverDto.getId()==84)
       {
           discoverDto=null;
       }

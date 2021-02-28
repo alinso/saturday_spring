@@ -302,8 +302,6 @@ public class EventService {
         //delete requests
         eventRequestService.deleteByEventId(id);
 
-        //delete dayAction
-        dayActionService.removeEvent();
 
         //delete activity Album
         eventPhotoService.deleteByEvent(eventInDb);
@@ -378,7 +376,7 @@ public class EventService {
         eventDto.setProfileDto(userService.toProfileDto(event.getCreator()));
         eventDto.setDeadLineString(DateUtil.dateToString(event.getDeadLine(), "dd/MM/yyyy HH:mm"));
         eventDto.setThisUserJoined(eventRequestService.isThisUserJoined(event.getId()));
-        eventDto.setAttendants(eventRequestService.findAttendants(event));
+        eventDto.setAttendants(null);// only get it in details page
         eventDto.setVote(eventVoteRepository.findTotalByEvent(event));
         User loggedUser  =(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -484,6 +482,13 @@ public class EventService {
         userService.setLastLogin();
 
         return filterEvents(events, true);
+    }
+
+    public EventDto eventDetailWithAttents(Long id) {
+        Event event = findEntityById(id);
+        EventDto dto  =findById(id);
+        dto.setAttendants(eventRequestService.findAttendants(event));
+        return dto;
     }
 }
 

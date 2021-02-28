@@ -90,6 +90,8 @@ public class UserService {
     @Autowired
     UserEventService userEventService;
 
+    @Autowired
+    FlorinService florinService;
 
     @Autowired
     BlockService blockService;
@@ -140,6 +142,12 @@ public class UserService {
         reference.setReferenceCode(newReferenceCode);
         reference.setParent(user);
         referenceRepository.save(reference);
+
+
+        // give florin to reference point
+        Reference ref=referenceRepository.findByChildEnabled(user);
+        if(ref!=null)
+        florinService.reference(ref.getParent());
 
         return user;
     }
@@ -341,109 +349,106 @@ public class UserService {
 //
 //        userRepository.saveAll(toBeSaved);
 //    }
-    public Integer calculateUserPoint(User user) {
-
-        if (user.getId() == 3212) {
-            return 0;
-        }
-
-        Integer point = 0;
-
-        /*
-         * send  request : 1 (max:8 of activity count)
-         * accept a unique request:2(max:6 of activity count)
-         * vote :1
-         * write review  : 2
-         * opening an activity 5
-         * complain 2
-         * */
-
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MONTH, -3);
-        Date threeMonthsAgo = cal.getTime();
-
-        int ACCEPT_UNIQUE_REQUEST = 2;
-        int WRITE_REVIEW = 2;
-        int VOTE = 1;
-        int SEND_REQUEST = 2;
-        int OPENING_EVENT = 5;
-
-        if (user.getGender() == Gender.FEMALE)
-            OPENING_EVENT = 10;
-
-        int FOLLOW = 1;
-
-
-        List<Event> userLast3MonthEvents = eventRepository.last3MonthEventsOfUser(user);
-        Integer eventCount = userLast3MonthEvents.size();
-
-        //opening an activity
-        point = point + (eventCount * OPENING_EVENT);
-
-
-        //send a request
-        Integer requestCount = eventRequestRepository.last3MonthSentRequestsOfUser(user);
-        point = point + requestCount * SEND_REQUEST;
-
-
-        //approved unique requests
-        List<EventRequest> eventRequestList = eventRequestRepository.last3MonthsIncomingApprovedRequests(user, EventRequestStatus.APPROVED);
-        List<Long> userIds = new ArrayList<>();
-        for (EventRequest r : eventRequestList) {
-
-            if (r.getEventRequestStatus() == EventRequestStatus.APPROVED) {
-                Boolean uniqueUser = true;
-                for (Long oldUserId : userIds) {
-                    if (oldUserId == r.getApplicant().getId()) {
-                        uniqueUser = false;
-                        break;
-                    }
-                }
-                if (uniqueUser) {
-                    point = point + ACCEPT_UNIQUE_REQUEST; ////////////// accept a request
-                    userIds.add(r.getApplicant().getId()); ////////accept a unique request
-                }
-            }
-        }
-
-
-        //review count
-        List<Review> rewiReviewList = reviewRepository.last3MonthReviewsOfUser(user);
-        point = point + (rewiReviewList.size() * WRITE_REVIEW);
-
-
-        //voting
-        List<Vote> voteListOfWriter = voteRepository.findByWriter(user);
-        Integer positiveVoteCount = 0;
-        Integer negativeVoteCount = 0;
-
-        for (Vote v : voteListOfWriter) {
-            if (v.getVoteType() == VoteType.POSITIVE)
-                positiveVoteCount++;
-            if (v.getVoteType() == VoteType.NEGATIVE)
-                negativeVoteCount++;
-        }
-
-        if (negativeVoteCount * 6 > positiveVoteCount * 4) {
-            user.setTooNegative(1);
-        } else {
-            point = point + voteListOfWriter.size() * VOTE;
-            user.setTooNegative(0);
-        }
-
-
-        //follow someone
-        //Integer followingCount = followRepository.last3MonthsFollowingCount(user);
-        //point = point + followingCount * FOLLOW;
-
-
-        //complain count
-        // Integer complainCount = complainRepository.last3MonthscountOfComplaintsByTheUser(user, threeMonthsAgo);
-        // point = point + (complainCount * COMPLAIN);
-
-
-        return point;
-    }
+//    public Integer calculateUserPoint(User user) {
+//
+//
+//        Integer point = 0;
+//
+//        /*
+//         * send  request : 1 (max:8 of activity count)
+//         * accept a unique request:2(max:6 of activity count)
+//         * vote :1
+//         * write review  : 2
+//         * opening an activity 5
+//         * complain 2
+//         * */
+//
+//        Calendar cal = Calendar.getInstance();
+//        cal.add(Calendar.MONTH, -3);
+//        Date threeMonthsAgo = cal.getTime();
+//
+//        int ACCEPT_UNIQUE_REQUEST = 2;
+//        int WRITE_REVIEW = 2;
+//        int VOTE = 1;
+//        int SEND_REQUEST = 2;
+//        int OPENING_EVENT = 5;
+//
+//        if (user.getGender() == Gender.FEMALE)
+//            OPENING_EVENT = 10;
+//
+//        int FOLLOW = 1;
+//
+//
+//        List<Event> userLast3MonthEvents = eventRepository.last3MonthEventsOfUser(user);
+//        Integer eventCount = userLast3MonthEvents.size();
+//
+//        //opening an activity
+//        point = point + (eventCount * OPENING_EVENT);
+//
+//
+//        //send a request
+//        Integer requestCount = eventRequestRepository.last3MonthSentRequestsOfUser(user);
+//        point = point + requestCount * SEND_REQUEST;
+//
+//
+//        //approved unique requests
+//        List<EventRequest> eventRequestList = eventRequestRepository.last3MonthsIncomingApprovedRequests(user, EventRequestStatus.APPROVED);
+//        List<Long> userIds = new ArrayList<>();
+//        for (EventRequest r : eventRequestList) {
+//
+//            if (r.getEventRequestStatus() == EventRequestStatus.APPROVED) {
+//                Boolean uniqueUser = true;
+//                for (Long oldUserId : userIds) {
+//                    if (oldUserId == r.getApplicant().getId()) {
+//                        uniqueUser = false;
+//                        break;
+//                    }
+//                }
+//                if (uniqueUser) {
+//                    point = point + ACCEPT_UNIQUE_REQUEST; ////////////// accept a request
+//                    userIds.add(r.getApplicant().getId()); ////////accept a unique request
+//                }
+//            }
+//        }
+//
+//
+//        //review count
+//        List<Review> rewiReviewList = reviewRepository.last3MonthReviewsOfUser(user);
+//        point = point + (rewiReviewList.size() * WRITE_REVIEW);
+//
+//
+//        //voting
+//        List<Vote> voteListOfWriter = voteRepository.findByWriter(user);
+//        Integer positiveVoteCount = 0;
+//        Integer negativeVoteCount = 0;
+//
+//        for (Vote v : voteListOfWriter) {
+//            if (v.getVoteType() == VoteType.POSITIVE)
+//                positiveVoteCount++;
+//            if (v.getVoteType() == VoteType.NEGATIVE)
+//                negativeVoteCount++;
+//        }
+//
+//        if (negativeVoteCount * 6 > positiveVoteCount * 4) {
+//            user.setTooNegative(1);
+//        } else {
+//            point = point + voteListOfWriter.size() * VOTE;
+//            user.setTooNegative(0);
+//        }
+//
+//
+//        //follow someone
+//        //Integer followingCount = followRepository.last3MonthsFollowingCount(user);
+//        //point = point + followingCount * FOLLOW;
+//
+//
+//        //complain count
+//        // Integer complainCount = complainRepository.last3MonthscountOfComplaintsByTheUser(user, threeMonthsAgo);
+//        // point = point + (complainCount * COMPLAIN);
+//
+//
+//        return point;
+//    }
 
 
 //    public List<ProfileDto> top100() {

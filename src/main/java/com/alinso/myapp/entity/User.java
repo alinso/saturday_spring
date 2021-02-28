@@ -69,7 +69,7 @@ public class User extends BaseEntity implements UserDetails {
 
 
     @Column(columnDefinition = "integer default 0")
-    private Integer point ;
+    private Integer florin;
 
 
     @Column
@@ -192,12 +192,12 @@ public class User extends BaseEntity implements UserDetails {
         this.birthDate = birthDate;
     }
 
-    public Integer getPoint() {
-        return point;
+    public Integer getFlorin() {
+        return florin;
     }
 
-    public void setPoint(Integer point) {
-        this.point = point;
+    public void setFlorin(Integer point) {
+        this.florin = point;
     }
 
     public City getCity() {

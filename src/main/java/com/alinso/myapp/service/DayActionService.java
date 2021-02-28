@@ -15,16 +15,8 @@ import org.springframework.stereotype.Service;
 public class DayActionService {
 
 
-    private Integer MALE_USER_REQUEST_LIMIT=1;
-    private Integer FEMALE_USER_REQUEST_LIMIT=15;
-    private Integer SILVER_USER_REQUEST_LIMIT=50;
-    private Integer GOLD_USER_REQUEST_LIMIT=80;
-
-
-    private Integer MALE_USER_EVENT_LIMIT=1;
-    private Integer FEMALE_USER_EVENT_LIMIT=2;
-    private Integer SILVER_USER_EVENT_LIMIT=5;
-    private Integer GOLD_USER_EVENT_LIMIT=10;
+    private Integer REQUEST_LIMIT=2;
+    private Integer EVENT_LIMIT=2;
 
     private Integer ORGANIZATOR_USER_EVENT_LIMIT=3;
     private  Integer ORGANIZATOR_USER_REQUEST_LIMIT=80;
@@ -35,6 +27,9 @@ public class DayActionService {
 
     @Autowired
     VoteService voteService;
+
+    @Autowired
+    FlorinService florinService;
 
 
     private DayAction getDayAction() {
@@ -66,76 +61,24 @@ public class DayActionService {
     }
 
 
-    public void removeRequest() {
-//        DayAction newDayAction = getDayAction();
-//        newDayAction.setRequestCount(newDayAction.getRequestCount() - 1);
-//        dayActionRepository.save(newDayAction);
-    }
-
-    public void removeEvent() {
-//        DayAction newDayAction = getDayAction();
-//        newDayAction.setEVENTCount(newDayAction.getEVENTCount() - 1);
-//        dayActionRepository.save(newDayAction);
-    }
-
     public void checkEventLimit() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
-
-        Integer vote  = voteService.calculateVote(user.getId());
-
-        if(vote<75 && vote>1 && user.getGender()==Gender.MALE){
-            throw new UserWarningException("Olumlu izlenim oranı %75 altı olan hesaplar aktivite açamaz");
+        if(dayAction!=null){
+            if(dayAction.getEventCount()>=EVENT_LIMIT)
+                florinService.eventExcess(user);
         }
-
-        Integer limit =MALE_USER_EVENT_LIMIT;
-        String warning  ="Haftada en fazla " + limit + " aktivite açabilirsin!";
-        if(user.getGender()==Gender.FEMALE){
-             limit =FEMALE_USER_EVENT_LIMIT;
-             warning  ="Haftada en fazla " + limit + " aktivite açabilirsin!";
-        }
-
-
-
-        if (dayAction != null)
-            if (dayAction.getEventCount() >= limit) {
-                throw new UserWarningException(warning);
-            }
     }
 
-    public void checkRequestLimit(Event event) {
+    public void checkRequestLimit() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         DayAction dayAction = dayActionRepository.findByUser(user);
-
-        Integer vote  = voteService.calculateVote(user.getId());
-
-        if(vote<75 && vote>1  && user.getGender()==Gender.MALE){
-            throw new UserWarningException("Olumlu izlenim oranı %75 altı olan hesaplar istek gönderemez");
+        if(dayAction!=null){
+            if(dayAction.getRequestCount()>=REQUEST_LIMIT)
+                florinService.requestExcess(user);
+            else
+                florinService.sendRequest(user);
         }
-
-
-
-        Integer limit = MALE_USER_REQUEST_LIMIT;
-        String warning = "Haftada en fazla " + limit + " istek gönderebilirsin!";
-        if (user.getGender() == Gender.FEMALE) {
-            limit = FEMALE_USER_REQUEST_LIMIT;
-            warning="Haftada en fazla " + limit + " istek gönderebilirsin!";
-        }
-
-        //if the EVENT owner is premium, request limit should be 2
-//        Premium ownerPremium = premiumService.isUserPremium(EVENT.getCreator());
-//
-//        if(ownerPremium!=null){
-//            if(ownerPremium.getDuration()== PremiumDuration.GONE_MONTH || ownerPremium.getDuration()==PremiumDuration.GTHREE_MONTHS || ownerPremium.getDuration()==PremiumDuration.GSIX_MONTHS){
-//                limit = 2;
-//                warning="Günde en fazla " + limit + " istek gönderebilirsin!";
-//            }
-//        }
-
-        if (dayAction != null)
-            if (dayAction.getRequestCount() >= limit) {
-                throw new UserWarningException(warning);
-            }
     }
 
 
